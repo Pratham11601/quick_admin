@@ -1,0 +1,161 @@
+/* General Dashboard Styling */
+.dashboard {
+  margin-top: 100px;
+  padding: 20px;
+}
+
+/* Apply margin-left only for desktop view (min-width: 1025px) */
+@media (min-width: 1025px) {
+  .dashboard {
+    margin-left: 260px;
+  }
+}
+
+/* Dashboard Cards */
+.dashboard__cards {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* 2 cards per row */
+  gap: 1.5rem;
+}
+
+/* Single Card Styling */
+.single__card {
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+}
+
+.single__card:hover {
+  transform: scale(1.05);
+}
+
+/* Dynamic Backgrounds */
+.single__card:nth-child(1) {
+  background: var(--card-01-bg);
+}
+
+.single__card:nth-child(2) {
+  background: var(--card-02-bg);
+}
+
+.single__card:nth-child(3) {
+  background: var(--card-03-bg);
+}
+
+.single__card:nth-child(4) {
+  background: var(--card-04-bg);
+}
+
+/* Card Content */
+.card__content h4 {
+  color: var(--heading-color);
+  font-size: 1rem;
+  font-weight: 400;
+}
+
+.card__content span {
+  color: var(--heading-color);
+  font-size: 2rem;
+}
+
+/* Card Icon */
+.card__icon {
+  font-size: 2rem;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+/* Stats Section */
+.statics {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.stats {
+  background: var(--primary-color);
+  padding: 25px;
+  border-radius: 8px;
+  height: 320px;
+}
+
+/* Tooltip */
+.tooltip__style {
+  background: var(--body-bg) !important;
+  color: #fff;
+}
+
+/* Stats Title */
+.stats__title {
+  color: #fff;
+  font-size: 1.2rem;
+  font-weight: 500;
+  margin-bottom: 15px;
+}
+
+/* Recommended Cars */
+.recommend__cars-wrapper {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+/* 🔹 RESPONSIVE DESIGN FIXES */
+
+/* ✅ Large Screens (Max: 1200px) */
+@media (max-width: 1200px) {
+  .dashboard__cards {
+    grid-template-columns: repeat(2, 1fr); /* 2 cards per row */
+  }
+  .recommend__cars-wrapper {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* ✅ Tablets & Smaller Screens (Max: 1024px) */
+@media (max-width: 1024px) {
+  .dashboard {
+    margin-left: 0; /* Remove margin for smaller screens */
+  }
+
+  .dashboard__cards {
+    grid-template-columns: repeat(1, 1fr); /* 1 card per row */
+  }
+
+  .statics {
+    grid-template-columns: repeat(1, 1fr); /* 1 stats card per row */
+  }
+
+  .recommend__cars-wrapper {
+    grid-template-columns: repeat(1, 1fr); /* 1 recommended car per row */
+  }
+}
+
+/* ✅ Mobile (Max: 480px) */
+@media (max-width: 480px) {
+  .card__content h4 {
+    font-size: 0.9rem;
+  }
+
+  .card__content span {
+    font-size: 1.5rem;
+  }
+
+  .card__icon {
+    font-size: 1.5rem;
+  }
+
+  .stats {
+    padding: 20px;
+    height: auto;
+  }
+
+  .stats__title {
+    font-size: 1rem;
+  }
+}
