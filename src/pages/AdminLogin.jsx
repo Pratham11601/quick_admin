@@ -21,7 +21,7 @@ const AdminLogin = () => {
           <input type="password" placeholder="Password" required className="admin-input" />
           <button type="submit" className="admin-button">Login</button>
         </form>
-        <a href="#" className="admin-forgot-password">Forgot Password?</a>
+        {/* <a href="#" className="admin-forgot-password">Forgot Password?</a> */}
       </div>
     </div>
   );
