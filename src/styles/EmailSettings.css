@@ -1,0 +1,189 @@
+/* General Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+.email {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 50vh;
+    background-color: #f5f5f5;
+    padding: 60px 20px;
+    margin-left: 220px;
+}
+
+.email__wrapper {
+    background: #fff;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 500px;
+}
+
+.email__title {
+    font-size: 24px;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+/* Top Navigation Buttons */
+.email__top {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.email__btn {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    background: #ddd;
+    cursor: pointer;
+    font-size: 14px;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: 0.3s;
+    text-align: center;
+}
+
+.email__btn:hover {
+    background: #bbb;
+    transform: scale(1.05);
+}
+
+.active__btn {
+    background: #ff9800;
+    color: #fff;
+    box-shadow: 0 3px 6px rgba(255, 152, 0, 0.3);
+}
+
+.active__btn:hover {
+    background: #e68900;
+}
+
+/* Email Form */
+.email__form {
+    background: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.email__desc {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 20px;
+}
+
+/* Form Group */
+.form__group {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+}
+
+.form__group div {
+    flex: 1;
+    min-width: 100%;
+}
+
+label {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 5px;
+}
+
+input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+    transition: 0.3s;
+}
+
+input:focus {
+    border-color: #ff9800;
+    box-shadow: 0 0 5px rgba(255, 152, 0, 0.5);
+    outline: none;
+}
+
+/* Buttons */
+.email__btns {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+}
+
+.cancel__btn, .save__btn {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: 0.3s;
+    text-align: center;
+}
+
+.cancel__btn {
+    background: #ff4d4d;
+    color: #fff;
+}
+
+.cancel__btn:hover {
+    background: #d43f3f;
+    transform: scale(1.05);
+}
+
+.save__btn {
+    background: #28a745;
+    color: #fff;
+}
+
+.save__btn:hover {
+    background: #218838;
+    transform: scale(1.05);
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .email {
+        margin-left: 0;
+        padding: 40px 20px;
+    }
+}
+
+@media (max-width: 768px) {
+    .form__group div {
+        min-width: 100%;
+    }
+    .email__top {
+        flex-direction: column;
+    }
+    .email__btns {
+        flex-direction: column;
+    }
+}
+
+@media (max-width: 500px) {
+    .email {
+        padding: 20px;
+    }
+    .form__group {
+        flex-direction: column;
+    }
+}

@@ -1,0 +1,115 @@
+/* AdminLogin.css */
+.admin-login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f8f9fa;
+    padding: 20px;
+}
+
+.admin-login-box {
+    background: #ffffff;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    width: 100%;
+    max-width: 350px;
+}
+
+.admin-logo {
+    width: 200px;
+    margin-bottom: -40px;
+}
+
+.admin-login-box h2 {
+    margin-bottom: 20px;
+    font-size: 22px;
+    color: #333;
+}
+
+.admin-login-box form {
+    display: flex;
+    flex-direction: column;
+}
+
+.admin-login-box input {
+    width: 100%;
+    padding: 10px;
+    margin: 8px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+.admin-login-box button {
+    background: linear-gradient(90deg, #ffa500, #ffcc00);
+    color: white;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: background 0.3s ease;
+}
+
+.admin-login-box button:hover {
+    background: linear-gradient(90deg, #ffcc00, #ffa500);
+}
+
+.admin-forgot-password {
+    display: block;
+    margin-top: 12px;
+    font-size: 14px;
+    color: #007bff;
+    text-decoration: none;
+}
+
+.admin-forgot-password:hover {
+    text-decoration: underline;
+}
+
+/* Responsive Design */
+@media (max-width: 480px) {
+    .admin-login-box {
+        padding: 20px;
+        max-width: 300px;
+    }
+
+    .admin-logo {
+        width: 180px;
+    }
+
+    .admin-login-box h2 {
+        font-size: 20px;
+    }
+
+    .admin-login-box input {
+        padding: 8px;
+        font-size: 12px;
+    }
+
+    .admin-login-box button {
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 768px) {
+    .admin-login-container {
+        padding: 10px;
+    }
+
+    .admin-login-box {
+        padding: 25px;
+    }
+
+    .admin-logo {
+        width: 200px;
+    }
+
+    .admin-login-box h2 {
+        font-size: 21px;
+    }
+}

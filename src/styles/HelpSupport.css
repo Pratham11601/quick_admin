@@ -1,0 +1,209 @@
+/* Reset & General Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Poppins", sans-serif;
+}
+
+body {
+    background-color: #f8f9fa;
+}
+
+/* Main Layout */
+.help_support {
+    display: flex;
+    flex-direction: column;
+    min-height: 10vh;
+    margin-left: 250px; /* Adjust based on sidebar width */
+    margin-top: 70px;
+    background-color: #ffffff;
+    padding: 20px;
+}
+
+
+
+/* Welcome Section */
+.top-wlc {
+    text-align: right;
+    padding: 15px;
+    background-color: rgb(219, 221, 223);
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.welcome {
+    color: rgba(255, 0, 0, 0.815);
+}
+
+.service {
+    color: red;
+    font-weight: bold;
+}
+
+/* Page Heading */
+.support {
+    font-size: 22px;
+    padding: 15px;
+    color: #222;
+    background-color: rgba(236, 230, 230, 0.952);
+    font-weight: bold;
+    border-radius: 8px;
+}
+
+.pagination {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+  }
+  
+  .pagination button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.3s ease-in-out;
+  }
+  
+  .pagination button.active {
+    background-color: #0056b3;
+  }
+  
+  .pagination button:hover {
+    background-color: #0056b3;
+  }
+  
+
+/* Table Styling */
+.table-container {
+    width: 100%;
+    background: white;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    overflow-x: auto;
+    margin-top: 20px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: center;
+}
+
+th, td {
+    padding: 12px;
+    border: 1px solid #ddd;
+    font-size: 16px;
+}
+
+th {
+    background-color: #007bff;
+    color: white;
+}
+
+tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+tr:hover {
+    background-color: #e9ecef;
+    transition: background 0.3s;
+}
+
+/* Input Field */
+.enter-remark {
+    width: 90%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+/* Action Button */
+.btn-action {
+    font-size: 16px;
+    height: 35px;
+    width: 80px;
+    color: white;
+    background-color: green;
+    outline: none;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-action:hover {
+    background-color: darkgreen;
+    transform: scale(1.05);
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .help_support {
+        margin-left: 220px; /* Adjust sidebar width */
+        padding: 15px;
+    }
+
+    .table-container {
+        padding: 10px;
+    }
+
+    th, td {
+        padding: 10px;
+        font-size: 14px;
+    }
+
+    .btn-action {
+        font-size: 14px;
+        height: 32px;
+        width: 75px;
+    }
+}
+
+@media (max-width: 768px) {
+    .help_support {
+        margin-left: 0;
+        padding: 10px;
+    }
+
+   
+
+    th, td {
+        padding: 8px;
+        font-size: 12px;
+    }
+
+    .btn-action {
+        font-size: 12px;
+        height: 30px;
+        width: 70px;
+    }
+}
+
+@media (max-width: 480px) {
+    .help_support {
+        margin-left: 0;
+        padding: 5px;
+    }
+
+    .table-container {
+        padding: 5px;
+    }
+
+    th, td {
+        font-size: 12px;
+        padding: 6px;
+    }
+
+    .btn-action {
+        font-size: 12px;
+        height: 26px;
+        width: 60px;
+    }
+}
