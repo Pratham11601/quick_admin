@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import React, { useState } from "react";
 import "../styles/HelpSupport.css";
 
@@ -27,6 +28,42 @@ const HelpSupport = () => {
   const indexOfLastRow = currentPage * rowsPerPage;
   const indexOfFirstRow = indexOfLastRow - rowsPerPage;
   const currentRows = data.slice(indexOfFirstRow, indexOfLastRow);
+=======
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import "../styles/HelpSupport.css";
+
+const HelpSupport = () => {
+  const [data, setData] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [remarks, setRemarks] = useState({}); // Store remarks entered by user
+
+  const rowsPerPage = 5;
+  const API_URL = "http://localhost:5000/api/help-support"; // Update with your actual API URL
+
+  // Fetch Help Support Queries from API
+  const fetchData = async (page) => {
+    try {
+      const response = await axios.get(`${API_URL}?page=${page}&limit=${rowsPerPage}`);
+      console.log("API Response:", response.data); // Debugging
+
+      if (response.data.success) {
+        setData(response.data.data);
+        setTotalPages(response.data.totalPages);
+      } else {
+        setData([]);
+        setTotalPages(1);
+      }
+    } catch (error) {
+      console.error("Error fetching help support data:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchData(currentPage);
+  }, [currentPage]);
+>>>>>>> 98af867 (Added new updates to NevDev branch)
 
   // Handle Next Page
   const nextPage = () => {
@@ -38,9 +75,33 @@ const HelpSupport = () => {
     if (currentPage > 1) setCurrentPage(currentPage - 1);
   };
 
+<<<<<<< HEAD
   return (
     <div className="help_support">
       <div className="top-wlc"></div>
+=======
+  // Handle Input Change for Remarks
+  const handleRemarkChange = (id, value) => {
+    setRemarks({ ...remarks, [id]: value });
+  };
+
+  // Handle Save Remark
+  const saveRemark = async (id) => {
+    try {
+      const updatedRemark = remarks[id] || "";
+      await axios.put(`${API_URL}/${id}`, { remark: updatedRemark });
+
+      // Refresh Data
+      fetchData(currentPage);
+      setRemarks({ ...remarks, [id]: "" }); // Clear input after saving
+    } catch (error) {
+      console.error("Error updating remark:", error);
+    }
+  };
+
+  return (
+    <div className="help_support">
+>>>>>>> 98af867 (Added new updates to NevDev branch)
       <h2 className="support">Manage Help & Support</h2>
       <hr />
 
@@ -50,6 +111,7 @@ const HelpSupport = () => {
             <thead>
               <tr>
                 <th>ID</th>
+<<<<<<< HEAD
                 <th>Received <br />On</th>
                 <th>Query Message</th>
                 <th>Vendor <br />Category</th>
@@ -57,10 +119,20 @@ const HelpSupport = () => {
                 <th>Vendor <br />Contact</th>
                 <th>Remarks</th>
                 <th>Remark <br />Date</th>
+=======
+                <th>Received On</th>
+                <th>Query Message</th>
+                <th>Vendor Category</th>
+                <th>Vendor Name</th>
+                <th>Vendor Contact</th>
+                <th>Remarks</th>
+                <th>Remark Date</th>
+>>>>>>> 98af867 (Added new updates to NevDev branch)
                 <th>Action</th>
               </tr>
             </thead>
             <tbody>
+<<<<<<< HEAD
               {currentRows.map((item) => (
                 <tr key={item.id}>
                   <td>{item.id}</td>
@@ -78,6 +150,38 @@ const HelpSupport = () => {
                   </td>
                 </tr>
               ))}
+=======
+              {data.length > 0 ? (
+                data.map((item) => (
+                  <tr key={item.id}>
+                    <td>{item.id}</td>
+                    <td>{new Date(item.createdAt).toLocaleString()}</td>
+                    <td dangerouslySetInnerHTML={{ __html: item.query_message }} />
+                    <td>{item.vendor_category}</td>
+                    <td>{item.vendor_name}</td>
+                    <td>{item.vendor_contact}</td>
+                    <td>{item.remark || "No remarks"}</td>
+                    <td>{item.remark_date ? new Date(item.remark_date).toLocaleString() : "N/A"}</td>
+                    <td>
+                      <textarea
+                        className="enter-remark"
+                        placeholder="Enter remark"
+                        value={remarks[item.id] || ""}
+                        onChange={(e) => handleRemarkChange(item.id, e.target.value)}
+                      />
+                      <br />
+                      <button className="btn-action" onClick={() => saveRemark(item.id)}>
+                        Save
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="9" className="text-center">No data found.</td>
+                </tr>
+              )}
+>>>>>>> 98af867 (Added new updates to NevDev branch)
             </tbody>
           </table>
         </div>

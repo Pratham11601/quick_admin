@@ -217,6 +217,10 @@
 @media screen and (max-width: 480px) {
   .title {
     font-size: 20px;
+<<<<<<< HEAD
+=======
+    margin-top: 40px;
+>>>>>>> 98af867 (Added new updates to NevDev branch)
   }
 
   .input-group input {

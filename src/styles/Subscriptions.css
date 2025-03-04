@@ -1,0 +1,250 @@
+/* General Styles */
+.container {
+    width: 100%;
+    max-width: 83.5%;
+    background: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    margin-left: 250px;
+    padding: 20px;
+    min-height: 100vh;
+  }
+  
+  /* Title */
+  .title {
+    font-size: 26px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    color: #333;
+  }
+  
+  /* Input Group */
+  .input-group {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 20px;
+  }
+  
+  .input-group input {
+    padding: 12px;
+    font-size: 16px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    width: 100%;
+    max-width: 300px;
+    outline: none;
+    transition: all 0.3s ease-in-out;
+  }
+  
+  .input-group input:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+  }
+  
+  /* Add Subscription Button */
+  .add-btn {
+    background: #28a745;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+  }
+  
+  .add-btn:hover {
+    background: #218838;
+  }
+  
+  /* Subscription Table */
+  .subscription-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  
+  .subscription-table th,
+  .subscription-table td {
+    padding: 12px;
+    text-align: center;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  .subscription-table th {
+    background: #007bff;
+    color: white;
+    font-size: 16px;
+  }
+  
+  .subscription-table tr:nth-child(even) {
+    background: #f9f9f9;
+  }
+  
+  .subscription-table tr:hover {
+    background: #f1f1f1;
+  }
+  
+  /* Action Buttons */
+  .edit-btn,
+  .delete-btn {
+    font-size: 15px;
+    padding: 10px 14px;
+    border: none;
+    cursor: pointer;
+    border-radius: 6px;
+    margin: 0 5px;
+    transition: all 0.3s ease-in-out;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+  
+  /* Edit Button */
+  .edit-btn {
+    background: #ffc107;
+    color: black;
+  }
+  
+  .edit-btn:hover {
+    background: #e0a800;
+  }
+  
+  /* Delete Button */
+  .delete-btn {
+    background: #dc3545;
+    color: white;
+  }
+  
+  .delete-btn:hover {
+    background: #c82333;
+  }
+  
+  /* Pagination Buttons */
+  .pagination {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+  }
+  
+  .page-btn {
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: all 0.3s ease-in-out;
+  }
+  
+  .page-btn:hover {
+    background: #0056b3;
+  }
+  
+  /* 📌 Responsive Adjustments */
+  
+  /* ✅ Large Screens (Above 1200px) */
+  @media screen and (min-width: 1200px) {
+    .container {
+      max-width: 80%;
+      margin-left: 260px;
+    }
+  }
+  
+  /* ✅ Tablet View (Below 1024px) */
+  @media screen and (max-width: 1024px) {
+    .container {
+      max-width: 90%;
+      margin-left: auto;
+      margin-right: auto;
+      padding: 15px;
+    }
+  
+    .edit-btn,
+    .delete-btn,
+    .page-btn {
+      font-size: 14px;
+      padding: 9px 13px;
+    }
+  }
+  
+  /* ✅ Mobile View (Below 768px) */
+  @media screen and (max-width: 768px) {
+    .container {
+      width: 95%;
+      margin: 0 auto;
+      padding: 15px;
+    }
+  
+    .title {
+      font-size: 22px;
+      text-align: center;
+    }
+  
+    .input-group {
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+  
+    .subscription-table {
+      display: block;
+      width: 100%;
+      overflow-x: auto;
+      white-space: nowrap;
+    }
+  
+    .edit-btn,
+    .delete-btn,
+    .page-btn {
+      font-size: 13px;
+      padding: 8px 12px;
+    }
+  }
+  
+  /* ✅ Small Mobile View (Below 480px) */
+  @media screen and (max-width: 0px) {
+    .title {
+      font-size: 10px;
+    }
+  
+    .input-group input {
+      font-size: 8px;
+      padding: 1px;
+      max-width: 100%;
+    }
+  
+    .add-btn {
+      font-size: 14px;
+      padding: 10px;
+      width: 100%;
+    }
+  
+    .edit-btn,
+    .delete-btn {
+      font-size: 12px;
+      padding: 7px 11px;
+    }
+  
+    .page-btn {
+      font-size: 12px;
+      padding: 7px 11px;
+    }
+  
+    .pagination {
+      flex-wrap: wrap;
+      gap: 5px;
+    }
+  }
+  

@@ -5,10 +5,17 @@ import "../styles/settings.css";
 const Profile = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
+<<<<<<< HEAD
     liveIn: "Sylhet, Bangladesh",
     street: "SYL 3108",
     email: "example@gmail.com",
     phone: "+880 17*******",
+=======
+    liveIn: "",
+    street: "",
+    email: "",
+    phone: "",
+>>>>>>> 98af867 (Added new updates to NevDev branch)
     dob: "",
     gender: "Male",
     profileImage: null,
@@ -29,6 +36,7 @@ const Profile = () => {
     alert("Profile updated successfully!");
   };
 
+<<<<<<< HEAD
   const handleDelete = () => {
     setFormData({
       liveIn: "",
@@ -42,12 +50,15 @@ const Profile = () => {
     alert("Profile data cleared!");
   };
 
+=======
+>>>>>>> 98af867 (Added new updates to NevDev branch)
   return (
     <div className="settings">
       <div className="settings__wrapper">
         <h2 className="settings__title">Settings</h2>
 
         <div className="settings__top">
+<<<<<<< HEAD
           <button className="setting__btn" onClick={() => navigate("/myprofile")}>
             My Details
           </button>
@@ -63,6 +74,13 @@ const Profile = () => {
           <button className="setting__btn" onClick={() => navigate("/notifications")}>
             Notification
           </button>
+=======
+          <button className="setting__btn" onClick={() => navigate("/myprofile")}>My Details</button>
+          <button className="setting__btn active__btn" onClick={() => navigate("/profile")}>Profile</button>
+          <button className="setting__btn" onClick={() => navigate("/password-settings")}>Password</button>
+          <button className="setting__btn" onClick={() => navigate("/email-settings")}>Email</button> {/* Updated here */}
+          <button className="setting__btn" onClick={() => navigate("/notifications")}>Notification</button>
+>>>>>>> 98af867 (Added new updates to NevDev branch)
         </div>
 
         <div className="details__form">
@@ -116,12 +134,16 @@ const Profile = () => {
             </div>
 
             <div className="profile__img-btns">
+<<<<<<< HEAD
               <button type="button" className="dlt__btn" onClick={handleDelete}>
                 Delete
               </button>
               <button type="submit" className="update__btn">
                 Update
               </button>
+=======
+              <button type="submit" className="update__btn">Update</button>
+>>>>>>> 98af867 (Added new updates to NevDev branch)
             </div>
           </form>
         </div>
@@ -130,4 +152,8 @@ const Profile = () => {
   );
 };
 
+<<<<<<< HEAD
 export default Profile;
+=======
+export default Profile;
+>>>>>>> 98af867 (Added new updates to NevDev branch)

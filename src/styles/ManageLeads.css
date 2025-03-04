@@ -3,7 +3,11 @@ body {
   font-family: "Poppins", sans-serif;
   background-color: #f8f9fa;
   margin: 0;
+<<<<<<< HEAD
   padding: 0;
+=======
+  padding: 2px;
+>>>>>>> 98af867 (Added new updates to NevDev branch)
 }
 
 /* Sidebar Adjustments */
