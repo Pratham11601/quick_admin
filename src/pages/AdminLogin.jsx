@@ -60,7 +60,9 @@ const AdminLogin = () => {
           />
           <button type="submit" className="admin-button">Login</button>
         </form>
-        <a href="#" className="admin-forgot-password">Forgot Password?</a>
+        <button className="admin-forgot-password" onClick={() => navigate('/forgot-password')}>
+  Forgot Password?
+</button>
       </div>
     </div>
   );
