@@ -39,9 +39,19 @@ const ManageLeads = () => {
       
       // Extract leads from API response
       if (response.data && response.data.success && response.data.data) {
-        setLeads(response.data.data);
-        // If API doesn't provide totalPages, estimate it
-        const totalItems = response.data.data.length * 3; // Estimate total for pagination
+        // Process the dates properly before setting state
+        const processedLeads = response.data.data.map(lead => ({
+          ...lead,
+          // Store original date string to debug
+          originalDate: lead.date,
+          // Ensure date format is correctly processed
+          formattedReceivedDate: formatDateForDisplay(lead.receivedOn || lead.date),
+          formattedTripDate: formatDateForDisplay(lead.tripDate || lead.date)
+        }));
+        
+        setLeads(processedLeads);
+        // Calculate total pages based on total count from API
+        const totalItems = response.data.totalCount || response.data.data.length * 5; // Use API count or estimate
         setTotalPages(Math.max(1, Math.ceil(totalItems / leadsPerPage)));
       } else {
         console.error("Unexpected API response format:", response.data);
@@ -111,34 +121,90 @@ const ManageLeads = () => {
     fetchLeads();
   };
 
-  const goToNextPage = () => {
+  // Improved date formatting function with several fallback methods
+  function formatDateForDisplay(dateString) {
+    if (!dateString) return "N/A";
+    
+    // Log the input for debugging
+    console.log("Formatting date:", dateString, "Type:", typeof dateString);
+    
+    try {
+      // First attempt: direct conversion
+      let date = new Date(dateString);
+      
+      // Check if valid
+      if (!isNaN(date.getTime())) {
+        return date.toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit'
+        });
+      }
+      
+      // Second attempt: try parsing different formats
+      // Try MM/DD/YYYY format
+      if (typeof dateString === 'string' && dateString.includes('/')) {
+        const parts = dateString.split('/');
+        if (parts.length === 3) {
+          date = new Date(parseInt(parts[2]), parseInt(parts[0]) - 1, parseInt(parts[1]));
+          if (!isNaN(date.getTime())) {
+            return date.toLocaleDateString('en-US', {
+              year: 'numeric',
+              month: '2-digit',
+              day: '2-digit'
+            });
+          }
+        }
+      }
+      
+      // Third attempt: try Unix timestamp (if it's a number or string number)
+      if (!isNaN(Number(dateString))) {
+        date = new Date(Number(dateString));
+        if (!isNaN(date.getTime())) {
+          return date.toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit'
+          });
+        }
+      }
+      
+      // Fourth attempt: try ISO date format
+      if (typeof dateString === 'string' && dateString.includes('-')) {
+        const parts = dateString.split('-');
+        if (parts.length === 3) {
+          date = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+          if (!isNaN(date.getTime())) {
+            return date.toLocaleDateString('en-US', {
+              year: 'numeric',
+              month: '2-digit',
+              day: '2-digit'
+            });
+          }
+        }
+      }
+      
+      // If all attempts fail
+      console.warn("Could not format date string:", dateString);
+      return "Invalid date";
+    } catch (err) {
+      console.error("Date formatting error:", err, "for date:", dateString);
+      return "Invalid date";
+    }
+  }
+
+  // Navigation functions for pagination
+  function goToNextPage() {
     if (currentPage < totalPages) {
       setCurrentPage(currentPage + 1);
     }
-  };
+  }
 
-  const goToPreviousPage = () => {
+  function goToPreviousPage() {
     if (currentPage > 1) {
       setCurrentPage(currentPage - 1);
     }
-  };
-
-  const paginate = (pageNumber) => {
-    setCurrentPage(pageNumber);
-  };
-
-  // Improved date formatting function
-  const formatDate = (dateString) => {
-    if (!dateString) return "";
-    try {
-      const date = new Date(dateString);
-      if (isNaN(date.getTime())) return "Invalid date";
-      return date.toLocaleDateString();
-    } catch (err) {
-      console.error("Date formatting error:", err);
-      return "Invalid date";
-    }
-  };
+  }
 
   return (
     <div className="categories-page-body h-screen">
@@ -192,6 +258,7 @@ const ManageLeads = () => {
             type="date" 
             value={receivedOnFilter}
             onChange={(e) => setReceivedOnFilter(e.target.value)}
+            placeholder="mm/dd/yyyy"
           />
           <button className="filter-btn" onClick={handleReceivedOnFilter}>Filter</button>
         </div>
@@ -202,6 +269,7 @@ const ManageLeads = () => {
             type="date" 
             value={tripDateFilter}
             onChange={(e) => setTripDateFilter(e.target.value)}
+            placeholder="mm/dd/yyyy"
           />
           <button className="filter-btn" onClick={handleTripDateFilter}>Filter</button>
         </div>
@@ -246,11 +314,11 @@ const ManageLeads = () => {
                 leads.map((lead, index) => (
                   <tr key={lead.id || index}>
                     <td>{(currentPage - 1) * leadsPerPage + index + 1}</td>
-                    <td>{formatDate(lead.date)}</td>
+                    <td>{lead.formattedReceivedDate}</td>
                     <td>{lead.vendor_name}</td>
                     <td>{lead.location_from}</td>
                     <td>{lead.to_location}</td>
-                    <td>{formatDate(lead.date)}</td>
+                    <td>{lead.formattedTripDate}</td>
                     <td>{lead.time}</td>
                     <td>
                       <a href={`tel:${lead.vendor_contact}`} style={{ color: "#007bff", textDecoration: "none" }}>
@@ -258,13 +326,28 @@ const ManageLeads = () => {
                       </a>
                     </td>
                     <td>
-                      <button className="update-btn" title="Edit Lead">✏️</button>
                       <button 
                         className="delete-btn" 
                         onClick={() => handleDelete(lead.id)}
                         title="Delete Lead"
+                        style={{
+                          background: 'none',
+                          border: 'none',
+                          cursor: 'pointer',
+                          color: 'white'
+                        }}
                       >
-                        🗑️
+                        <div style={{
+                          backgroundColor: '#dc3545',
+                          borderRadius: '4px',
+                          width: '40px',
+                          height: '40px',
+                          display: 'flex',
+                          justifyContent: 'center',
+                          alignItems: 'center'
+                        }}>
+                          🗑️
+                        </div>
                       </button>
                     </td>
                   </tr>
@@ -286,69 +369,58 @@ const ManageLeads = () => {
         )}
       </div>
 
-      {/* Pagination with Next/Previous Buttons */}
-      {totalPages > 1 && (
+      {/* Updated Pagination to match the image */}
+      {totalPages > 0 && (
         <div style={{ 
           display: "flex", 
-          justifyContent: "center", 
-          gap: "5px", 
-          margin: "20px 0" 
+          justifyContent: "space-between", 
+          alignItems: "center", 
+          margin: "20px 0",
+          maxWidth: "100%"
         }}>
           <button 
             onClick={goToPreviousPage} 
             disabled={currentPage === 1}
             style={{ 
-              padding: "8px 12px", 
-              backgroundColor: currentPage === 1 ? "#e9ecef" : "#007bff", 
-              color: currentPage === 1 ? "#6c757d" : "white", 
-              border: "1px solid #ddd", 
+              padding: "8px 16px", 
+              backgroundColor: "#007bff", 
+              color: "white", 
+              border: "none", 
               borderRadius: "4px", 
               cursor: currentPage === 1 ? "not-allowed" : "pointer", 
-              margin: "0 2px" 
+              opacity: currentPage === 1 ? 0.6 : 1,
+              display: "flex",
+              alignItems: "center",
+              gap: "5px"
             }}
           >
-            Previous
+            ← Previous
           </button>
           
-          {/* Display page numbers */}
-          {Array.from({ length: totalPages }, (_, i) => {
-            // Only show 5 page numbers at a time
-            if (i + 1 > currentPage - 3 && i + 1 < currentPage + 3) {
-              return (
-                <button 
-                  key={i} 
-                  onClick={() => paginate(i + 1)} 
-                  style={{ 
-                    padding: "8px 12px", 
-                    backgroundColor: currentPage === i + 1 ? "#007bff" : "white", 
-                    color: currentPage === i + 1 ? "white" : "black", 
-                    border: "1px solid #ddd", 
-                    borderRadius: "4px", 
-                    cursor: "pointer", 
-                    margin: "0 2px" 
-                  }}
-                >
-                  {i + 1}
-                </button>
-              );
-            }
-            return null;
-          })}
+          <div style={{
+            fontWeight: "bold",
+            fontSize: "16px"
+          }}>
+            Page {currentPage} of {totalPages}
+          </div>
           
           <button 
             onClick={goToNextPage} 
             disabled={currentPage === totalPages}
             style={{ 
-              padding: "8px 12px", 
-              backgroundColor: currentPage === totalPages ? "#e9ecef" : "#007bff", 
-              color: currentPage === totalPages ? "#6c757d" : "white", 
-              border: "1px solid #ddd", 
+              padding: "8px 16px", 
+              backgroundColor: "#007bff", 
+              color: "white", 
+              border: "none", 
               borderRadius: "4px", 
               cursor: currentPage === totalPages ? "not-allowed" : "pointer", 
-              margin: "0 2px" 
+              opacity: currentPage === totalPages ? 0.6 : 1,
+              display: "flex",
+              alignItems: "center",
+              gap: "5px"
             }}
           >
-            Next
+            Next →
           </button>
         </div>
       )}
