@@ -10,7 +10,7 @@ const VendorDetails = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const vendorsPerPage = 10;
-  const API_BASE_URL = "http://localhost:5000/api/vendor";
+  const API_BASE_URL = "https://quickcabpune.com/admin/api/vendor";
 
   useEffect(() => {
     const fetchVendors = async () => {
@@ -18,14 +18,36 @@ const VendorDetails = () => {
       try {
         let response;
         
+        // Looking at your API response, the base endpoint returns all vendors
+        // There's no indication of paginated or search endpoints in the screenshot
         if (searchTerm) {
-          response = await axios.get(`${API_BASE_URL}/search?query=${searchTerm}`);
-          setVendors(response.data.data || response.data);
-          setTotalPages(Math.ceil((response.data.data?.length || response.data.length) / vendorsPerPage));
+          // Use the base endpoint since there doesn't appear to be a dedicated search endpoint
+          response = await axios.get(API_BASE_URL);
+          // Filter vendors client-side based on search term
+          const filteredData = response.data.data.filter(vendor => 
+            (vendor.fullname && vendor.fullname.toLowerCase().includes(searchTerm.toLowerCase())) ||
+            (vendor.city && vendor.city.toLowerCase().includes(searchTerm.toLowerCase())) ||
+            (vendor.phone && vendor.phone.includes(searchTerm)) ||
+            (vendor.email && vendor.email.toLowerCase().includes(searchTerm.toLowerCase()))
+          );
+          setVendors(filteredData);
+          setTotalPages(Math.ceil(filteredData.length / vendorsPerPage));
         } else {
-          response = await axios.get(`${API_BASE_URL}/paginated?page=${currentPage}&limit=${vendorsPerPage}`);
-          setVendors(response.data.data || response.data);
-          setTotalPages(response.data.totalPages || Math.ceil((response.data.data?.length || response.data.length) / vendorsPerPage));
+          // Just get all vendors and handle pagination client-side
+          response = await axios.get(API_BASE_URL);
+          
+          // Extract the data array from the response
+          const allVendors = response.data.data || [];
+          
+          // Calculate total pages
+          const total = allVendors.length;
+          setTotalPages(Math.ceil(total / vendorsPerPage));
+          
+          // Implement client-side pagination
+          const startIndex = (currentPage - 1) * vendorsPerPage;
+          const paginatedVendors = allVendors.slice(startIndex, startIndex + vendorsPerPage);
+          
+          setVendors(paginatedVendors);
         }
         
         setError(null);
@@ -73,7 +95,6 @@ const VendorDetails = () => {
       // Toggle status: if current status is 1 (active), change to 0 (inactive) and vice versa
       const newStatus = currentStatus === 1 ? 0 : 1;
       
-      // Using the exact endpoint structure from your router
       await axios.put(`${API_BASE_URL}/${vendorId}`, { 
         status: newStatus 
       });
@@ -91,6 +112,16 @@ const VendorDetails = () => {
     } catch (err) {
       console.error("Error updating vendor status:", err);
       alert("Failed to update vendor status. Please try again.");
+    }
+  };
+
+  // Format date safely
+  const formatDate = (dateString) => {
+    if (!dateString) return "N/A";
+    try {
+      return new Date(dateString).toLocaleDateString();
+    } catch (error) {
+      return "Invalid Date";
     }
   };
 
@@ -152,7 +183,7 @@ const VendorDetails = () => {
                     <td>{vendor.vendor_gender || "N/A"}</td>
                     <td>{vendor.aadhaar_number || "N/A"}</td>
                     <td>{vendor.subscriptionPlan || "N/A"}</td>
-                    <td>{new Date(vendor.subscription_date).toLocaleDateString()}</td>
+                    <td>{formatDate(vendor.subscription_date)}</td>
                     <td>
                       <span 
                         style={{
@@ -210,8 +241,8 @@ const VendorDetails = () => {
 
       <div className="vendor-details-pagination">
         <button onClick={() => paginate("prev")} disabled={currentPage === 1}>Previous</button>
-        <span className="page-info">Page {currentPage} of {totalPages}</span>
-        <button onClick={() => paginate("next")} disabled={currentPage === totalPages}>Next</button>
+        <span className="page-info">Page {currentPage} of {totalPages || 1}</span>
+        <button onClick={() => paginate("next")} disabled={currentPage === totalPages || totalPages === 0}>Next</button>
       </div>
 
       <div className="vendor-details-footer">© 2025 Vendor Services. All rights reserved.</div>

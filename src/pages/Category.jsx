@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "../styles/Category.css"; // Importing the CSS file
 
-const API_BASE_URL = "http://localhost:5000/api/category";
+const API_BASE_URL = "https://quickcabpune.com/admin/api/category";
 
 const Categories = () => {
   const [categories, setCategories] = useState([]);
