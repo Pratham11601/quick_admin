@@ -4,7 +4,7 @@ const Vendor = require("../models/vendorModel");
 exports.getAllVendors = async (req, res) => {
   try {
     const vendors = await Vendor.getAll();
-    if (!vendors.length) {
+    if (!vendors || vendors.length === 0) {
       return res.status(404).json({ success: false, message: "No vendors found" });
     }
     res.status(200).json({ success: true, data: vendors });
@@ -17,13 +17,13 @@ exports.getAllVendors = async (req, res) => {
 // Get vendors with pagination
 exports.getVendorsWithPagination = async (req, res) => {
   try {
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
+    const page = parseInt(req.query.page, 10) || 1;
+    const limit = parseInt(req.query.limit, 10) || 10;
     const offset = (page - 1) * limit;
 
     const { total, vendors } = await Vendor.getAllWithPagination(limit, offset);
 
-    if (!vendors.length) {
+    if (!vendors || vendors.length === 0) {
       return res.status(404).json({ success: false, message: "No vendors found" });
     }
 
@@ -45,12 +45,12 @@ exports.getVendorsWithPagination = async (req, res) => {
 exports.searchVendor = async (req, res) => {
   try {
     const { query } = req.query;
-    if (!query) {
+    if (!query || query.trim() === "") {
       return res.status(400).json({ success: false, message: "Search query is required" });
     }
 
-    const vendors = await Vendor.search(query);
-    if (!vendors.length) {
+    const vendors = await Vendor.search(query.trim());
+    if (!vendors || vendors.length === 0) {
       return res.status(404).json({ success: false, message: "No vendors found" });
     }
 
@@ -64,7 +64,12 @@ exports.searchVendor = async (req, res) => {
 // Get vendor by ID
 exports.getVendorById = async (req, res) => {
   try {
-    const vendor = await Vendor.getById(req.params.id);
+    const { id } = req.params;
+    if (isNaN(id)) {
+      return res.status(400).json({ success: false, message: "Invalid vendor ID" });
+    }
+
+    const vendor = await Vendor.getById(id);
     if (!vendor) {
       return res.status(404).json({ success: false, message: "Vendor not found" });
     }
@@ -79,8 +84,12 @@ exports.getVendorById = async (req, res) => {
 exports.addVendor = async (req, res) => {
   try {
     const vendorData = req.body;
-    if (!vendorData.fullname || !vendorData.email || !vendorData.phone || !vendorData.password) {
-      return res.status(400).json({ success: false, message: "Missing required vendor details" });
+    const requiredFields = ["fullname", "email", "phone", "password"];
+
+    for (const field of requiredFields) {
+      if (!vendorData[field]) {
+        return res.status(400).json({ success: false, message: `${field} is required` });
+      }
     }
 
     const vendorId = await Vendor.addVendor(vendorData);
@@ -91,20 +100,29 @@ exports.addVendor = async (req, res) => {
   }
 };
 
-// Update vendor details
+// Update vendor status
 exports.updateVendor = async (req, res) => {
   try {
     const { id } = req.params;
-    const vendorData = req.body;
+    const { status } = req.body;
 
-    const success = await Vendor.updateVendor(id, vendorData);
-    if (!success) {
+    if (isNaN(id)) {
+      return res.status(400).json({ success: false, message: "Invalid vendor ID" });
+    }
+
+    if (status === undefined) {
+      return res.status(400).json({ success: false, message: "Status field is required" });
+    }
+
+    const result = await Vendor.updateVendor(id, status);
+
+    if (result.affectedRows === 0) {
       return res.status(404).json({ success: false, message: "Vendor not found or update failed" });
     }
 
-    res.status(200).json({ success: true, message: "Vendor details updated successfully" });
+    res.status(200).json({ success: true, message: "Vendor status updated successfully" });
   } catch (error) {
-    console.error("Error updating vendor:", error);
+    console.error("Error updating vendor status:", error);
     res.status(500).json({ success: false, message: "Server error" });
   }
 };
@@ -113,6 +131,10 @@ exports.updateVendor = async (req, res) => {
 exports.deleteVendor = async (req, res) => {
   try {
     const { id } = req.params;
+
+    if (isNaN(id)) {
+      return res.status(400).json({ success: false, message: "Invalid vendor ID" });
+    }
 
     const success = await Vendor.deleteById(id);
     if (!success) {

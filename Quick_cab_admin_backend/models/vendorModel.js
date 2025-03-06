@@ -12,40 +12,37 @@ class Vendor {
     return { total, vendors: rows };
   }
 
-  // Get all vendors (Existing)
+  // Get all vendors
   static async getAll() {
     const [rows] = await db.execute("SELECT * FROM vendordetails ORDER BY createdAt DESC");
     return rows;
   }
 
-  // Get vendor by ID (Existing)
+  // Get vendor by ID
   static async getById(id) {
     const [rows] = await db.execute("SELECT * FROM vendordetails WHERE id = ?", [id]);
     return rows[0] || null;
   }
 
-  // Update vendor details (New)
-  static async updateVendor(id, vendorData) {
-    let query = `
-      UPDATE vendordetails 
-      SET fullname=?, vendor_cat=?, phone=?, aadhaar_number=?, email=?, 
-          profileImgUrl=?, documentImgUrl=?, licenseImgUrl=?, currentAddress=?, 
-          pin_code=?, carnumber=?, vendor_gender=?, subscriptionPlan=?, 
-          subscription_date=?, businessName=?, city=?, updatedAt=NOW() 
-      WHERE id=?`;
+  // **FIXED: Update vendor status**
+  static async updateVendor(id, status) {
+    try {
+      const query = `
+        UPDATE vendordetails 
+        SET status = ?, updatedAt = NOW() 
+        WHERE id = ?`;
 
-    const values = [
-      vendorData.fullname, vendorData.vendor_cat, vendorData.phone, vendorData.aadhaar_number,
-      vendorData.email, vendorData.profileImgUrl, vendorData.documentImgUrl, vendorData.licenseImgUrl,
-      vendorData.currentAddress, vendorData.pin_code, vendorData.carnumber, vendorData.vendor_gender,
-      vendorData.subscriptionPlan, vendorData.subscription_date, vendorData.businessName, vendorData.city, id
-    ];
+      const values = [status, id];
 
-    const [result] = await db.execute(query, values);
-    return result.affectedRows > 0;
+      const [result] = await db.execute(query, values);
+      return result;
+    } catch (error) {
+      console.error("Error updating vendor status:", error);
+      throw error;
+    }
   }
 
-  // Search vendor by any column (New)
+  // Search vendor by any column
   static async search(query) {
     const searchQuery = `%${query}%`;
     const [rows] = await db.execute(
@@ -56,7 +53,7 @@ class Vendor {
     return rows;
   }
 
-  // Add a new vendor (Existing)
+  // Add a new vendor
   static async addVendor(vendorData) {
     const query = `
       INSERT INTO vendordetails 
@@ -78,7 +75,7 @@ class Vendor {
     return result.insertId;
   }
 
-  // Delete vendor (Existing)
+  // Delete vendor by ID
   static async deleteById(id) {
     const [result] = await db.execute("DELETE FROM vendordetails WHERE id = ?", [id]);
     return result.affectedRows > 0;

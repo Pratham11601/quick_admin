@@ -6,7 +6,7 @@ const {
   addVendor,
   deleteVendor,
   updateVendor,
-  searchVendor, // Ensure this is properly defined in the controller
+  searchVendor,
 } = require("../controllers/vendorController");
 
 const router = express.Router();
@@ -15,18 +15,20 @@ const router = express.Router();
  * @swagger
  * tags:
  *   name: Vendor
- *   description: Vendor management APIs
+ *   description: Vendor management APIs for MySQL
  */
 
 /**
  * @swagger
  * /api/vendor:
  *   get:
- *     summary: Get all vendors
+ *     summary: Retrieve all vendors
  *     tags: [Vendor]
  *     responses:
  *       200:
  *         description: Successfully retrieved all vendors.
+ *       500:
+ *         description: Server error.
  */
 router.get("/", getAllVendors);
 
@@ -41,15 +43,17 @@ router.get("/", getAllVendors);
  *         name: page
  *         schema:
  *           type: integer
- *         description: Page number
+ *         description: Page number (default is 1)
  *       - in: query
  *         name: limit
  *         schema:
  *           type: integer
- *         description: Number of records per page
+ *         description: Number of records per page (default is 10)
  *     responses:
  *       200:
  *         description: Successfully retrieved paginated vendors.
+ *       500:
+ *         description: Server error.
  */
 router.get("/paginated", getVendorsWithPagination);
 
@@ -57,7 +61,7 @@ router.get("/paginated", getVendorsWithPagination);
  * @swagger
  * /api/vendor/search:
  *   get:
- *     summary: Search vendors by any column
+ *     summary: Search vendors by name, email, phone, or business name
  *     tags: [Vendor]
  *     parameters:
  *       - in: query
@@ -65,10 +69,16 @@ router.get("/paginated", getVendorsWithPagination);
  *         schema:
  *           type: string
  *         required: true
- *         description: Search term (name, email, phone, business name, etc.)
+ *         description: Search term (e.g., vendor name, email, phone, business name)
  *     responses:
  *       200:
  *         description: Successfully retrieved matching vendors.
+ *       400:
+ *         description: Missing search query.
+ *       404:
+ *         description: No vendors found.
+ *       500:
+ *         description: Server error.
  */
 router.get("/search", searchVendor);
 
@@ -76,7 +86,7 @@ router.get("/search", searchVendor);
  * @swagger
  * /api/vendor/{id}:
  *   get:
- *     summary: Get vendor by ID
+ *     summary: Retrieve a vendor by ID
  *     tags: [Vendor]
  *     parameters:
  *       - in: path
@@ -84,12 +94,14 @@ router.get("/search", searchVendor);
  *         required: true
  *         schema:
  *           type: integer
- *         description: Vendor ID
+ *         description: Vendor ID (Primary Key in MySQL)
  *     responses:
  *       200:
  *         description: Vendor found.
  *       404:
  *         description: Vendor not found.
+ *       500:
+ *         description: Server error.
  */
 router.get("/:id", getVendorById);
 
@@ -104,10 +116,33 @@ router.get("/:id", getVendorById);
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/Vendor'
+ *             type: object
+ *             required:
+ *               - name
+ *               - email
+ *               - phone
+ *               - business_name
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 description: Vendor's full name
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 description: Vendor's email address
+ *               phone:
+ *                 type: string
+ *                 description: Vendor's phone number
+ *               business_name:
+ *                 type: string
+ *                 description: Vendor's business name
  *     responses:
  *       201:
  *         description: Vendor added successfully.
+ *       400:
+ *         description: Missing required fields.
+ *       500:
+ *         description: Server error.
  */
 router.post("/", addVendor);
 
@@ -123,16 +158,36 @@ router.post("/", addVendor);
  *         required: true
  *         schema:
  *           type: integer
- *         description: Vendor ID
+ *         description: Vendor ID (Primary Key in MySQL)
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/Vendor'
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 description: Vendor's updated name
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 description: Vendor's updated email
+ *               phone:
+ *                 type: string
+ *                 description: Vendor's updated phone number
+ *               business_name:
+ *                 type: string
+ *                 description: Vendor's updated business name
  *     responses:
  *       200:
  *         description: Vendor details updated successfully.
+ *       400:
+ *         description: Invalid request or missing fields.
+ *       404:
+ *         description: Vendor not found.
+ *       500:
+ *         description: Server error.
  */
 router.put("/:id", updateVendor);
 
@@ -148,12 +203,14 @@ router.put("/:id", updateVendor);
  *         required: true
  *         schema:
  *           type: integer
- *         description: Vendor ID
+ *         description: Vendor ID (Primary Key in MySQL)
  *     responses:
  *       200:
  *         description: Vendor deleted successfully.
  *       404:
  *         description: Vendor not found.
+ *       500:
+ *         description: Server error.
  */
 router.delete("/:id", deleteVendor);
 

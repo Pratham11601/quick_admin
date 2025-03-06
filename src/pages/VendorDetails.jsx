@@ -92,14 +92,15 @@ const VendorDetails = () => {
 
   const handleStatusToggle = async (vendorId, currentStatus) => {
     try {
-      // Toggle status: if current status is 1 (active), change to 0 (inactive) and vice versa
+      // Set specific status values: 1 for activate, 0 for deactivate
       const newStatus = currentStatus === 1 ? 0 : 1;
       
+      // Make the API request to update the status
       await axios.put(`${API_BASE_URL}/${vendorId}`, { 
         status: newStatus 
       });
       
-      // Refresh the vendors list after status update
+      // Update the local state to reflect the change
       const updatedVendors = vendors.map(vendor => {
         if (vendor.id === vendorId) {
           return { ...vendor, status: newStatus };
@@ -108,7 +109,13 @@ const VendorDetails = () => {
       });
       
       setVendors(updatedVendors);
-      alert(`Vendor status ${newStatus === 1 ? 'activated' : 'deactivated'} successfully!`);
+      
+      // Show appropriate message based on the new status
+      if (newStatus === 1) {
+        alert("Vendor activated successfully!");
+      } else {
+        alert("Vendor deactivated successfully!");
+      }
     } catch (err) {
       console.error("Error updating vendor status:", err);
       alert("Failed to update vendor status. Please try again.");
