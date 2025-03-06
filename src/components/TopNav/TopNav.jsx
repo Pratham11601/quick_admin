@@ -1,6 +1,5 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
-import profileImg from "../../assets/images/profile-02.png";
 import "./TopNav.css";
 
 const TopNav = () => {
