@@ -6,7 +6,7 @@
   z-index: 999;
   background: var(--primary-color);
   width: calc(100% - 260px);
-  height: 70px;
+  height: 10px;
   display: flex;
   align-items: center;
   padding: 0 20px;
