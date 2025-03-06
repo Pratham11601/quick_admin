@@ -23,21 +23,17 @@ const Dashboard = () => {
           setVendorCount(vendorData.data.length);
         }
 
-        // Fetch leads
         const leadsResponse = await fetch("https://quickcabpune.com/app/leads");
         const leadsData = await leadsResponse.json();
         
         if (leadsData && leadsData.data) {
           const leads = Array.isArray(leadsData) ? leadsData : leadsData.data;
           
-          // Calculate total leads
           setTotalLeads(leads.length);
           
-          // Calculate active leads (assuming 'status' field exists and can be 'active' or 'inactive')
           const active = leads.filter(lead => lead.status === 'active').length;
           setActiveLeads(active);
           
-          // Calculate inactive leads
           setInactiveLeads(leads.length - active);
         }
       } catch (error) {
