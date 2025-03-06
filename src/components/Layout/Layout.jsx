@@ -15,7 +15,7 @@ const Layout = () => {
         {!isAdminLogin && <TopNav />} {/* Hide TopNav on AdminLogin */}
         <div className="content">
           <Router />
-        </div>
+        </div>   
       </div>
     </div>
   );
