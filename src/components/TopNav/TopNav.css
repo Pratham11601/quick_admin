@@ -2,7 +2,7 @@
 .top__nav {
   position: fixed;
   top: 0;
-  left: 280px;
+  left: 260px;
   z-index: 999;
   background: var(--primary-color);
   width: calc(100% - 260px);
@@ -110,6 +110,7 @@
   .search__box {
     width: 150px;
     height: 30px;
+    margin-left: 55px;
   }
   .badge {
     width: 10px;

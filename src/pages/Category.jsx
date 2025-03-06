@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import "../styles/Category.css"; // Importing the CSS file
 
@@ -11,18 +11,18 @@ const Categories = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const categoriesPerPage = 5;
 
-  useEffect(() => {
-    fetchCategories();
-  }, []);
-
-  const fetchCategories = async () => {
+  const fetchCategories = useCallback(async () => {
     try {
       const response = await axios.get(API_BASE_URL);
       setCategories(response.data.data || []);
     } catch (error) {
       console.error("Error fetching categories:", error);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchCategories();
+  }, [fetchCategories]);
 
   const handleCategory = async () => {
     if (!newCategory.trim()) return;
@@ -31,7 +31,7 @@ const Categories = () => {
       const existingCategory = categories.find(
         (cat) => cat.cat_name.toLowerCase() === newCategory.toLowerCase()
       );
-      
+
       if (existingCategory) {
         alert("Category already exists!");
         return;
@@ -105,7 +105,7 @@ const Categories = () => {
                 <td>{indexOfFirstCategory + index + 1}</td>
                 <td>{category.cat_name}</td>
                 <td>
-                  {/* <button className="edit-btn" onClick={() => editCategory(category)}>✏️</button> */}
+                  <button className="edit-btn" onClick={() => editCategory(category)}>✏️</button>
                   <button className="delete-btn" onClick={() => deleteCategory(category.id)}>🗑️</button>
                 </td>
               </tr>
