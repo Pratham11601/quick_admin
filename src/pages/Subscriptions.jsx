@@ -13,20 +13,27 @@ const Subscriptions = () => {
   const [editingId, setEditingId] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
+  const [totalPages, setTotalPages] = useState(1);
 
   // Fetch subscriptions from API
   useEffect(() => {
     fetchSubscriptions();
-  }, []);
+  }, [page, limit]);
 
   const fetchSubscriptions = async () => {
     try {
       setLoading(true);
-      const response = await fetch(API_URL);
+      const response = await fetch(`${API_URL}?page=${page}&limit=${limit}`);
       const data = await response.json();
 
-      if (Array.isArray(data)) {
-        setSubscriptions(data);
+      if (data.status && data.data && Array.isArray(data.data)) {
+        setSubscriptions(data.data);
+        // Calculate total pages if the API provides total count
+        if (data.totalCount) {
+          setTotalPages(Math.ceil(data.totalCount / limit));
+        }
       } else {
         setSubscriptions([]); // Ensure subscriptions is always an array
       }
@@ -101,6 +108,17 @@ const Subscriptions = () => {
     }
   };
 
+  const handlePageChange = (newPage) => {
+    if (newPage > 0 && newPage <= totalPages) {
+      setPage(newPage);
+    }
+  };
+
+  const handleLimitChange = (e) => {
+    setLimit(parseInt(e.target.value));
+    setPage(1); // Reset to first page when changing limit
+  };
+
   return (
     <div className="container">
       <h2 className="title">Manage Subscriptions</h2>
@@ -157,6 +175,43 @@ const Subscriptions = () => {
           )}
         </tbody>
       </table>
+
+      {/* Pagination Controls */}
+      <div className="pagination-controls">
+        <div className="limit-selector">
+          <label htmlFor="limit-select">Items per page:</label>
+          <select
+            id="limit-select"
+            value={limit}
+            onChange={handleLimitChange}
+          >
+            <option value="5">5</option>
+            <option value="10">10</option>
+            <option value="20">20</option>
+            <option value="50">50</option>
+          </select>
+        </div>
+        
+        <div className="page-navigator">
+          <button
+            onClick={() => handlePageChange(page - 1)}
+            disabled={page === 1}
+            className="page-btn"
+          >
+            Previous
+          </button>
+          <span className="page-indicator">
+            Page {page} of {totalPages}
+          </span>
+          <button
+            onClick={() => handlePageChange(page + 1)}
+            disabled={page >= totalPages}
+            className="page-btn"
+          >
+            Next
+          </button>
+        </div>
+      </div>
     </div>
   );
 };
