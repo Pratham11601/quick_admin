@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "../styles/Subscriptions.css";
 
-const API_URL = "https://quickcabpune.com/admin/api/subscriptions";
+const API_URL = "http://localhost:5000/api/subscriptions";
 
 const Subscriptions = () => {
   const [subscriptions, setSubscriptions] = useState([]);

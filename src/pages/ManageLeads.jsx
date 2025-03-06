@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 // Import your existing CSS file
 import "../styles/ManageLeads.css";
@@ -15,10 +15,14 @@ const ManageLeads = () => {
   const [tripDateFilter, setTripDateFilter] = useState("");
 
   // Set base URL for all API requests
-  const API_BASE_URL = "https://quickcabpune.com/admin/api/leads";
+  const API_BASE_URL = "http://localhost:5000/api/leads";
 
-  // Use useCallback to memoize the fetchLeads function to avoid ESLint warnings
-  const fetchLeads = useCallback(async () => {
+  // Fetch leads when component mounts or filters change
+  useEffect(() => {
+    fetchLeads();
+  }, [currentPage, leadsPerPage]); // Only refresh automatically when page changes
+
+  const fetchLeads = async () => {
     setLoading(true);
     try {
       // Build query parameters
@@ -31,30 +35,14 @@ const ManageLeads = () => {
       if (receivedOnFilter) params.append("receivedOn", receivedOnFilter);
       if (tripDateFilter) params.append("tripDate", tripDateFilter);
       
-      // Make API request
       const response = await axios.get(`${API_BASE_URL}?${params.toString()}`);
       
-      // Extract leads from API response with proper error handling
-      if (response.data && Array.isArray(response.data)) {
-        // Handle if API returns array directly
-        setLeads(response.data);
-        setTotalPages(Math.max(1, Math.ceil(response.data.length / leadsPerPage)));
-      } else if (response.data && response.data.success && Array.isArray(response.data.data)) {
-        // Handle if API returns {success: true, data: [...]}
+      // Extract leads from API response
+      if (response.data && response.data.success && response.data.data) {
         setLeads(response.data.data);
-        setTotalPages(Math.max(1, Math.ceil(response.data.data.length / leadsPerPage)));
-      } else if (response.data && response.data.data && Array.isArray(response.data.data.leads)) {
-        // Handle if API returns {data: {leads: [...]}}
-        setLeads(response.data.data.leads);
-        
-        // Set total pages from API response if available
-        if (response.data.data.totalPages) {
-          setTotalPages(response.data.data.totalPages);
-        } else if (response.data.data.totalItems) {
-          setTotalPages(Math.ceil(response.data.data.totalItems / leadsPerPage));
-        } else {
-          setTotalPages(Math.max(1, Math.ceil(response.data.data.leads.length / leadsPerPage)));
-        }
+        // If API doesn't provide totalPages, estimate it
+        const totalItems = response.data.data.length * 3; // Estimate total for pagination
+        setTotalPages(Math.max(1, Math.ceil(totalItems / leadsPerPage)));
       } else {
         console.error("Unexpected API response format:", response.data);
         setLeads([]);
@@ -63,18 +51,12 @@ const ManageLeads = () => {
       setError(null);
     } catch (err) {
       console.error("Error fetching leads:", err);
-      setError(`Failed to load leads: ${err.message}`);
+      setError(`Failed to load leads: ${err.response?.data?.message || err.message}`);
       setLeads([]);
-      setTotalPages(1);
     } finally {
       setLoading(false);
     }
-  }, [currentPage, leadsPerPage, search, receivedOnFilter, tripDateFilter]); // Include all dependencies
-
-  // Fetch leads when component mounts or dependencies change
-  useEffect(() => {
-    fetchLeads();
-  }, [fetchLeads]); // fetchLeads is now a dependency but is memoized with useCallback
+  };
 
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this lead?")) {
@@ -82,14 +64,15 @@ const ManageLeads = () => {
     }
     
     try {
-      // Ensure we're passing a valid ID
-      if (!id) {
+      // Ensure we're passing a numeric ID
+      const numericId = parseInt(id, 10);
+      if (isNaN(numericId)) {
         throw new Error("Invalid lead ID");
       }
       
-      const response = await axios.delete(`${API_BASE_URL}/${id}`);
+      const response = await axios.delete(`${API_BASE_URL}/${numericId}`);
       
-      // Check if delete was successful
+      // Check if delete was successful (both ways API might respond)
       if ((response.data && response.data.success) || response.status === 200) {
         // Show success message
         alert("Lead deleted successfully");
@@ -100,7 +83,7 @@ const ManageLeads = () => {
       }
     } catch (err) {
       console.error("Error deleting lead:", err);
-      setError(`Failed to delete lead: ${err.message}`);
+      setError(`Failed to delete lead: ${err.response?.data?.message || err.message}`);
     }
   };
 
@@ -144,9 +127,9 @@ const ManageLeads = () => {
     setCurrentPage(pageNumber);
   };
 
-  // Improved date formatting function with more robust error handling
+  // Improved date formatting function
   const formatDate = (dateString) => {
-    if (!dateString) return "N/A";
+    if (!dateString) return "";
     try {
       const date = new Date(dateString);
       if (isNaN(date.getTime())) return "Invalid date";
@@ -259,36 +242,26 @@ const ManageLeads = () => {
               </tr>
             </thead>
             <tbody>
-              {leads && leads.length > 0 ? (
+              {leads.length > 0 ? (
                 leads.map((lead, index) => (
-                  <tr key={lead.id || lead._id || index}>
+                  <tr key={lead.id || index}>
                     <td>{(currentPage - 1) * leadsPerPage + index + 1}</td>
-                    <td>{formatDate(lead.date || lead.received_date || lead.created_at)}</td>
-                    <td>{lead.vendor_name || lead.vendorName || "N/A"}</td>
-                    <td>{lead.location_from || lead.locationFrom || lead.from || "N/A"}</td>
-                    <td>{lead.to_location || lead.location_to || lead.locationTo || lead.to || "N/A"}</td>
-                    <td>{formatDate(lead.trip_date || lead.tripDate || lead.date)}</td>
-                    <td>{lead.time || lead.trip_time || lead.tripTime || "N/A"}</td>
+                    <td>{formatDate(lead.date)}</td>
+                    <td>{lead.vendor_name}</td>
+                    <td>{lead.location_from}</td>
+                    <td>{lead.to_location}</td>
+                    <td>{formatDate(lead.date)}</td>
+                    <td>{lead.time}</td>
                     <td>
-                      {lead.vendor_contact || lead.vendorContact || lead.contact ? (
-                        <a href={`tel:${lead.vendor_contact || lead.vendorContact || lead.contact}`} style={{ color: "#007bff", textDecoration: "none" }}>
-                          {lead.vendor_contact || lead.vendorContact || lead.contact}
-                        </a>
-                      ) : (
-                        "N/A"
-                      )}
+                      <a href={`tel:${lead.vendor_contact}`} style={{ color: "#007bff", textDecoration: "none" }}>
+                        {lead.vendor_contact}
+                      </a>
                     </td>
                     <td>
-                      <button 
-                        className="update-btn" 
-                        title="Edit Lead"
-                        onClick={() => window.location.href = `/admin/leads/edit/${lead.id || lead._id}`}
-                      >
-                        ✏️
-                      </button>
+                      <button className="update-btn" title="Edit Lead">✏️</button>
                       <button 
                         className="delete-btn" 
-                        onClick={() => handleDelete(lead.id || lead._id)}
+                        onClick={() => handleDelete(lead.id)}
                         title="Delete Lead"
                       >
                         🗑️
@@ -339,13 +312,8 @@ const ManageLeads = () => {
           
           {/* Display page numbers */}
           {Array.from({ length: totalPages }, (_, i) => {
-            // Only show 5 page numbers at a time centered around current page
-            if (
-              (totalPages <= 5) ||
-              (i + 1 === 1) || 
-              (i + 1 === totalPages) ||
-              (i + 1 >= currentPage - 1 && i + 1 <= currentPage + 1)
-            ) {
+            // Only show 5 page numbers at a time
+            if (i + 1 > currentPage - 3 && i + 1 < currentPage + 3) {
               return (
                 <button 
                   key={i} 
@@ -363,11 +331,6 @@ const ManageLeads = () => {
                   {i + 1}
                 </button>
               );
-            } else if (
-              (i + 1 === currentPage - 2 && currentPage > 3) || 
-              (i + 1 === currentPage + 2 && currentPage < totalPages - 2)
-            ) {
-              return <span key={i} style={{ margin: "0 5px" }}>...</span>;
             }
             return null;
           })}
@@ -389,33 +352,6 @@ const ManageLeads = () => {
           </button>
         </div>
       )}
-
-      {/* Records per page selector */}
-      <div style={{ 
-        display: "flex", 
-        justifyContent: "center", 
-        alignItems: "center", 
-        margin: "15px 0" 
-      }}>
-        <label style={{ marginRight: "10px" }}>Leads per page:</label>
-        <select 
-          value={leadsPerPage} 
-          onChange={(e) => {
-            setLeadsPerPage(Number(e.target.value));
-            setCurrentPage(1); // Reset to first page when changing limit
-          }}
-          style={{ 
-            padding: "6px 10px", 
-            borderRadius: "4px", 
-            border: "1px solid #ddd" 
-          }}
-        >
-          <option value={5}>5</option>
-          <option value={10}>10</option>
-          <option value={25}>25</option>
-          <option value={50}>50</option>
-        </select>
-      </div>
 
       {/* Footer */}
       <div style={{ 
