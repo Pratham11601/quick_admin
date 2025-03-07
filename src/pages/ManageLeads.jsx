@@ -15,25 +15,56 @@ const ManageLeads = () => {
   const [tripDateFilter, setTripDateFilter] = useState("");
 
   // Set base URL for all API requests
-  const API_BASE_URL = "https://quickcabpune.com/app/leads";
+  const API_BASE_URL = "http://localhost:5000/api/leads";
 
   // Fetch leads when component mounts or filters change
   useEffect(() => {
     fetchLeads();
   }, [currentPage, leadsPerPage]); // Only refresh automatically when page changes
 
+  // Function to format date for API requests - DD/MM/YYYY format (Changed from MM/DD/YYYY)
+  const formatDateForAPI = (dateString) => {
+    if (!dateString) return "";
+    
+    try {
+      // Parse the input date (which will be in yyyy-MM-dd format from the input field)
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) return "";
+      
+      // Format as DD/MM/YYYY for API - updated from MM/DD/YYYY
+      const day = String(date.getDate()).padStart(2, '0');
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const year = date.getFullYear();
+      
+      return `${day}/${month}/${year}`;
+    } catch (err) {
+      console.error("Error formatting date for API:", err);
+      return "";
+    }
+  };
+
   const fetchLeads = async () => {
     setLoading(true);
     try {
       // Build query parameters
-      const params = new URLSearchParams({
-        page: currentPage,
-        limit: leadsPerPage
-      });
+      const params = new URLSearchParams();
+      params.append("page", currentPage);
+      params.append("limit", leadsPerPage);
       
       if (search) params.append("search", search);
-      if (receivedOnFilter) params.append("receivedOn", receivedOnFilter);
-      if (tripDateFilter) params.append("tripDate", tripDateFilter);
+      
+      // Format dates properly for API and ensure they match exactly what's shown in Swagger
+      if (receivedOnFilter) {
+        const formattedDate = formatDateForAPI(receivedOnFilter);
+        if (formattedDate) params.append("receivedOn", formattedDate);
+      }
+      
+      if (tripDateFilter) {
+        const formattedDate = formatDateForAPI(tripDateFilter);
+        if (formattedDate) params.append("tripDate", formattedDate);
+      }
+      
+      console.log("API Request URL:", `${API_BASE_URL}?${params.toString()}`); // Debug log
       
       const response = await axios.get(`${API_BASE_URL}?${params.toString()}`);
       
@@ -42,8 +73,6 @@ const ManageLeads = () => {
         // Process the dates properly before setting state
         const processedLeads = response.data.data.map(lead => ({
           ...lead,
-          // Store original date string to debug
-          originalDate: lead.date,
           // Ensure date format is correctly processed
           formattedReceivedDate: formatDateForDisplay(lead.receivedOn || lead.date),
           formattedTripDate: formatDateForDisplay(lead.tripDate || lead.date)
@@ -118,15 +147,13 @@ const ManageLeads = () => {
     setReceivedOnFilter("");
     setTripDateFilter("");
     setCurrentPage(1);
-    fetchLeads();
+    // Call fetchLeads immediately after clearing filters
+    setTimeout(() => fetchLeads(), 0);
   };
 
-  // Improved date formatting function with several fallback methods
+  // Improved date formatting function with several fallback methods - Updated to DD/MM/YYYY
   function formatDateForDisplay(dateString) {
     if (!dateString) return "N/A";
-    
-    // Log the input for debugging
-    console.log("Formatting date:", dateString, "Type:", typeof dateString);
     
     try {
       // First attempt: direct conversion
@@ -134,7 +161,7 @@ const ManageLeads = () => {
       
       // Check if valid
       if (!isNaN(date.getTime())) {
-        return date.toLocaleDateString('en-US', {
+        return date.toLocaleDateString('en-GB', {  // Changed from 'en-US' to 'en-GB' for DD/MM/YYYY format
           year: 'numeric',
           month: '2-digit',
           day: '2-digit'
@@ -142,13 +169,14 @@ const ManageLeads = () => {
       }
       
       // Second attempt: try parsing different formats
-      // Try MM/DD/YYYY format
+      // Try DD/MM/YYYY format (updated from MM/DD/YYYY)
       if (typeof dateString === 'string' && dateString.includes('/')) {
         const parts = dateString.split('/');
         if (parts.length === 3) {
-          date = new Date(parseInt(parts[2]), parseInt(parts[0]) - 1, parseInt(parts[1]));
+          // Changed order to accommodate DD/MM/YYYY format
+          date = new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));
           if (!isNaN(date.getTime())) {
-            return date.toLocaleDateString('en-US', {
+            return date.toLocaleDateString('en-GB', {
               year: 'numeric',
               month: '2-digit',
               day: '2-digit'
@@ -161,7 +189,7 @@ const ManageLeads = () => {
       if (!isNaN(Number(dateString))) {
         date = new Date(Number(dateString));
         if (!isNaN(date.getTime())) {
-          return date.toLocaleDateString('en-US', {
+          return date.toLocaleDateString('en-GB', {
             year: 'numeric',
             month: '2-digit',
             day: '2-digit'
@@ -175,7 +203,7 @@ const ManageLeads = () => {
         if (parts.length === 3) {
           date = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
           if (!isNaN(date.getTime())) {
-            return date.toLocaleDateString('en-US', {
+            return date.toLocaleDateString('en-GB', {
               year: 'numeric',
               month: '2-digit',
               day: '2-digit'
@@ -205,6 +233,39 @@ const ManageLeads = () => {
       setCurrentPage(currentPage - 1);
     }
   }
+
+  // Function to handle date input changes with proper formatting
+  const handleDateInputChange = (setter, value) => {
+    setter(value);
+  };
+
+  // Format date from yyyy-MM-dd to MM/dd/yyyy for display in input fields
+  const formatDateForInput = (dateString) => {
+    if (!dateString) return "";
+    
+    try {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) return dateString;
+      
+      return date.toISOString().split('T')[0]; // Keep as yyyy-MM-dd for HTML date input
+    } catch (err) {
+      return dateString;
+    }
+  };
+
+  // Debug function to check date formats
+  const debugDate = (label, dateString) => {
+    console.log(`${label}: ${dateString}`);
+    if (dateString) {
+      console.log(`Formatted for API: ${formatDateForAPI(dateString)}`);
+    }
+  };
+
+  // Call debug function to help troubleshoot
+  useEffect(() => {
+    debugDate('Received On Filter', receivedOnFilter);
+    debugDate('Trip Date Filter', tripDateFilter);
+  }, [receivedOnFilter, tripDateFilter]);
 
   return (
     <div className="categories-page-body h-screen">
@@ -250,41 +311,87 @@ const ManageLeads = () => {
         <button className="search-btn" onClick={handleSearch}>Search</button>
       </div>
 
-      {/* Filter Section */}
-      <div className="filter-container">
-        <div>
+      {/* Filter Section - Updated with modern UI and updated placeholder */}
+      <div className="filter-container" style={{ 
+        display: "flex", 
+        gap: "10px", 
+        margin: "20px 0",
+        flexWrap: "wrap",
+        alignItems: "center" 
+      }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
           <label>Received On:</label>
           <input 
             type="date" 
-            value={receivedOnFilter}
-            onChange={(e) => setReceivedOnFilter(e.target.value)}
-            placeholder="mm/dd/yyyy"
+            value={formatDateForInput(receivedOnFilter)}
+            onChange={(e) => handleDateInputChange(setReceivedOnFilter, e.target.value)}
+            style={{
+              padding: "8px 12px",
+              borderRadius: "4px",
+              border: "1px solid #ddd"
+            }}
+            placeholder="dd/mm/yyyy"  // Updated placeholder
           />
-          <button className="filter-btn" onClick={handleReceivedOnFilter}>Filter</button>
+          <button 
+            onClick={handleReceivedOnFilter}
+            style={{
+              padding: "8px 16px",
+              backgroundColor: "#ff9800",
+              color: "white",
+              border: "none",
+              borderRadius: "4px",
+              cursor: "pointer"
+            }}
+          >
+            Filter
+          </button>
         </div>
         
-        <div>
+        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
           <label>Trip Date:</label>
           <input 
             type="date" 
-            value={tripDateFilter}
-            onChange={(e) => setTripDateFilter(e.target.value)}
-            placeholder="mm/dd/yyyy"
+            value={formatDateForInput(tripDateFilter)}
+            onChange={(e) => handleDateInputChange(setTripDateFilter, e.target.value)}
+            style={{
+              padding: "8px 12px",
+              borderRadius: "4px",
+              border: "1px solid #ddd"
+            }}
+            placeholder="dd/mm/yyyy"  // Updated placeholder
           />
-          <button className="filter-btn" onClick={handleTripDateFilter}>Filter</button>
+          <button 
+            onClick={handleTripDateFilter}
+            style={{
+              padding: "8px 16px",
+              backgroundColor: "#ff9800",
+              color: "white",
+              border: "none",
+              borderRadius: "4px",
+              cursor: "pointer"
+            }}
+          >
+            Filter
+          </button>
         </div>
         
         <button 
-          className="filter-btn" 
           onClick={clearFilters}
-          style={{ backgroundColor: "#6c757d" }}
+          style={{
+            padding: "8px 16px",
+            backgroundColor: "#6c757d",
+            color: "white",
+            border: "none",
+            borderRadius: "4px",
+            cursor: "pointer"
+          }}
         >
           Clear Filters
         </button>
       </div>
 
-      {/* Leads Table */}
-      <div className="table-container">
+      {/* Leads Table - Updated with modern styling */}
+      <div className="table-container" style={{ overflowX: "auto" }}>
         {loading ? (
           <div style={{ 
             padding: "40px", 
@@ -295,59 +402,65 @@ const ManageLeads = () => {
             Loading leads...
           </div>
         ) : (
-          <table>
+          <table style={{ 
+            width: "100%", 
+            borderCollapse: "separate", 
+            borderSpacing: "0",
+            backgroundColor: "white",
+            borderRadius: "8px",
+            overflow: "hidden",
+            boxShadow: "0 2px 8px rgba(0,0,0,0.1)"
+          }}>
             <thead>
-              <tr>
-                <th>Sr. No.</th>
-                <th>Received On</th>
-                <th>Vendor Name</th>
-                <th>Location From</th>
-                <th>Location To</th>
-                <th>Trip Date</th>
-                <th>Trip Time</th>
-                <th>Contact</th>
-                <th>Actions</th>
+              <tr style={{ backgroundColor: "#0d6efd", color: "white" }}>
+                <th style={{ padding: "12px", textAlign: "center" }}>Sr. No.</th>
+                <th style={{ padding: "12px", textAlign: "center" }}>Received On</th>
+                <th style={{ padding: "12px", textAlign: "center" }}>Vendor Name</th>
+                <th style={{ padding: "12px", textAlign: "center" }}>Location From</th>
+                <th style={{ padding: "12px", textAlign: "center" }}>Location To</th>
+                <th style={{ padding: "12px", textAlign: "center" }}>Trip Date</th>
+                <th style={{ padding: "12px", textAlign: "center" }}>Trip Time</th>
+                <th style={{ padding: "12px", textAlign: "center" }}>Contact</th>
+                <th style={{ padding: "12px", textAlign: "center" }}>Actions</th>
               </tr>
             </thead>
             <tbody>
               {leads.length > 0 ? (
                 leads.map((lead, index) => (
-                  <tr key={lead.id || index}>
-                    <td>{(currentPage - 1) * leadsPerPage + index + 1}</td>
-                    <td>{lead.formattedReceivedDate}</td>
-                    <td>{lead.vendor_name}</td>
-                    <td>{lead.location_from}</td>
-                    <td>{lead.to_location}</td>
-                    <td>{lead.formattedTripDate}</td>
-                    <td>{lead.time}</td>
-                    <td>
+                  <tr key={lead.id || index} style={{ 
+                    borderBottom: "1px solid #dee2e6",
+                    backgroundColor: index % 2 === 0 ? "#f9f9f9" : "white"
+                  }}>
+                    <td style={{ padding: "12px", textAlign: "center" }}>{(currentPage - 1) * leadsPerPage + index + 1}</td>
+                    <td style={{ padding: "12px", textAlign: "center" }}>{lead.formattedReceivedDate}</td>
+                    <td style={{ padding: "12px", textAlign: "center" }}>{lead.vendor_name}</td>
+                    <td style={{ padding: "12px", textAlign: "center" }}>{lead.location_from}</td>
+                    <td style={{ padding: "12px", textAlign: "center" }}>{lead.to_location}</td>
+                    <td style={{ padding: "12px", textAlign: "center" }}>{lead.formattedTripDate}</td>
+                    <td style={{ padding: "12px", textAlign: "center" }}>{lead.time}</td>
+                    <td style={{ padding: "12px", textAlign: "center" }}>
                       <a href={`tel:${lead.vendor_contact}`} style={{ color: "#007bff", textDecoration: "none" }}>
                         {lead.vendor_contact}
                       </a>
                     </td>
-                    <td>
+                    <td style={{ padding: "12px", textAlign: "center" }}>
                       <button 
-                        className="delete-btn" 
                         onClick={() => handleDelete(lead.id)}
                         title="Delete Lead"
                         style={{
-                          background: 'none',
-                          border: 'none',
-                          cursor: 'pointer',
-                          color: 'white'
-                        }}
-                      >
-                        <div style={{
-                          backgroundColor: '#dc3545',
+                          background: '#dc3545',
                           borderRadius: '4px',
                           width: '40px',
                           height: '40px',
                           display: 'flex',
                           justifyContent: 'center',
-                          alignItems: 'center'
-                        }}>
-                          🗑️
-                        </div>
+                          alignItems: 'center',
+                          border: 'none',
+                          color: 'white',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        🗑️
                       </button>
                     </td>
                   </tr>
@@ -369,55 +482,51 @@ const ManageLeads = () => {
         )}
       </div>
 
-      {/* Updated Pagination to match the image */}
+      {/* Pagination - Updated with modern styling to match the image */}
       {totalPages > 0 && (
-        <div style={{ 
-          display: "flex", 
-          justifyContent: "space-between", 
-          alignItems: "center", 
+        <div style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
           margin: "20px 0",
-          maxWidth: "100%"
+          gap: "10px"
         }}>
-          <button 
-            onClick={goToPreviousPage} 
+          <button
+            onClick={goToPreviousPage}
             disabled={currentPage === 1}
-            style={{ 
-              padding: "8px 16px", 
-              backgroundColor: "#007bff", 
-              color: "white", 
-              border: "none", 
-              borderRadius: "4px", 
-              cursor: currentPage === 1 ? "not-allowed" : "pointer", 
-              opacity: currentPage === 1 ? 0.6 : 1,
-              display: "flex",
-              alignItems: "center",
-              gap: "5px"
+            style={{
+              padding: "8px 16px",
+              backgroundColor: "#0d6efd",
+              color: "white",
+              border: "none",
+              borderRadius: "4px",
+              cursor: currentPage === 1 ? "not-allowed" : "pointer",
+              opacity: currentPage === 1 ? 0.6 : 1
             }}
           >
             ← Previous
           </button>
           
           <div style={{
-            fontWeight: "bold",
-            fontSize: "16px"
+            padding: "8px 16px",
+            backgroundColor: "#f8f9fa",
+            borderRadius: "4px",
+            border: "1px solid #dee2e6"
           }}>
             Page {currentPage} of {totalPages}
           </div>
           
-          <button 
-            onClick={goToNextPage} 
+          <button
+            onClick={goToNextPage}
             disabled={currentPage === totalPages}
-            style={{ 
-              padding: "8px 16px", 
-              backgroundColor: "#007bff", 
-              color: "white", 
-              border: "none", 
-              borderRadius: "4px", 
-              cursor: currentPage === totalPages ? "not-allowed" : "pointer", 
-              opacity: currentPage === totalPages ? 0.6 : 1,
-              display: "flex",
-              alignItems: "center",
-              gap: "5px"
+            style={{
+              padding: "8px 16px",
+              backgroundColor: "#0d6efd",
+              color: "white",
+              border: "none",
+              borderRadius: "4px",
+              cursor: currentPage === totalPages ? "not-allowed" : "pointer",
+              opacity: currentPage === totalPages ? 0.6 : 1
             }}
           >
             Next →
