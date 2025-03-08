@@ -22,7 +22,7 @@ const ManageSubPackages = () => {
 
   const fetchPackages = async () => {
     try {
-      const response = await axios.get(`http://localhost:5000/api/sub-packages?page=${currentPage}&limit=${limit}`);
+      const response = await axios.get(`https://quickcabpune.com/admin/api/sub-packages?page=${currentPage}&limit=${limit}`);
       setPackages(response.data.data);
       setTotalPages(response.data.totalPages);
     } catch (error) {
@@ -47,10 +47,10 @@ const ManageSubPackages = () => {
       try {
         if (editingIndex !== null) {
           // Update existing package
-          await axios.put(`http://localhost:5000/api/sub-packages/${packages[editingIndex].id}`, packageData);
+          await axios.put(`https://quickcabpune.com/admin/api/sub-packages/${packages[editingIndex].id}`, packageData);
         } else {
           // Add new package
-          await axios.post("http://localhost:5000/api/sub-packages", packageData);
+          await axios.post("https://quickcabpune.com/admin/api/sub-packages", packageData);
         }
         setEditingIndex(null);
         setNewPackage({ name: "", duration: "", pricePerDay: "" });
@@ -74,7 +74,7 @@ const ManageSubPackages = () => {
   // Delete package
   const deletePackage = async (id) => {
     try {
-      await axios.delete(`http://localhost:5000/api/sub-packages/${id}`);
+      await axios.delete(`https://quickcabpune.com/admin/api/sub-packages/${id}`);
       fetchPackages();
     } catch (error) {
       console.error("Error deleting package:", error);

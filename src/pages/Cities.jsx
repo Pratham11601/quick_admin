@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "../styles/cities.css";
 
-const API_URL = "http://localhost:5000/api/cities";
+const API_URL = "https://quickcabpune.com/admin/api/cities";
 
 const ManageCities = () => {
   const [cities, setCities] = useState([]);

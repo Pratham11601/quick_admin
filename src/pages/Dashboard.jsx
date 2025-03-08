@@ -23,7 +23,7 @@ const Dashboard = () => {
           setVendorCount(vendorData.data.length);
         }
 
-        const leadsResponse = await fetch("http://localhost:5000/api/leads");
+        const leadsResponse = await fetch("https://quickcabpune.com/admin/api/leads");
         const leadsData = await leadsResponse.json();
         
         if (leadsData && leadsData.data) {

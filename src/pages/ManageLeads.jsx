@@ -15,7 +15,7 @@ const ManageLeads = () => {
   const [tripDateFilter, setTripDateFilter] = useState("");
 
   // Set base URL for all API requests
-  const API_BASE_URL = "http://localhost:5000/api/leads";
+  const API_BASE_URL = "https://quickcabpune.com/admin/api/leads";
 
   // Fetch leads when component mounts or filters change
   useEffect(() => {

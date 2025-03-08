@@ -11,7 +11,7 @@ const HelpSupport = () => {
   const [remarkText, setRemarkText] = useState("");
 
   const rowsPerPage = 5;
-  const API_URL = "http://localhost:5000/api/help-support";
+  const API_URL = "https://quickcabpune.com/admin/api/help-support";
 
   // Fetch Help Support Queries from API
   const fetchData = async (page) => {
