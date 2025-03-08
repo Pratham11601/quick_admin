@@ -20,10 +20,10 @@ const Router = () => {
     <Routes>
       <Route path="/" element={<Navigate to="/dashboard" />} />
       <Route path="/admin-login" element={<AdminLogin />} />
-      <Route path="/dashboard" element={<Dashboard />} />
-      <Route path="/sell-car" element={<SellCar />} />
-      <Route path="/settings" element={<Settings />} />
-      <Route path="/cities" element={<Cities />} />
+      <Route path="/admin/dashboard" element={<Dashboard />} />
+      <Route path="/admin/sell-car" element={<SellCar />} />
+      <Route path="/admin/settings" element={<Settings />} />
+      <Route path="/admin/cities" element={<Cities />} />
       <Route path="/category" element={<Category />} /> 
       <Route path="/sub-packages" element={<Subpackages />} /> 
       <Route path="/subscriptions" element={<Subscriptions />} /> 
