@@ -16,28 +16,47 @@ const Dashboard = () => {
         // Fetch vendors
         const vendorResponse = await fetch("https://quickcabpune.com/admin/api/vendor");
         const vendorData = await vendorResponse.json();
-        
-        if (Array.isArray(vendorData)) {
-          setVendorCount(vendorData.length);
-        } else if (vendorData.data && Array.isArray(vendorData.data)) {
+        console.log("Vendor Data:", vendorData);
+
+        if (vendorData && Array.isArray(vendorData.data)) {
           setVendorCount(vendorData.data.length);
+        } else if (Array.isArray(vendorData)) {
+          setVendorCount(vendorData.length);
+        } else {
+          setVendorCount(0);
         }
 
-        const leadsResponse = await fetch("https://quickcabpune.com/admin/api/leads");
+        // Fetch leads
+        const leadsResponse = await fetch("https://quickcabpune.com/app/leads");
         const leadsData = await leadsResponse.json();
-        
-        if (leadsData && leadsData.data) {
-          const leads = Array.isArray(leadsData) ? leadsData : leadsData.data;
-          
-          setTotalLeads(leads.length);
-          
-          const active = leads.filter(lead => lead.status === 'active').length;
+        console.log("Leads Data:", leadsData);
+
+        let leadsArray = [];
+        if (leadsData && Array.isArray(leadsData)) {
+          leadsArray = leadsData;
+        } else if (leadsData && leadsData.data && Array.isArray(leadsData.data)) {
+          leadsArray = leadsData.data;
+        }
+
+        if (leadsArray.length > 0) {
+          setTotalLeads(leadsArray.length);
+
+          const active = leadsArray.filter(
+            (lead) => lead.status && lead.status.toLowerCase() === "active"
+          ).length;
           setActiveLeads(active);
-          
-          setInactiveLeads(leads.length - active);
+          setInactiveLeads(leadsArray.length - active);
+        } else {
+          setTotalLeads(0);
+          setActiveLeads(0);
+          setInactiveLeads(0);
         }
       } catch (error) {
         console.error("Error fetching data:", error);
+        setVendorCount(0);
+        setTotalLeads(0);
+        setActiveLeads(0);
+        setInactiveLeads(0);
       } finally {
         setLoading(false);
       }
