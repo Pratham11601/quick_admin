@@ -1,4 +1,4 @@
-import React from "react";
+// import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 
 import AdminLogin from "../pages/AdminLogin";
@@ -18,7 +18,7 @@ import EmailSettings from "../pages/EmailSettings";
 const Router = () => {
   return (
     <Routes>
-      <Route path="/" element={<Navigate to="/dashboard" />} />
+      // <Route path="/" element={<Navigate to="/dashboard" />} />
       <Route path="/admin-login" element={<AdminLogin />} />
       <Route path="/dashboard" element={<Dashboard />} />
       <Route path="/sell-car" element={<SellCar />} />
