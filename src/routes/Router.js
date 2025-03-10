@@ -33,6 +33,7 @@ const Router = () => {
       <Route path="/help-support" element={<HelpSupport />} />
       <Route path="/password-settings" element={<PasswordSettings />} />
       <Route path="/email-settings" element={<EmailSettings />} />
+      {/* <Route path="/advertisements" element={<Advertisements />} /> */}
     </Routes>
   );
 };
@@ -40,4 +41,3 @@ const Router = () => {
 export default Router;
 
     // <Route path="/" element={<Navigate to="/dashboard" />} />
-
