@@ -4,11 +4,9 @@ import "../styles/Subscriptions.css";
 const API_URL = "https://quickcabpune.com/admin/api/subscriptions";
 
 const Subscriptions = () => {
-  const [subscriptions, setSubscriptions] = useState([]);
-  const [newSubscription, setNewSubscription] = useState({
-    duration: "",
-    price: "",
-  });
+  const [allSubscriptions, setAllSubscriptions] = useState([]); // Store all data
+  const [subscriptions, setSubscriptions] = useState([]); // Store paginated data
+  const [newSubscription, setNewSubscription] = useState({ duration: "", price: "" });
   const [editingIndex, setEditingIndex] = useState(null);
   const [editingId, setEditingId] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -17,33 +15,41 @@ const Subscriptions = () => {
   const [limit, setLimit] = useState(10);
   const [totalPages, setTotalPages] = useState(1);
 
-  // Fetch subscriptions from API
   useEffect(() => {
     fetchSubscriptions();
-  }, [page, limit]);
+  }, []);
+
+  useEffect(() => {
+    paginateData();
+  }, [page, limit, allSubscriptions]);
 
   const fetchSubscriptions = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`${API_URL}?page=${page}&limit=${limit}`);
+      const response = await fetch(API_URL);
       const data = await response.json();
 
       if (data.status && data.data && Array.isArray(data.data)) {
-        setSubscriptions(data.data);
-        // Calculate total pages if the API provides total count
-        if (data.totalCount) {
-          setTotalPages(Math.ceil(data.totalCount / limit));
-        }
+        setAllSubscriptions(data.data);
+        setTotalPages(Math.ceil(data.data.length / limit));
+        setPage(1); // Reset to first page when fetching new data
       } else {
-        setSubscriptions([]); // Ensure subscriptions is always an array
+        setAllSubscriptions([]);
       }
     } catch (error) {
       console.error("Error fetching subscriptions:", error);
       setError("Failed to load subscriptions.");
-      setSubscriptions([]); // Prevents .map() crash
+      setAllSubscriptions([]);
     } finally {
       setLoading(false);
     }
+  };
+
+  const paginateData = () => {
+    const startIndex = (page - 1) * limit;
+    const endIndex = startIndex + limit;
+    setSubscriptions(allSubscriptions.slice(startIndex, endIndex));
+    setTotalPages(Math.ceil(allSubscriptions.length / limit));
   };
 
   const handleChange = (e) => {
@@ -96,9 +102,7 @@ const Subscriptions = () => {
 
   const deleteSubscription = async (id) => {
     try {
-      const response = await fetch(`${API_URL}/${id}`, {
-        method: "DELETE",
-      });
+      const response = await fetch(`${API_URL}/${id}`, { method: "DELETE" });
 
       if (response.ok) {
         fetchSubscriptions();
@@ -180,18 +184,14 @@ const Subscriptions = () => {
       <div className="pagination-controls">
         <div className="limit-selector">
           <label htmlFor="limit-select">Items per page:</label>
-          <select
-            id="limit-select"
-            value={limit}
-            onChange={handleLimitChange}
-          >
+          <select id="limit-select" value={limit} onChange={handleLimitChange}>
             <option value="5">5</option>
             <option value="10">10</option>
             <option value="20">20</option>
             <option value="50">50</option>
           </select>
         </div>
-        
+
         <div className="page-navigator">
           <button
             onClick={() => handlePageChange(page - 1)}
