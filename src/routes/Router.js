@@ -24,10 +24,6 @@ import Advertisements from "../pages/Advertisements"; // New Advertisements Page
 const Router = () => {
   return (
     <Routes>
-<<<<<<< HEAD
-      <Route path="/admin/*" element={<AdminLogin />} />
-      <Route path="/dashboard/*" element={<Dashboard />} />
-=======
          
       <Route path="/admin/*" element={<AdminLogin />} />
       <Route path="/admin-dasd/*" element={<Dashboard />} />
