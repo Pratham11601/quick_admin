@@ -18,9 +18,8 @@ import EmailSettings from "../pages/EmailSettings";
 const Router = () => {
   return (
     <Routes>
-      // <Route path="/" element={<Navigate to="/dashboard" />} />
+   
        <Route path="/admin/*" element={<AdminLogin />} />
-       // <Route path="/admin-login" element={<AdminLogin />} />
        <Route path="/dashboard/*" element={<Dashboard />} />
        <Route path="/sell-car" element={<SellCar />} />
        <Route path="/settings" element={<Settings />} />
