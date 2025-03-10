@@ -14,11 +14,12 @@ import VendorDetails from "../pages/VendorDetails";
 import HelpSupport from "../pages/HelpSupport";  
 import PasswordSettings from "../pages/PasswordSettings"; 
 import EmailSettings from "../pages/EmailSettings";
+import HomeNavigate from "../pages/HomeNavigate";
 
 const Router = () => {
   return (
     <Routes>
-      <Route path="/" element={<Navigate to="https://quickcabpune.com" />} />
+      <Route path="/" element={<HomeNavigate />} />
       <Route path="/admin/*" element={<AdminLogin />} />
       <Route path="/admin-dasd/*" element={<Dashboard />} />
       <Route path="/sell-car" element={<SellCar />} />

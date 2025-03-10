@@ -6,13 +6,13 @@ import TopNav from "../TopNav/TopNav";
 
 const Layout = () => {
   const location = useLocation();
-  const isAdminLogin = location.pathname === "/admin-login"; // Check if current page is AdminLogin
+  const isAdminLogin = location.pathname === "/"; // Check if current page is AdminLogin
 
   return (
     <div className="layout">
-      {!isAdminLogin && <Sidebar />} {/* Hide Sidebar on AdminLogin */}
+      {isAdminLogin && <Sidebar />} {/* Hide Sidebar on AdminLogin */}
       <div className="main__layout">
-        {!isAdminLogin && <TopNav />} {/* Hide TopNav on AdminLogin */}
+        {isAdminLogin && <TopNav />} {/* Hide TopNav on AdminLogin */}
         <div className="content">
           <Router />
         </div>   
