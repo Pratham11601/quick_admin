@@ -14,18 +14,26 @@ const ManageCities = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const citiesPerPage = 5;
+  const [filteredCities, setFilteredCities] = useState([]);
 
-  // Fetch cities from API
+  // Fetch all cities from API
   useEffect(() => {
-    fetchCities();
-  }, [currentPage]);
+    fetchAllCities();
+  }, []);
 
-  const fetchCities = async () => {
+  // Update filtered cities when cities or pagination changes
+  useEffect(() => {
+    const startIndex = (currentPage - 1) * citiesPerPage;
+    const endIndex = startIndex + citiesPerPage;
+    setFilteredCities(cities.slice(startIndex, endIndex));
+    setTotalPages(Math.ceil(cities.length / citiesPerPage));
+  }, [cities, currentPage, citiesPerPage]);
+
+  const fetchAllCities = async () => {
     try {
-      const response = await axios.get(`${API_URL}?page=${currentPage}&limit=${citiesPerPage}`);
+      const response = await axios.get(`${API_URL}/all`);
       if (response.data.success) {
         setCities(response.data.data);
-        setTotalPages(Math.ceil(response.data.total / citiesPerPage));
       } else {
         setCities([]);
       }
@@ -48,7 +56,7 @@ const ManageCities = () => {
       });
       setNewCity("");
       setNewState("");
-      fetchCities();
+      fetchAllCities();
     } catch (error) {
       console.error("Error adding city:", error);
     }
@@ -60,7 +68,7 @@ const ManageCities = () => {
 
     try {
       await axios.delete(`${API_URL}/${city_id}`);
-      fetchCities();
+      fetchAllCities();
     } catch (error) {
       console.error("Error deleting city:", error);
     }
@@ -86,7 +94,7 @@ const ManageCities = () => {
         state_name: editStateName,
       });
       setEditCity(null);
-      fetchCities();
+      fetchAllCities();
     } catch (error) {
       console.error("Error updating city:", error);
     }
@@ -103,7 +111,7 @@ const ManageCities = () => {
 
   return (
     <div className="container">
-<h1 style={{ marginTop: "35px" }}>Manage Cities</h1>
+      <h1 style={{ marginTop: "35px" }}>Manage Cities</h1>
 
       {/* Add City Form */}
       <div className="add-city">
@@ -134,8 +142,8 @@ const ManageCities = () => {
             </tr>
           </thead>
           <tbody>
-            {cities.length > 0 ? (
-              cities.map((city, index) => (
+            {filteredCities.length > 0 ? (
+              filteredCities.map((city, index) => (
                 <tr key={city.city_id}>
                   <td>{(currentPage - 1) * citiesPerPage + index + 1}</td>
                   <td>
