@@ -1,5 +1,5 @@
 import React from "react";
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 
 import AdminLogin from "../pages/AdminLogin";
 import Dashboard from "../pages/Dashboard";
@@ -14,16 +14,16 @@ import VendorDetails from "../pages/VendorDetails";
 import HelpSupport from "../pages/HelpSupport";  
 import PasswordSettings from "../pages/PasswordSettings"; 
 import EmailSettings from "../pages/EmailSettings";
+import Advertisements from "../pages/Advertisements"; // New Advertisements Page
 
 const Router = () => {
   return (
     <Routes>
-   
-       <Route path="/admin/*" element={<AdminLogin />} />
-       <Route path="/dashboard/*" element={<Dashboard />} />
-       <Route path="/sell-car" element={<SellCar />} />
-       <Route path="/settings" element={<Settings />} />
-       <Route path="/cities" element={<Cities />} />
+      <Route path="/admin/*" element={<AdminLogin />} />
+      <Route path="/dashboard/*" element={<Dashboard />} />
+      <Route path="/sell-car" element={<SellCar />} />
+      <Route path="/settings" element={<Settings />} />
+      <Route path="/cities" element={<Cities />} />
       <Route path="/category" element={<Category />} /> 
       <Route path="/sub-packages" element={<Subpackages />} /> 
       <Route path="/subscriptions" element={<Subscriptions />} /> 
@@ -32,6 +32,7 @@ const Router = () => {
       <Route path="/help-support" element={<HelpSupport />} />
       <Route path="/password-settings" element={<PasswordSettings />} />
       <Route path="/email-settings" element={<EmailSettings />} />
+      <Route path="/advertisements" element={<Advertisements />} /> {/* New Route for Advertisements */}
     </Routes>
   );
 };

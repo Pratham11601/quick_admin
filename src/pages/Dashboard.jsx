@@ -14,43 +14,41 @@ const Dashboard = () => {
       setLoading(true);
       try {
         // Fetch vendors
-        const vendorResponse = await fetch("https://quickcabpune.com/admin/api/vendor");
+        const vendorResponse = await fetch("https://quickcabpune.com/app/vendordetails");
         const vendorData = await vendorResponse.json();
-        console.log("Vendor Data:", vendorData);
-
-        if (vendorData && Array.isArray(vendorData.data)) {
-          setVendorCount(vendorData.data.length);
-        } else if (Array.isArray(vendorData)) {
+        
+        // Parse vendor data
+        if (vendorData && vendorData.vendors && Array.isArray(vendorData.vendors)) {
+          setVendorCount(vendorData.vendors.length);
+        } else if (vendorData && Array.isArray(vendorData)) {
           setVendorCount(vendorData.length);
         } else {
+          console.log("Vendor data structure:", vendorData);
           setVendorCount(0);
         }
 
         // Fetch leads
         const leadsResponse = await fetch("https://quickcabpune.com/app/leads");
         const leadsData = await leadsResponse.json();
-        console.log("Leads Data:", leadsData);
-
+        
+        // Parse leads data
         let leadsArray = [];
-        if (leadsData && Array.isArray(leadsData)) {
+        if (leadsData && leadsData.result && Array.isArray(leadsData.result)) {
+          leadsArray = leadsData.result;
+        } else if (leadsData && Array.isArray(leadsData)) {
           leadsArray = leadsData;
-        } else if (leadsData && leadsData.data && Array.isArray(leadsData.data)) {
-          leadsArray = leadsData.data;
         }
 
-        if (leadsArray.length > 0) {
-          setTotalLeads(leadsArray.length);
-
-          const active = leadsArray.filter(
-            (lead) => lead.status && lead.status.toLowerCase() === "active"
-          ).length;
-          setActiveLeads(active);
-          setInactiveLeads(leadsArray.length - active);
-        } else {
-          setTotalLeads(0);
-          setActiveLeads(0);
-          setInactiveLeads(0);
-        }
+        setTotalLeads(leadsArray.length);
+        
+        // Count active and inactive leads
+        const active = leadsArray.filter(
+          (lead) => lead.is_active === true || lead.is_active === "true"
+        ).length;
+        
+        setActiveLeads(active);
+        setInactiveLeads(leadsArray.length - active);
+        
       } catch (error) {
         console.error("Error fetching data:", error);
         setVendorCount(0);

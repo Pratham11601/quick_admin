@@ -50,8 +50,9 @@ const Sidebar = () => {
             </ul>
           </div>
 
+          {/* Logout Button with Margin */}
           <div className="sidebar__bottom">
-            <span>
+            <span className="logout__btn">
               <i className="ri-logout-circle-r-line"></i> Logout
             </span>
           </div>
