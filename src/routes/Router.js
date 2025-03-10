@@ -15,33 +15,30 @@ import PasswordSettings from "../pages/PasswordSettings";
 import EmailSettings from "../pages/EmailSettings";
 
 const Router = () => {
- return (
+  return (
      <Routes>
-        {/* Redirect /admin to dashboard */}
-        <Route path="/admin" element={<Navigate to="/admin/dashboard" />} />
-
-        {/* Login Page */}
-        <Route path="/admin/login" element={<AdminLogin />} />
-
-        {/* Admin Panel Routes */}
-        <Route path="/admin/dashboard" element={<Dashboard />} />
-        <Route path="/admin/dashboard/*" element={<Dashboard />} />
-        <Route path="/admin/sell-car" element={<SellCar />} />
-        <Route path="/admin/settings" element={<Settings />} />
-        <Route path="/admin/cities" element={<Cities />} />
-        <Route path="/admin/category" element={<Category />} /> 
-        <Route path="/admin/sub-packages" element={<Subpackages />} /> 
-        <Route path="/admin/subscriptions" element={<Subscriptions />} /> 
-        <Route path="/admin/leads" element={<ManageLeads />} /> 
-        <Route path="/admin/vendor-details" element={<VendorDetails />} /> 
-        <Route path="/admin/help-support" element={<HelpSupport />} />
-        <Route path="/admin/password-settings" element={<PasswordSettings />} />
-        <Route path="/admin/email-settings" element={<EmailSettings />} />
-    </Routes>
-  );
-};
-
-export default Router;
+       <Route path="/" element={<Navigate to="/dashboard" />} />
+        <Route path="/admin/*" element={<AdminRoutes />} />
+        <Route path="/admin/*" element={<AdminLogin />} />
+        // <Route path="/admin-login" element={<AdminLogin />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/dashboard/*" element={<Dashboard />} />
+        <Route path="/sell-car" element={<SellCar />} />
+        <Route path="/settings" element={<Settings />} />
+        <Route path="/cities" element={<Cities />} />
+       <Route path="/category" element={<Category />} /> 
+       <Route path="/sub-packages" element={<Subpackages />} /> 
+       <Route path="/subscriptions" element={<Subscriptions />} /> 
+       <Route path="/leads" element={<ManageLeads />} /> 
+       <Route path="/vendor-details" element={<VendorDetails />} /> 
+       <Route path="/help-support" element={<HelpSupport />} />
+       <Route path="/password-settings" element={<PasswordSettings />} />
+       <Route path="/email-settings" element={<EmailSettings />} />
+     </Routes>
+   );
+ };
+ 
+ export default Router;
 
 //  <Route path="/" element={<Navigate to="/dashboard" />} />
    // <Route path="/admin/*" element={<AdminRoutes />} />
