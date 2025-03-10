@@ -22,7 +22,7 @@ const Router = () => {
 
  return (
      <Routes>
-       <Route path="/" element={<Navigate to="/dashboard" />} />
+     
      
         <Route path="/admin/*" element={<AdminLogin />} />
 
@@ -45,6 +45,7 @@ const Router = () => {
 };
 
 export default Router;
+//  <Route path="/" element={<Navigate to="/dashboard" />} />
    // <Route path="/admin/*" element={<AdminRoutes />} />
   // <Route path="/" element={<HomeNavigate />} />
     // <Route path="/" element={<Navigate to="/dashboard" />} />
