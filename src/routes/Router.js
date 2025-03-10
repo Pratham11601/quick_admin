@@ -19,7 +19,7 @@ import HomeNavigate from "../pages/HomeNavigate";
 const Router = () => {
   return (
     <Routes>
-      // <Route path="/" element={<HomeNavigate />} />
+    
       <Route path="/admin/*" element={<AdminLogin />} />
       <Route path="/admin-dasd/*" element={<Dashboard />} />
       <Route path="/sell-car" element={<SellCar />} />
@@ -39,5 +39,5 @@ const Router = () => {
 };
 
 export default Router;
-
+  // <Route path="/" element={<HomeNavigate />} />
     // <Route path="/" element={<Navigate to="/dashboard" />} />
