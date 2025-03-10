@@ -2,7 +2,9 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "../styles/Category.css"; // Importing the CSS file
 
-const API_BASE_URL = "https://quickcabpune.com/app/categories/all";
+const GET_ALL_CATEGORIES_URL = "https://quickcabpune.com/app/categories/all"; // Endpoint for fetching all categories
+const ADD_CATEGORY_URL = "https://quickcabpune.com/admin/api/category"; // Updated endpoint for adding categories
+const DELETE_CATEGORY_URL = "https://quickcabpune.com/admin/api/category"; // Base URL for deleting categories
 
 const Categories = () => {
   const [categories, setCategories] = useState([]);
@@ -17,7 +19,7 @@ const Categories = () => {
 
   const fetchCategories = async () => {
     try {
-      const response = await axios.get(API_BASE_URL);
+      const response = await axios.get(GET_ALL_CATEGORIES_URL);
       setCategories(response.data.data || []);
     } catch (error) {
       console.error("Error fetching categories:", error);
@@ -39,14 +41,14 @@ const Categories = () => {
 
       if (editId) {
         await axios.put(
-          `${API_BASE_URL}/${editId}`,
+          `${DELETE_CATEGORY_URL}/${editId}`,
           { cat_name: newCategory },
           { headers: { "Content-Type": "application/json" } }
         );
         setEditId(null);
       } else {
         await axios.post(
-          API_BASE_URL,
+          ADD_CATEGORY_URL,
           { cat_name: newCategory },
           { headers: { "Content-Type": "application/json" } }
         );
@@ -61,7 +63,7 @@ const Categories = () => {
 
   const deleteCategory = async (categoryId) => {
     try {
-      await axios.delete(`${API_BASE_URL}/${categoryId}`);
+      await axios.delete(`${DELETE_CATEGORY_URL}/${categoryId}`);
       fetchCategories();
     } catch (error) {
       console.error("Error deleting category:", error);
