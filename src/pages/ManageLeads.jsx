@@ -1,30 +1,30 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import "../styles/ManageLeads.css"; // Keep existing styles
+import "../styles/ManageLeads.css";
 
 const ManageLeads = () => {
   const [leads, setLeads] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const leadsPerPage = 5; // Static pagination
 
   useEffect(() => {
     fetchLeads();
-  }, []); // Fetch leads on component mount
+  }, []);
 
   const fetchLeads = async () => {
     setLoading(true);
     try {
-      const headers = { "Content-Type": "application/json" };
-
-      const response = await axios.get("https://quickcabpune.com/app/leads", { headers });
-
-      console.log("API Response:", response.data); // Log API response to verify structure
+      const response = await axios.get("https://quickcabpune.com/app/leads", {
+        headers: { "Content-Type": "application/json" },
+      });
 
       if (response.data && Array.isArray(response.data.result)) {
-        setLeads(response.data.result); // ✅ Corrected
+        setLeads(response.data.result);
       } else {
         console.warn("Unexpected API response format:", response.data);
-        setLeads([]); // Fallback if response is not as expected
+        setLeads([]);
       }
       setError(null);
     } catch (err) {
@@ -36,42 +36,44 @@ const ManageLeads = () => {
     }
   };
 
+  const deleteLead = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this lead?")) return;
+    
+    try {
+      await axios.delete(`https://quickcabpune.com/admin/api/leads/${id}`, {
+        headers: { "Content-Type": "application/json" },
+      });
+      setLeads(leads.filter((lead) => lead.id !== id));
+    } catch (err) {
+      console.error("Delete Error:", err);
+      setError(`Failed to delete lead: ${err.response?.data?.message || err.message}`);
+    }
+  };
+
+  // Pagination logic
+  const indexOfLastLead = currentPage * leadsPerPage;
+  const indexOfFirstLead = indexOfLastLead - leadsPerPage;
+  const currentLeads = leads.slice(indexOfFirstLead, indexOfLastLead);
+  const totalPages = Math.ceil(leads.length / leadsPerPage);
+
   return (
     <div className="categories-page-body h-screen">
       <h1>Manage Leads</h1>
 
       {error && (
-        <div style={{
-          backgroundColor: "#f8d7da",
-          color: "#721c24",
-          padding: "10px 15px",
-          borderRadius: "4px",
-          marginBottom: "20px",
-          display: "flex",
-          justifyContent: "space-between",
-        }}>
+        <div className="error-box">
           {error}
-          <button onClick={() => setError(null)} style={{ background: "none", border: "none", cursor: "pointer", fontSize: "20px", color: "#721c24" }}>×</button>
+          <button onClick={() => setError(null)} className="close-btn">×</button>
         </div>
       )}
 
       <div className="table-container">
         {loading ? (
-          <div style={{ padding: "40px", textAlign: "center", fontStyle: "italic", color: "#666" }}>
-            Loading leads...
-          </div>
+          <div className="loading-box">Loading leads...</div>
         ) : (
-          <table style={{
-            width: "100%",
-            borderCollapse: "separate",
-            borderSpacing: "0",
-            backgroundColor: "white",
-            borderRadius: "8px",
-            overflow: "hidden",
-            boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-          }}>
+          <table className="styled-table">
             <thead>
-              <tr style={{ backgroundColor: "#0d6efd", color: "white" }}>
+              <tr>
                 <th>Sr. No.</th>
                 <th>Date</th>
                 <th>Vendor Name</th>
@@ -81,13 +83,14 @@ const ManageLeads = () => {
                 <th>Fare</th>
                 <th>Time</th>
                 <th>Contact</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody>
-              {leads.length > 0 ? (
-                leads.map((lead, index) => (
+              {currentLeads.length > 0 ? (
+                currentLeads.map((lead, index) => (
                   <tr key={lead.id || index}>
-                    <td>{index + 1}</td>
+                    <td>{indexOfFirstLead + index + 1}</td>
                     <td>{lead.date || "-"}</td>
                     <td>{lead.vendor_name || "-"}</td>
                     <td>{lead.location_from || "-"}</td>
@@ -97,25 +100,41 @@ const ManageLeads = () => {
                     <td>{lead.time || "-"}</td>
                     <td>
                       {lead.vendor_contact ? (
-                        <a href={`tel:${lead.vendor_contact}`} style={{ color: "#007bff", textDecoration: "none" }}>
+                        <a href={`tel:${lead.vendor_contact}`} className="contact-link">
                           {lead.vendor_contact}
                         </a>
                       ) : (
                         "-"
                       )}
                     </td>
+                    <td>
+                      <button className="delete-btn" onClick={() => deleteLead(lead.id)}>
+                        Delete
+                      </button>
+                    </td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan="9" style={{ textAlign: "center", padding: "40px 0", color: "#666", fontStyle: "italic" }}>
-                    No leads found
-                  </td>
+                  <td colSpan="10" className="no-data">No leads found</td>
                 </tr>
               )}
             </tbody>
           </table>
         )}
+      </div>
+
+      {/* Pagination */}
+      <div className="pagination">
+        <button disabled={currentPage === 1} onClick={() => setCurrentPage(currentPage - 1)}>
+          Previous
+        </button>
+        <span>
+          Page {currentPage} of {totalPages}
+        </span>
+        <button disabled={currentPage === totalPages} onClick={() => setCurrentPage(currentPage + 1)}>
+          Next
+        </button>
       </div>
     </div>
   );
