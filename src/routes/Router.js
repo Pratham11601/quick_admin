@@ -18,13 +18,37 @@ import Advertisements from "../pages/Advertisements";
 
 const Router = () => {
   return (
-    <Routes>
-      // <Route path="/" element={<Navigate to="https://quickcabpune.com" />} />
-      <Route path="/admin/*" element={<AdminLogin />} />
-      <Route path="/dashboard/*" element={<Dashboard />} />
-      <Route path="/sell-car" element={<SellCar />} />
-      <Route path="/settings" element={<Settings />} />
-      <Route path="/cities" element={<Cities />} />
+
+ <Routes>
+       <Route path="/" element={<Navigate to="/dashboard" />} />
+        <Route path="/admin/*" element={<AdminRoutes />} />
+        <Route path="/admin/*" element={<AdminLogin />} />
+        // <Route path="/admin-login" element={<AdminLogin />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/dashboard/*" element={<Dashboard />} />
+        <Route path="/sell-car" element={<SellCar />} />
+        <Route path="/settings" element={<Settings />} />
+        <Route path="/cities" element={<Cities />} />
+
+
+
+
+
+
+
+
+
+
+
+
+    
+    // <Routes>
+    //   // <Route path="/" element={<Navigate to="https://quickcabpune.com" />} />
+    //   <Route path="/admin/*" element={<AdminLogin />} />
+    //   <Route path="/dashboard/*" element={<Dashboard />} />
+    //   <Route path="/sell-car" element={<SellCar />} />
+    //   <Route path="/settings" element={<Settings />} />
+    //   <Route path="/cities" element={<Cities />} />
       <Route path="/category" element={<Category />} /> 
       <Route path="/sub-packages" element={<Subpackages />} /> 
       <Route path="/subscriptions" element={<Subscriptions />} /> 
