@@ -15,7 +15,7 @@
   justify-content: flex-start;
   min-height: 100vh;
   padding: 20px;
-  margin-left: 250px;
+  margin-left: 290px;
   transition: margin-left 0.3s ease-in-out;
 }
 
@@ -70,11 +70,11 @@ h1 {
 /* Table Container */
 .table-container {
   background: white;
-  padding: 20px;
+  padding: 0px;
   border-radius: 10px;
   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-  width: 85%;
-  max-width: 1000px;
+  width: 100%;
+  max-width: 100%;
   overflow-x: auto;
 }
 

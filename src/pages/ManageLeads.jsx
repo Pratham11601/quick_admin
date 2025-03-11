@@ -57,7 +57,7 @@ const ManageLeads = () => {
   const totalPages = Math.ceil(leads.length / leadsPerPage);
 
   return (
-    <div className="categories-page-body h-screen">
+    <div className="categories-page-body h-screen h-screen-2">
       <h1>Manage Leads</h1>
 
       {error && (
@@ -108,8 +108,24 @@ const ManageLeads = () => {
                       )}
                     </td>
                     <td>
-                      <button className="delete-btn" onClick={() => deleteLead(lead.id)}>
+                      {/* <button className="delete-btn" onClick={() => deleteLead(lead.id)}>
                         Delete
+                      </button> */}
+
+                      <button class="text-nowrap"
+                         onClick={() => deleteLead(lead.id)}
+                        style={{
+                          backgroundColor: '#f8d7da',
+                          color: '#721c24',
+                          border: '1px solid #f5c6cb',
+                          borderRadius: '4px',
+                          margin: '0 5px',
+                          padding: '5px 10px',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        {/* 🗑️ Delete */}
+                        <i class="fa-solid fa-trash"></i> Delete
                       </button>
                     </td>
                   </tr>

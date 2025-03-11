@@ -33,7 +33,7 @@ const Categories = () => {
       const existingCategory = categories.find(
         (cat) => cat.cat_name.toLowerCase() === newCategory.toLowerCase()
       );
-      
+
       if (existingCategory) {
         alert("Category already exists!");
         return;
@@ -108,7 +108,23 @@ const Categories = () => {
                 <td>{category.cat_name}</td>
                 <td>
                   {/* <button className="edit-btn" onClick={() => editCategory(category)}>✏️</button> */}
-                  <button className="delete-btn" onClick={() => deleteCategory(category.id)}>🗑️</button>
+                  {/* <button className="delete-btn" onClick={() => deleteCategory(category.id)}>🗑️</button> */}
+
+                  <button class="text-nowrap"
+                    onClick={() => deleteCategory(category.id)}
+                    style={{
+                      backgroundColor: '#f8d7da',
+                      color: '#721c24',
+                      border: '1px solid #f5c6cb',
+                      borderRadius: '4px',
+                      margin: '0 5px',
+                      padding: '5px 10px',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    {/* 🗑️ Delete */}
+                    <i class="fa-solid fa-trash"></i> Delete
+                  </button>
                 </td>
               </tr>
             ))}
