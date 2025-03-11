@@ -7,7 +7,7 @@ const ManageLeads = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const leadsPerPage = 5; // Static pagination
+  const leadsPerPage = 10; // Static pagination
 
   useEffect(() => {
     fetchLeads();

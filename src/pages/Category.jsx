@@ -11,7 +11,7 @@ const Categories = () => {
   const [newCategory, setNewCategory] = useState("");
   const [editId, setEditId] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const categoriesPerPage = 5;
+  const categoriesPerPage = 10;
 
   useEffect(() => {
     fetchCategories();

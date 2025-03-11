@@ -12,7 +12,7 @@ const Subscriptions = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [page, setPage] = useState(1);
-  const [limit, setLimit] = useState(10);
+  const limit = 10; // Fixed limit set to 10
   const [totalPages, setTotalPages] = useState(1);
 
   useEffect(() => {
@@ -21,7 +21,7 @@ const Subscriptions = () => {
 
   useEffect(() => {
     paginateData();
-  }, [page, limit, allSubscriptions]);
+  }, [page, allSubscriptions]);
 
   const fetchSubscriptions = async () => {
     try {
@@ -103,7 +103,6 @@ const Subscriptions = () => {
   const deleteSubscription = async (id) => {
     try {
       const response = await fetch(`${API_URL}/${id}`, { method: "DELETE" });
-
       if (response.ok) {
         fetchSubscriptions();
       }
@@ -116,11 +115,6 @@ const Subscriptions = () => {
     if (newPage > 0 && newPage <= totalPages) {
       setPage(newPage);
     }
-  };
-
-  const handleLimitChange = (e) => {
-    setLimit(parseInt(e.target.value));
-    setPage(1); // Reset to first page when changing limit
   };
 
   return (
@@ -182,16 +176,6 @@ const Subscriptions = () => {
 
       {/* Pagination Controls */}
       <div className="pagination-controls">
-        <div className="limit-selector">
-          <label htmlFor="limit-select">Items per page:</label>
-          <select id="limit-select" value={limit} onChange={handleLimitChange}>
-            <option value="5">5</option>
-            <option value="10">10</option>
-            <option value="20">20</option>
-            <option value="50">50</option>
-          </select>
-        </div>
-
         <div className="page-navigator">
           <button
             onClick={() => handlePageChange(page - 1)}

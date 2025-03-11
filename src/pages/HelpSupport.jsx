@@ -10,7 +10,7 @@ const HelpSupport = () => {
   const [selectedId, setSelectedId] = useState(null);
   const [remarkText, setRemarkText] = useState("");
 
-  const rowsPerPage = 5;
+  const rowsPerPage = 10;
   const API_URL = "https://quickcabpune.com/admin/api/help-support";
 
   // Fetch Help Support Queries from API

@@ -13,7 +13,7 @@ const ManageCities = () => {
   const [editStateName, setEditStateName] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const citiesPerPage = 5;
+  const citiesPerPage = 10;
   const [filteredCities, setFilteredCities] = useState([]);
 
   // Fetch all cities from API
