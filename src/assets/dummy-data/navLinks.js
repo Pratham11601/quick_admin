@@ -35,11 +35,6 @@ const navLinks = [
     display: "Sub Packages",
   },
   {
-    path: "/subscriptions",
-    icon: "ri-shopping-bag-line",
-    display: "Subscription",
-  },
-  {
     path: "/advertisements", // Added Advertisements page
     icon: "ri-megaphone-line", // Chose an appropriate icon
     display: "Advertisements",

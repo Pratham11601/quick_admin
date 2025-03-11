@@ -5,7 +5,90 @@ import { Button, Table, Form, Card } from "react-bootstrap";
 import { FaEdit, FaTrash } from "react-icons/fa";
 
 const ManageAdvertises = () => {
-  const [advertises, setAdvertises] = useState([]);
+  // Initialize with dummy data
+  const [advertises, setAdvertises] = useState([
+    {
+      id: 1,
+      name: "Advertise 1",
+      image: "https://via.placeholder.com/150",
+      url: "https://example.com",
+      start_date: "2023-10-01",
+      end_date: "2023-10-31",
+    },
+    {
+      id: 2,
+      name: "Advertise 2",
+      image: "https://via.placeholder.com/150",
+      url: "https://example.com",
+      start_date: "2023-11-01",
+      end_date: "2023-11-30",
+    },
+    {
+      id: 3,
+      name: "Advertise 3",
+      image: "https://via.placeholder.com/150",
+      url: "https://example.com",
+      start_date: "2023-12-01",
+      end_date: "2023-12-31",
+    },
+    {
+      id: 4,
+      name: "Advertise 4",
+      image: "https://via.placeholder.com/150",
+      url: "https://example.com",
+      start_date: "2023-11-01",
+      end_date: "2023-11-30",
+    },
+    {
+      id: 5,
+      name: "Advertise 5",
+      image: "https://via.placeholder.com/150",
+      url: "https://example.com",
+      start_date: "2023-12-01",
+      end_date: "2023-12-31",
+    },
+    {
+      id: 6,
+      name: "Advertise 6",
+      image: "https://via.placeholder.com/150",
+      url: "https://example.com",
+      start_date: "2024-01-01",
+      end_date: "2024-01-31",
+    },
+    {
+      id: 7,
+      name: "Advertise 7",
+      image: "https://via.placeholder.com/150",
+      url: "https://example.com",
+      start_date: "2024-02-01",
+      end_date: "2024-02-28",
+    },
+    {
+      id: 8,
+      name: "Advertise 8",
+      image: "https://via.placeholder.com/150",
+      url: "https://example.com",
+      start_date: "2024-03-01",
+      end_date: "2024-03-31",
+    },
+    {
+      id: 9,
+      name: "Advertise 9",
+      image: "https://via.placeholder.com/150",
+      url: "https://example.com",
+      start_date: "2024-04-01",
+      end_date: "2024-04-30",
+    },
+    {
+      id: 10,
+      name: "Advertise 10",
+      image: "https://via.placeholder.com/150",
+      url: "https://example.com",
+      start_date: "2024-05-01",
+      end_date: "2024-05-31",
+    },
+  ]);
+
   const [newAdvertise, setNewAdvertise] = useState({
     name: "",
     image: "",
@@ -17,20 +100,18 @@ const ManageAdvertises = () => {
   const [editingIndex, setEditingIndex] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const limit = 5;
+  const limit = 5; // Number of items per page
 
   useEffect(() => {
-    fetchAdvertises();
-  }, [currentPage]);
+    // Calculate total pages based on the number of items
+    setTotalPages(Math.ceil(advertises.length / limit));
+  }, [advertises]);
 
-  const fetchAdvertises = async () => {
-    try {
-      const response = await axios.get(`https://your-api.com/advertises?page=${currentPage}&limit=${limit}`);
-      setAdvertises(response.data.data);
-      setTotalPages(response.data.totalPages);
-    } catch (error) {
-      console.error("Error fetching advertisements:", error);
-    }
+  // Function to get the data for the current page
+  const getPaginatedData = () => {
+    const startIndex = (currentPage - 1) * limit;
+    const endIndex = startIndex + limit;
+    return advertises.slice(startIndex, endIndex);
   };
 
   const handleChange = (e) => {
@@ -55,7 +136,6 @@ const ManageAdvertises = () => {
         }
         setEditingIndex(null);
         setNewAdvertise({ name: "", image: "", url: "", startDate: "", endDate: "" });
-        fetchAdvertises();
       } catch (error) {
         console.error("Error saving advertisement:", error);
       }
@@ -76,7 +156,7 @@ const ManageAdvertises = () => {
   const deleteAdvertise = async (id) => {
     try {
       await axios.delete(`https://your-api.com/advertises/${id}`);
-      fetchAdvertises();
+
     } catch (error) {
       console.error("Error deleting advertisement:", error);
     }
@@ -120,7 +200,7 @@ const ManageAdvertises = () => {
           </tr>
         </thead>
         <tbody>
-          {advertises.map((ad, index) => (
+          {getPaginatedData().map((ad, index) => (
             <tr key={ad.id}>
               <td>{ad.id}</td>
               <td><img src={ad.image} alt={ad.name} width="50" /></td>
