@@ -34,12 +34,7 @@ const navLinks = [
     icon: "ri-gift-line",
     display: "Sub Packages",
   },
-  {
-    path: "/subscriptions",
-    icon: "ri-shopping-bag-line",
-    display: "Subscription",
-  },
-  {
+    {
     path: "/advertisements",
     icon: "ri-megaphone-line",
     display: "Advertisements",
