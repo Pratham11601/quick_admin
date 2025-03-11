@@ -35,10 +35,16 @@ const navLinks = [
     display: "Sub Packages",
   },
   {
-    path: "/subscriptions", // Corrected path
+    path: "/subscriptions",
     icon: "ri-shopping-bag-line",
     display: "Subscription",
   },
+  {
+    path: "/advertisements",
+    icon: "ri-megaphone-line",
+    display: "Advertisements",
+  }
+  
 ];
 
 export default navLinks;
