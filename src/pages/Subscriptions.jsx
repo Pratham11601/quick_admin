@@ -12,7 +12,7 @@ const Subscriptions = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [page, setPage] = useState(1);
-  const limit = 10; // Fixed limit set to 10
+  const limit = 12; // Fixed limit set to 12
   const [totalPages, setTotalPages] = useState(1);
 
   useEffect(() => {

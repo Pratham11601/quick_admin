@@ -13,6 +13,7 @@ import VendorDetails from "../pages/VendorDetails";
 import HelpSupport from "../pages/HelpSupport";  
 import PasswordSettings from "../pages/PasswordSettings"; 
 import EmailSettings from "../pages/EmailSettings";
+import Advertisements from "../pages/Advertisements";
 
 const Router = () => {
   return (
@@ -34,6 +35,7 @@ const Router = () => {
        <Route path="/help-support" element={<HelpSupport />} />
        <Route path="/password-settings" element={<PasswordSettings />} />
        <Route path="/email-settings" element={<EmailSettings />} />
+       <Route path="/advertisements" element={<Advertisements />} />
      </Routes>
    );
  };

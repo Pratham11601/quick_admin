@@ -10,7 +10,7 @@ const VendorDetails = () => {
   const [totalPages, setTotalPages] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const vendorsPerPage = 10;
+  const vendorsPerPage = 12;
   const API_BASE_URL = "https://quickcabpune.com/app/vendordetails";
 
   useEffect(() => {

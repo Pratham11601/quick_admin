@@ -13,7 +13,7 @@ const ManageSubPackages = () => {
   const [editingIndex, setEditingIndex] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const limit = 10; // Number of packages per page
+  const limit = 12; // Number of packages per page
 
   // Fetch sub-packages from API with pagination
   useEffect(() => {
