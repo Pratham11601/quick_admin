@@ -154,41 +154,41 @@ const VendorDetails = () => {
   };
 
   // PAGINATION
-  // const items = [...Array(50).keys()]; // Example data (50 items)
+  const items = [...Array(50).keys()]; // Example data (50 items)
 
-  // const PaginationComponent = () => {
-  //   const [currentPage, setCurrentPage] = useState(0);
-  //   const itemsPerPage = 5;
+  const PaginationComponent = () => {
+    const [currentPage, setCurrentPage] = useState(0);
+    const itemsPerPage = 5;
 
-  //   const handlePageClick = (event) => {
-  //     setCurrentPage(event.selected);
-  //   };
+    const handlePageClick = (event) => {
+      setCurrentPage(event.selected);
+    };
 
-  //   const offset = currentPage * itemsPerPage;
-  //   const currentItems = items.slice(offset, offset + itemsPerPage);
+    const offset = currentPage * itemsPerPage;
+    const currentItems = items.slice(offset, offset + itemsPerPage);
 
-  //   return (
-  //     <div>
-  //       <ul>
-  //         {currentItems.map((item, index) => (
-  //           <li key={index}>Item {item + 1}</li>
-  //         ))}
-  //       </ul>
+    return (
+      <div>
+        <ul>
+          {currentItems.map((item, index) => (
+            <li key={index}>Item {item + 1}</li>
+          ))}
+        </ul>
 
-  //       <ReactPaginate
-  //         previousLabel={"← Previous"}
-  //         nextLabel={"Next →"}
-  //         breakLabel={"..."}
-  //         pageCount={Math.ceil(items.length / itemsPerPage)}
-  //         marginPagesDisplayed={2}
-  //         pageRangeDisplayed={3}
-  //         onPageChange={handlePageClick}
-  //         containerClassName={"pagination"}
-  //         activeClassName={"active"}
-  //       />
-  //     </div>
-  //   );
-  // };
+        <ReactPaginate
+          previousLabel={"← Previous"}
+          nextLabel={"Next →"}
+          breakLabel={"..."}
+          pageCount={Math.ceil(items.length / itemsPerPage)}
+          marginPagesDisplayed={2}
+          pageRangeDisplayed={3}
+          onPageChange={handlePageClick}
+          containerClassName={"pagination"}
+          activeClassName={"active"}
+        />
+      </div>
+    );
+  };
 
 
   return (
@@ -210,8 +210,12 @@ const VendorDetails = () => {
       {error && <div className="error-message">{error}</div>}
 
       <div className="vendor-details-table-container">
+        <div className="table-responsive">
         {loading ? (
-          <div className="loading-message">Loading vendors...</div>
+          // <div className="loading-message">Loading vendors...</div>
+          <div className="loader-container">
+            <div className="loading-box"><i class="fa-solid fa-circle-notch"></i></div>
+          </div>
         ) : (
           <table className="vendor-details-table">
             <thead>
@@ -245,7 +249,7 @@ const VendorDetails = () => {
                     <td>{vendor.phone || "N/A"}</td>
                     <td>{vendor.email || "N/A"}</td>
                     <td>{vendor.city || "N/A"}</td>
-                    <td>{vendor.currentAddress || "N/A"}</td>
+                    <td class="common-adress-col">{vendor.currentAddress || "N/A"}</td>
                     <td>{vendor.pin_code || "N/A"}</td>
                     <td>{vendor.carnumber || "N/A"}</td>
                     <td>{vendor.vendor_gender || "N/A"}</td>
@@ -321,6 +325,7 @@ const VendorDetails = () => {
             </tbody>
           </table>
         )}
+        </div>
       </div>
 
       <div className="vendor-details-pagination">
@@ -329,21 +334,21 @@ const VendorDetails = () => {
           disabled={currentPage === 1}
           className="pagination-button"
         >
-          Previous
+          <i class="fa-solid fa-chevron-left"></i>
         </button>
-        <span className="page-info">Page {currentPage} of {totalPages || 1}</span>
+        <span className="page-info" class="mx-4">Page {currentPage} of {totalPages || 1}</span>
         <button
           onClick={() => paginate("next")}
           disabled={currentPage === totalPages || totalPages === 0}
           className="pagination-button"
         >
-          Next
+          <i class="fa-solid fa-angle-right"></i>
         </button>
       </div>
 
       {/* PAGINATION */}
-       {/* Updated Pagination */}
-       {/* <div className="vendor-details-pagination">
+      {/* Updated Pagination */}
+      {/* <div className="vendor-details-pagination">
         <ReactPaginate
           previousLabel={<i className="fa fa-angle-left"></i>}
           nextLabel={<i className="fa fa-angle-right"></i>}
@@ -373,7 +378,7 @@ const VendorDetails = () => {
 
     // 
 
-    
+
 
   );
 };

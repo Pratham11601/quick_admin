@@ -91,7 +91,7 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="dashboard">
+    <div className="dashboard common-main-content-wrapper">
       <div className="dashboard__wrapper">
         <div className="dashboard__cards">
           <SingleCard item={vendorCardData} />

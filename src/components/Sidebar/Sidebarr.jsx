@@ -32,7 +32,7 @@ const Sidebar = () => {
 
         <div className="sidebar__content">
           <div className="menu">
-            <ul className="nav__list">
+            <ul className="nav__list ps-0">
               {navLinks.map((item, index) => (
                 <li className="nav__item" key={index}>
                   <NavLink

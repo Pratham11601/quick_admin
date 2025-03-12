@@ -1,5 +1,5 @@
 .sidebar {
-  width: 260px;
+  width: 220px;
   height: 100%;
   position: fixed;
   top: 0;
@@ -29,6 +29,7 @@
   align-items: center;
   column-gap: 0.5rem;
   color: var(--heading-color);
+  font-size: 1.2rem;
 }
 
 .sidebar__top h2 span {

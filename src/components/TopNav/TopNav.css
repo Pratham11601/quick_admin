@@ -2,10 +2,10 @@
 .top__nav {
   position: fixed;
   top: 0;
-  left: 260px;
+  right: 0px;
   z-index: 999;
   background: var(--primary-color);
-  width: calc(100% - 260px);
+  width: calc(100% - 220px);
   height: 90px;
   display: flex;
   align-items: center;

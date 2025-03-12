@@ -69,7 +69,10 @@ const ManageLeads = () => {
 
       <div className="table-container">
         {loading ? (
-          <div className="loading-box">Loading leads...</div>
+          // <div className="loading-box">Loading leads...</div>
+          <div className="loader-container">
+            <div className="loading-box"><i class="fa-solid fa-circle-notch"></i></div>
+          </div>
         ) : (
           <table className="styled-table">
             <thead>
@@ -139,17 +142,19 @@ const ManageLeads = () => {
           </table>
         )}
       </div>
-
+ 
       {/* Pagination */}
-      <div className="pagination">
+      <div className="vendor-details-pagination">
         <button disabled={currentPage === 1} onClick={() => setCurrentPage(currentPage - 1)}>
-          Previous
+          <i class="fa-solid fa-chevron-left"></i>
+
         </button>
         <span>
           Page {currentPage} of {totalPages}
         </span>
         <button disabled={currentPage === totalPages} onClick={() => setCurrentPage(currentPage + 1)}>
-          Next
+        <i class="fa-solid fa-angle-right"></i>
+
         </button>
       </div>
     </div>

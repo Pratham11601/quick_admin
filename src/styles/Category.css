@@ -14,8 +14,6 @@
   align-items: center;
   justify-content: flex-start;
   min-height: 100vh;
-  padding: 20px;
-  margin-left: 290px;
   transition: margin-left 0.3s ease-in-out;
 }
 
@@ -159,17 +157,17 @@ tr:hover {
 }
 
 /* Sidebar & Page Alignment */
-@media (min-width: 1024px) and (max-width: 1440px) {
+/* @media (min-width: 1024px) and (max-width: 1440px) {
   .h-screen {
     margin-left: 250px;
   }
-}
+} */
 
 /* Tablet View */
 @media (max-width: 1024px) {
-  .h-screen {
+  /* .h-screen {
     margin-left: 0;
-  }
+  } */
 
   .add-category {
     flex-direction: column;

@@ -174,7 +174,7 @@ const ManageAdvertises = () => {
     <div className="container mt-4">
       <h2 className="title">Manage Advertisements</h2>
 
-      <Card className="p-3 mb-3">
+      <Card className="p-3 mb-3 form-container-top">
         <div className="form-container">
           <Form.Control type="text" name="name" value={newAdvertise.name} onChange={handleChange} placeholder="Enter advertise name" />
           <Form.Control type="text" name="image" value={newAdvertise.image} onChange={handleChange} placeholder="Enter image URL" />

@@ -42,3 +42,74 @@ a {
 img {
   width: 100%;
 }
+
+
+/* COMMON STYLES FOR DASHBOARD */
+body *::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+  -webkit-transition: .3s;
+  transition: .3s;
+}
+
+body *:hover::-webkit-scrollbar-thumb {
+  background: #2f333982;
+}
+
+body *::-webkit-scrollbar-thumb {
+  background: #2f333982;
+
+}
+
+.common-adress-col{
+  min-width: 250px;
+}
+
+.content{
+  margin-left:250px ;
+  margin-top: 90px;
+  margin-right: 10px;
+}
+
+
+/* common loader */
+
+.loader-container {
+  min-height: 300px;
+  display: grid;
+  place-content: center;
+}
+
+.loader-container .loading-box i{
+  font-size: 50px;
+  color: rgba(13, 61, 114, 0.482);
+}
+
+.loader-container .loading-box {
+  width: fit-content;
+  height: fit-content;
+  animation: loader-anim 1s linear infinite;
+}
+
+
+@keyframes loader-anim {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+.container{
+  margin: 0;
+}
+
+
+/* RESPONSIVE STARTS HERE */
+@media only screen and (max-width: 769px) {
+  .content{
+    margin-left:10px ;
+    margin-top: 10px;
+    margin-right: 10px;
+  }
+}

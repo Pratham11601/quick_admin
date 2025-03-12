@@ -15,10 +15,7 @@ body {
     display: flex;
     flex-direction: column;
     min-height: 10vh;
-    margin-left: 250px; /* Adjust based on sidebar width */
-    margin-top: 70px;
     background-color: #ffffff;
-    padding: 20px;
 }
 
 
