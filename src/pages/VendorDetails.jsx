@@ -19,7 +19,7 @@ const VendorDetails = () => {
       try {
         // Fetch all vendors from the API
         const response = await axios.get(API_BASE_URL);
-        
+
         // Check if the response contains data
         if (response.data && Array.isArray(response.data)) {
           // API returns an array directly
@@ -40,7 +40,7 @@ const VendorDetails = () => {
           console.error("Unexpected API response format:", response.data);
           setAllVendors([]);
         }
-        
+
         setError(null);
       } catch (err) {
         console.error("Error fetching vendors:", err);
@@ -58,23 +58,23 @@ const VendorDetails = () => {
   useEffect(() => {
     // Filter vendors based on search term
     let filteredVendors = allVendors;
-    
+
     if (searchTerm) {
-      filteredVendors = allVendors.filter(vendor => 
+      filteredVendors = allVendors.filter(vendor =>
         (vendor.fullname && vendor.fullname.toLowerCase().includes(searchTerm.toLowerCase())) ||
         (vendor.city && vendor.city.toLowerCase().includes(searchTerm.toLowerCase())) ||
         (vendor.phone && vendor.phone.includes(searchTerm)) ||
         (vendor.email && vendor.email.toLowerCase().includes(searchTerm.toLowerCase()))
       );
     }
-    
+
     // Calculate total pages
     setTotalPages(Math.ceil(filteredVendors.length / vendorsPerPage));
-    
+
     // Apply pagination
     const startIndex = (currentPage - 1) * vendorsPerPage;
     const paginatedVendors = filteredVendors.slice(startIndex, startIndex + vendorsPerPage);
-    
+
     setVendors(paginatedVendors);
   }, [allVendors, searchTerm, currentPage]);
 
@@ -94,13 +94,13 @@ const VendorDetails = () => {
   const handleDeleteVendor = async (vendorId) => {
     if (window.confirm("Are you sure you want to delete this vendor?")) {
       try {
-        // Updated: Make the delete request to the correct endpoint
+        // Make the delete request to the correct endpoint
         await axios.delete(`https://quickcabpune.com/admin/api/vendor/${vendorId}`);
-        
+
         // Update the local state to remove the deleted vendor
         const updatedAllVendors = allVendors.filter(vendor => vendor.id !== vendorId);
         setAllVendors(updatedAllVendors);
-        
+
         alert("Vendor deleted successfully!");
       } catch (err) {
         console.error("Error deleting vendor:", err);
@@ -113,12 +113,12 @@ const VendorDetails = () => {
     try {
       // Set specific status values: 1 for activate, 0 for deactivate
       const newStatus = currentStatus === 1 ? 0 : 1;
-      
-      // Updated: Make the API request to update the status using the correct endpoint
-      await axios.put(`https://quickcabpune.com/admin/api/vendor/${vendorId}`, { 
-        status: newStatus 
+
+      // Make the API request to update the status using the correct endpoint
+      await axios.put(`https://quickcabpune.com/admin/api/vendor/${vendorId}`, {
+        status: newStatus
       });
-      
+
       // Update the local state to reflect the change
       const updatedAllVendors = allVendors.map(vendor => {
         if (vendor.id === vendorId) {
@@ -126,9 +126,9 @@ const VendorDetails = () => {
         }
         return vendor;
       });
-      
+
       setAllVendors(updatedAllVendors);
-      
+
       // Show appropriate message based on the new status
       if (newStatus === 1) {
         alert("Vendor activated successfully!");
@@ -139,6 +139,11 @@ const VendorDetails = () => {
       console.error("Error updating vendor status:", err);
       alert("Failed to update vendor status. Please try again.");
     }
+  };
+
+  const handleEditVendor = (vendor) => {
+    console.log("Editing vendor:", vendor);
+    // Add your logic to open the edit modal or navigate to an edit page
   };
 
   // Format date safely
@@ -211,53 +216,88 @@ const VendorDetails = () => {
                     <td>{vendor.subscriptionPlan || "N/A"}</td>
                     <td>{formatDate(vendor.subscription_date)}</td>
                     <td>
-                      <span 
+                      <span
                         style={{
-                          backgroundColor: vendor.status === 1 ? '#d4edda' : '#f8d7da',
-                          color: vendor.status === 1 ? '#155724' : '#721c24',
+                          backgroundColor: vendor.status === 1 ? '#155724' : '#721c24',
+                          color: vendor.status === 1 ? '#d4edda' : '#f8d7da',
                           padding: '3px 8px',
                           borderRadius: '4px',
-                          fontWeight: 'bold'
+                          fontWeight: 'bold',
+                          display: 'inline-block',
+                          margin: '5px 0'
                         }}
                       >
                         {vendor.status === 1 ? "Active" : "Inactive"}
                       </span>
                     </td>
                     <td>
-                      <button 
-                        onClick={() => handleDeleteVendor(vendor.id)}
-                        style={{
-                          backgroundColor: '#f8d7da',
-                          color: '#721c24',
-                          border: '1px solid #f5c6cb',
-                          borderRadius: '4px',
-                          margin: '0 5px',
-                          padding: '5px 10px',
-                          cursor: 'pointer'
-                        }}
-                      >
-                        🗑️ Delete
-                      </button>
-                      <button 
-                        onClick={() => handleStatusToggle(vendor.id, vendor.status)}
-                        style={{
-                          backgroundColor: vendor.status === 1 ? '#f8d7da' : '#d4edda',
-                          color: vendor.status === 1 ? '#721c24' : '#155724',
-                          border: vendor.status === 1 ? '1px solid #f5c6cb' : '1px solid #c3e6cb',
-                          borderRadius: '4px',
-                          margin: '0 5px',
-                          padding: '5px 10px',
-                          cursor: 'pointer'
-                        }}
-                      >
-                        {vendor.status === 1 ? '🔴 Deactivate' : '🟢 Activate'}
-                      </button>
+                    <button
+  onClick={() => handleDeleteVendor(vendor.id)}
+  style={{
+    backgroundColor: '#dc3545',
+    color: '#fff',
+    border: '1px solid #b52b3a',
+    borderRadius: '4px',
+    margin: '5px',
+    padding: '8px 15px',
+    cursor: 'pointer',
+    transition: 'background-color 0.3s ease',
+    minWidth: '120px',
+    textAlign: 'center'
+  }}
+  onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#b52b3a'}
+  onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#dc3545'}
+>
+  🗑️ Delete
+</button>
+
+<button
+  onClick={() => handleEditVendor(vendor)}
+  style={{
+    backgroundColor: '#ffcc00',
+    color: '#333',
+    border: '1px solid #e6b800',
+    borderRadius: '4px',
+    margin: '5px',
+    padding: '8px 15px',
+    cursor: 'pointer',
+    transition: 'background-color 0.3s ease',
+    minWidth: '120px',
+    textAlign: 'center'
+  }}
+  onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#e6b800'}
+  onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#ffcc00'}
+>
+  ✏️ Edit
+</button>
+
+<button
+  onClick={() => handleStatusToggle(vendor.id, vendor.status)}
+  style={{
+    backgroundColor: vendor.status === 1 ? '#ff4444' : '#28a745',
+    color: '#fff',
+    border: vendor.status === 1 ? '1px solid #cc0000' : '1px solid #218838',
+    borderRadius: '4px',
+    margin: '5px',
+    padding: '8px 15px',
+    cursor: 'pointer',
+    transition: 'background-color 0.3s ease',
+    minWidth: '120px',
+    textAlign: 'center'
+  }}
+  onMouseOver={(e) => e.currentTarget.style.backgroundColor = vendor.status === 1 ? '#cc0000' : '#1e7e34'}
+  onMouseOut={(e) => e.currentTarget.style.backgroundColor = vendor.status === 1 ? '#ff4444' : '#28a745'}
+>
+  {vendor.status === 1 ? '🔴 Deactivate' : '🟢 Activate'}
+</button>
                     </td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan="16" style={{ textAlign: "center", fontWeight: "bold" }}>No vendors found</td>
+                  <td colSpan="16" style={{ textAlign: "center", fontWeight: "bold", color: '#fff', padding: '20px 0' }}>
+                    No vendors found
+                  </td>
                 </tr>
               )}
             </tbody>
@@ -266,16 +306,16 @@ const VendorDetails = () => {
       </div>
 
       <div className="vendor-details-pagination">
-        <button 
-          onClick={() => paginate("prev")} 
+        <button
+          onClick={() => paginate("prev")}
           disabled={currentPage === 1}
           className="pagination-button"
         >
           Previous
         </button>
         <span className="page-info">Page {currentPage} of {totalPages || 1}</span>
-        <button 
-          onClick={() => paginate("next")} 
+        <button
+          onClick={() => paginate("next")}
           disabled={currentPage === totalPages || totalPages === 0}
           className="pagination-button"
         >
