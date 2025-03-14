@@ -194,7 +194,7 @@ const VendorDetails = () => {
   return (
     <div className="vendor-details-page-body">
       <div className="d-flex justify-content-between align-items-center">
-        <h1 className="vendor-details-h1">Vendor Details</h1>
+        <h1 className="vendor-details-h1 page-main-head">Vendor Details</h1>
 
         <div className="vendor-details-add-category">
           <input

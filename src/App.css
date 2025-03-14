@@ -104,6 +104,21 @@ body *::-webkit-scrollbar-thumb {
   margin: 0;
 }
 
+.page-main-head{
+  position: relative;
+  width: fit-content;
+}
+
+.page-main-head::after{
+  position: absolute;
+  content: "";
+  width: 40px;
+  height: 2px;
+  right: 0;
+  bottom: 0;
+  background: red;
+}
+
 
 /* RESPONSIVE STARTS HERE */
 @media only screen and (max-width: 769px) {
