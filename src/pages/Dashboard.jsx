@@ -3,10 +3,8 @@ import "../styles/Dashboard.css";
 import SingleCard from "../components/reuseable/SingleCard";
 
 const Dashboard = () => {
+  const [leadsData, setLeadsData] = useState(null);
   const [vendorCount, setVendorCount] = useState(0);
-  const [totalLeads, setTotalLeads] = useState(0);
-  const [activeLeads, setActiveLeads] = useState(0);
-  const [inactiveLeads, setInactiveLeads] = useState(0);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -27,36 +25,15 @@ const Dashboard = () => {
         }
 
         // Fetch leads
-        const leadsResponse = await fetch("https://quickcabpune.com/app/leads");
-        const leadsData = await leadsResponse.json();
-        console.log("Leads Data:", leadsData);
+        const leadsResponse = await fetch("https://quickcabpune.com/app/leads/stats");
+        const leadsStats = await leadsResponse.json();
+        console.log("Leads Stats:", leadsStats);
 
-        let leadsArray = [];
-        if (leadsData && Array.isArray(leadsData)) {
-          leadsArray = leadsData;
-        } else if (leadsData && leadsData.data && Array.isArray(leadsData.data)) {
-          leadsArray = leadsData.data;
-        }
-
-        if (leadsArray.length > 0) {
-          setTotalLeads(leadsArray.length);
-
-          const active = leadsArray.filter(
-            (lead) => lead.status && lead.status.toLowerCase() === "active"
-          ).length;
-          setActiveLeads(active);
-          setInactiveLeads(leadsArray.length - active);
-        } else {
-          setTotalLeads(0);
-          setActiveLeads(0);
-          setInactiveLeads(0);
-        }
+        setLeadsData(leadsStats);
       } catch (error) {
         console.error("Error fetching data:", error);
         setVendorCount(0);
-        setTotalLeads(0);
-        setActiveLeads(0);
-        setInactiveLeads(0);
+        setLeadsData({ totalLeads: 0, activeLeads: 0, inactiveLeads: 0, currentMonthLeads: 0 });
       } finally {
         setLoading(false);
       }
@@ -65,29 +42,37 @@ const Dashboard = () => {
     fetchData();
   }, []);
 
+  if (loading) return <div>Loading...</div>;
+
   // Card data objects
   const vendorCardData = {
     title: "Total Vendors",
-    totalNumber: loading ? "Loading..." : vendorCount,
+    totalNumber: vendorCount,
     icon: "ri-truck-line",
   };
 
   const totalLeadsCardData = {
     title: "Total Leads",
-    totalNumber: loading ? "Loading..." : totalLeads,
+    totalNumber: leadsData?.totalLeads || 0,
     icon: "ri-group-line",
   };
 
   const activeLeadsCardData = {
     title: "Active Leads",
-    totalNumber: loading ? "Loading..." : activeLeads,
+    totalNumber: leadsData?.activeLeads || 0,
     icon: "ri-user-star-line",
   };
 
   const inactiveLeadsCardData = {
     title: "Inactive Leads",
-    totalNumber: loading ? "Loading..." : inactiveLeads,
+    totalNumber: leadsData?.inactiveLeads || 0,
     icon: "ri-user-unfollow-line",
+  };
+
+  const currentMonthLeadsCardData = {
+    title: "Current Month Leads",
+    totalNumber: leadsData?.currentMonthLeads || 0,
+    icon: "ri-calendar-event-line",
   };
 
   return (
@@ -98,6 +83,7 @@ const Dashboard = () => {
           <SingleCard item={totalLeadsCardData} />
           <SingleCard item={activeLeadsCardData} />
           <SingleCard item={inactiveLeadsCardData} />
+          <SingleCard item={currentMonthLeadsCardData} />
         </div>
       </div>
     </div>
