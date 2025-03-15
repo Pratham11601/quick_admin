@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import ReactPaginate from "react-paginate";
 import "../styles/HelpSupport.css";
 
 const HelpSupport = () => {
@@ -9,14 +10,14 @@ const HelpSupport = () => {
   const [showRemarkModal, setShowRemarkModal] = useState(false);
   const [selectedId, setSelectedId] = useState(null);
   const [remarkText, setRemarkText] = useState("");
+  const [rowsPerPage, setRowsPerPage] = useState(500); // State for rows per page
 
-  const rowsPerPage = 10;
   const API_URL = "https://quickcabpune.com/admin/api/help-support";
 
   // Fetch Help Support Queries from API
-  const fetchData = async (page) => {
+  const fetchData = async (page, limit) => {
     try {
-      const response = await axios.get(`${API_URL}?page=${page}&limit=${rowsPerPage}`);
+      const response = await axios.get(`${API_URL}?page=${page}&limit=${limit}`);
       if (response.data.success) {
         setData(response.data.data);
         setTotalPages(response.data.totalPages);
@@ -30,8 +31,8 @@ const HelpSupport = () => {
   };
 
   useEffect(() => {
-    fetchData(currentPage);
-  }, [currentPage]);
+    fetchData(currentPage, rowsPerPage); // Pass the updated rowsPerPage
+  }, [currentPage, rowsPerPage]); // Re-fetch when rowsPerPage changes
 
   // Open Remark Form
   const openRemarkForm = (id) => {
@@ -63,7 +64,7 @@ const HelpSupport = () => {
       await axios.post(`${API_URL}/${selectedId}/remark`, requestData);
 
       // Refresh Data after saving
-      fetchData(currentPage);
+      fetchData(currentPage, rowsPerPage);
       closeRemarkForm();
     } catch (error) {
       console.error("Error updating remark:", error);
@@ -72,32 +73,53 @@ const HelpSupport = () => {
 
   // Format date or return empty string for invalid dates
   const formatDate = (dateString) => {
-    // Check for null, undefined or empty string
     if (!dateString) {
       return "";
     }
-    
-    // Convert to date object
+
     const date = new Date(dateString);
-    
-    // Check for invalid dates, "0000-00-00" pattern, or 11/30/1899 (which seems to be a default date in your DB)
     if (
-      isNaN(date.getTime()) || 
-      dateString.includes("0000-00-00") || 
+      isNaN(date.getTime()) ||
+      dateString.includes("0000-00-00") ||
       dateString.includes("1899") ||
       date.getFullYear() === 1899
     ) {
       return "";
     }
-    
-    // Only return valid dates
+
     return date.toLocaleDateString();
+  };
+
+  // Handle page change in pagination
+  const handlePageChange = (selectedItem) => {
+    setCurrentPage(selectedItem.selected + 1); // ReactPaginate starts from page 0
+  };
+
+  // Handle rows per page change
+  const handleRowsPerPageChange = (e) => {
+    setRowsPerPage(parseInt(e.target.value, 10)); // Update rowsPerPage state
+    setCurrentPage(1); // Reset to first page when rows per page change
   };
 
   return (
     <div className="help_support">
-      <h2 className="support">Manage Help & Support</h2>
-      <hr />
+      <div className="d-flex align-items-center justify-content-between flex-wrap">
+        <h2 className="page-main-head fs-5 fw-semibold">Manage Help & Support</h2>
+
+        <div className="rows-per-page"> 
+          <select className="requiredData-dropdown"
+            id="rowsPerPage"
+            value={rowsPerPage}
+            onChange={handleRowsPerPageChange}
+          >
+            <option value={10}>10</option>
+            <option value={50}>50</option>
+            <option value={100}>100</option>
+            <option value={200}>200</option>
+            <option value={500}>500</option>
+          </select>
+        </div>
+      </div>
 
       <div className="data-container">
         <div className="table-container">
@@ -144,16 +166,18 @@ const HelpSupport = () => {
         </div>
 
         {/* Pagination Controls */}
-        <div className="pagination">
-          <button onClick={() => setCurrentPage(currentPage - 1)} disabled={currentPage === 1}>
-            Prev
-          </button>
-          <span>
-            Page {currentPage} of {totalPages}
-          </span>
-          <button onClick={() => setCurrentPage(currentPage + 1)} disabled={currentPage === totalPages}>
-            Next
-          </button>
+        <div className="vendor-details-pagination">
+          <ReactPaginate
+            previousLabel={"← Previous"}
+            nextLabel={"Next →"}
+            breakLabel={"..."}
+            pageCount={totalPages} // Use the total pages from API response
+            marginPagesDisplayed={2}
+            pageRangeDisplayed={3}
+            onPageChange={handlePageChange}
+            containerClassName={"pagination"}
+            activeClassName={"active"}
+          />
         </div>
       </div>
 

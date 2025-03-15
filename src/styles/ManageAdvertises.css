@@ -179,7 +179,7 @@
     }
   
     .pagination {
-        flex-direction: column;
+        flex-direction: row;
         gap: 10px;
     }
   
@@ -213,7 +213,7 @@
     }
   
     .pagination {
-        flex-direction: column;
+        flex-direction: row;
         gap: 8px;
     }
   
@@ -247,7 +247,7 @@
     }
   
     .pagination {
-        flex-direction: column;
+        flex-direction: row;
         gap: 6px;
     }
   

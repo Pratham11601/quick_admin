@@ -80,9 +80,60 @@ const Categories = () => {
   const currentCategories = categories.slice(indexOfFirstCategory, indexOfLastCategory);
 
   return (
-    <div className="categories-page-body h-screen">
-      <h1>Manage Categories</h1>
-      <div className="add-category">
+    <div className="categories-page-body">
+      <div className="d-flex justify-content-between items-center  flex-wrap">
+        <h2 className="fs-5 page-main-head">Manage Categories</h2>
+
+        <button className="btn btn-primary mb-3 text-nowrap" data-bs-toggle="modal" data-bs-target="#categoryModal">
+          Add Category
+        </button>
+      </div>
+
+      {/* Bootstrap Modal */}
+      <div className="modal fade" id="categoryModal" tabIndex="-1" aria-labelledby="addAdModalLabel" aria-hidden="true">
+        <div className="modal-dialog">
+          <div className="modal-content">
+            <div className="modal-header border-0">
+              <h5 className="modal-title" id="addAdModalLabel">Add Advertisement</h5>
+              <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div className="modal-body">
+              <div className="mb-3">
+                <label className="form-label text-start ">Name</label>
+
+                {/* <input
+                  type="text"
+                  placeholder="Enter category name"
+                  value={newCategory}
+                  onChange={(e) => setForm({ ...form, name: e.target.value })}
+                  required
+                /> */}
+
+                <input
+                  type="text"
+                  placeholder="Enter category name"
+                  value={newCategory}
+                  onChange={(e) => setNewCategory(e.target.value)}
+                />
+              </div>
+
+
+              <div className="text-start">
+                {/* <button type="submit" className="btn btn-dark mt-3 ms-0">
+                    Add Advertisement
+                  </button> */}
+
+                <button className="btn btn-dark mt-3 ms-0" onClick={handleCategory}>{editId ? "Save" : "Add"}</button>
+
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+      {/* <div className="add-category">
         <input
           type="text"
           placeholder="Enter category name"
@@ -90,7 +141,7 @@ const Categories = () => {
           onChange={(e) => setNewCategory(e.target.value)}
         />
         <button onClick={handleCategory}>{editId ? "Save" : "Add"}</button>
-      </div>
+      </div> */}
 
       <div className="table-container">
         <table>
@@ -110,20 +161,20 @@ const Categories = () => {
                   {/* <button className="edit-btn" onClick={() => editCategory(category)}>✏️</button> */}
                   {/* <button className="delete-btn" onClick={() => deleteCategory(category.id)}>🗑️</button> */}
 
-                  <button class="text-nowrap"
+                  <button
+                    className="text-nowrap"
                     onClick={() => deleteCategory(category.id)}
                     style={{
-                      backgroundColor: '#f8d7da',
-                      color: '#721c24',
+                      backgroundColor: '#b80000cc',
+                      color: 'white',
                       border: '1px solid #f5c6cb',
                       borderRadius: '4px',
                       margin: '0 5px',
                       padding: '5px 10px',
-                      cursor: 'pointer'
+                      cursor: 'pointer',
                     }}
                   >
-                    {/* 🗑️ Delete */}
-                    <i class="fa-solid fa-trash"></i> Delete
+                    <i className="fa-solid fa-trash"></i> Delete
                   </button>
                 </td>
               </tr>
@@ -132,7 +183,7 @@ const Categories = () => {
         </table>
       </div>
 
-      <div className="pagination">
+      {/* <div className="pagination">
         <button onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))} disabled={currentPage === 1}>
           ⬅️ Previous
         </button>
@@ -140,7 +191,7 @@ const Categories = () => {
         <button onClick={() => setCurrentPage((prev) => prev + 1)} disabled={currentPage >= Math.ceil(categories.length / categoriesPerPage)}>
           Next ➡️
         </button>
-      </div>
+      </div> */}
       <div className="footer">© 2024 Quick Cab Services. All rights reserved.</div>
     </div>
   );

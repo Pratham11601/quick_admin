@@ -1,19 +1,17 @@
 import React, { useState, useEffect } from "react";
 import "../styles/VendorDetails.css";
 import axios from "axios";
-//  
 import ReactPaginate from "react-paginate";
 
 const VendorDetails = () => {
   const [vendors, setVendors] = useState([]);
   const [allVendors, setAllVendors] = useState([]); // Store all vendors for client-side pagination
   const [searchTerm, setSearchTerm] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const vendorsPerPage = 10;
+  const [vendorsPerPage, setVendorsPerPage] = useState(500); // Default to 500 vendors per page
   const API_BASE_URL = "https://quickcabpune.com/app/vendordetails";
+  const [currentPage, setCurrentPage] = useState(0);
 
   useEffect(() => {
     const fetchVendors = async () => {
@@ -24,13 +22,10 @@ const VendorDetails = () => {
 
         // Check if the response contains data
         if (response.data && Array.isArray(response.data)) {
-          // API returns an array directly
           setAllVendors(response.data);
         } else if (response.data && Array.isArray(response.data.data)) {
-          // API returns data in a nested 'data' property
           setAllVendors(response.data.data);
         } else if (typeof response.data === 'object') {
-          // Try to extract vendor data from response object
           const possibleData = Object.values(response.data).find(val => Array.isArray(val));
           if (possibleData) {
             setAllVendors(possibleData);
@@ -42,7 +37,6 @@ const VendorDetails = () => {
           console.error("Unexpected API response format:", response.data);
           setAllVendors([]);
         }
-
         setError(null);
       } catch (err) {
         console.error("Error fetching vendors:", err);
@@ -56,9 +50,7 @@ const VendorDetails = () => {
     fetchVendors();
   }, []);
 
-  // Apply search filter and pagination whenever allVendors, searchTerm or currentPage changes
   useEffect(() => {
-    // Filter vendors based on search term
     let filteredVendors = allVendors;
 
     if (searchTerm) {
@@ -70,39 +62,33 @@ const VendorDetails = () => {
       );
     }
 
-    // Calculate total pages
-    setTotalPages(Math.ceil(filteredVendors.length / vendorsPerPage));
+    // Paginate vendors: Slice data according to current page and vendorsPerPage
+    const offset = currentPage * vendorsPerPage;
+    const currentVendors = filteredVendors.slice(offset, offset + vendorsPerPage);
+    setVendors(currentVendors);
 
-    // Apply pagination
-    const startIndex = (currentPage - 1) * vendorsPerPage;
-    const paginatedVendors = filteredVendors.slice(startIndex, startIndex + vendorsPerPage);
+  }, [allVendors, searchTerm, currentPage, vendorsPerPage]);
 
-    setVendors(paginatedVendors);
-  }, [allVendors, searchTerm, currentPage]);
+  const handlePageChange = (selectedPage) => {
+    setCurrentPage(selectedPage.selected);
+  };
 
   const handleSearchChange = (e) => {
     setSearchTerm(e.target.value);
-    setCurrentPage(1);
+    setCurrentPage(0); // Reset to the first page when search term changes
   };
 
-  const paginate = (direction) => {
-    if (direction === "prev" && currentPage > 1) {
-      setCurrentPage(currentPage - 1);
-    } else if (direction === "next" && currentPage < totalPages) {
-      setCurrentPage(currentPage + 1);
-    }
+  const handleVendorsPerPageChange = (e) => {
+    setVendorsPerPage(Number(e.target.value)); // Update vendors per page
+    setCurrentPage(0); // Reset to the first page when vendors per page is changed
   };
 
   const handleDeleteVendor = async (vendorId) => {
     if (window.confirm("Are you sure you want to delete this vendor?")) {
       try {
-        // Updated: Make the delete request to the correct endpoint
         await axios.delete(`https://quickcabpune.com/admin/api/vendor/${vendorId}`);
-
-        // Update the local state to remove the deleted vendor
         const updatedAllVendors = allVendors.filter(vendor => vendor.id !== vendorId);
         setAllVendors(updatedAllVendors);
-
         alert("Vendor deleted successfully!");
       } catch (err) {
         console.error("Error deleting vendor:", err);
@@ -113,30 +99,13 @@ const VendorDetails = () => {
 
   const handleStatusToggle = async (vendorId, currentStatus) => {
     try {
-      // Set specific status values: 1 for activate, 0 for deactivate
       const newStatus = currentStatus === 1 ? 0 : 1;
-
-      // Updated: Make the API request to update the status using the correct endpoint
-      await axios.put(`https://quickcabpune.com/admin/api/vendor/${vendorId}`, {
-        status: newStatus
-      });
-
-      // Update the local state to reflect the change
-      const updatedAllVendors = allVendors.map(vendor => {
-        if (vendor.id === vendorId) {
-          return { ...vendor, status: newStatus };
-        }
-        return vendor;
-      });
-
+      await axios.put(`https://quickcabpune.com/admin/api/vendor/${vendorId}`, { status: newStatus });
+      const updatedAllVendors = allVendors.map(vendor =>
+        vendor.id === vendorId ? { ...vendor, status: newStatus } : vendor
+      );
       setAllVendors(updatedAllVendors);
-
-      // Show appropriate message based on the new status
-      if (newStatus === 1) {
-        alert("Vendor activated successfully!");
-      } else {
-        alert("Vendor deactivated successfully!");
-      }
+      alert(newStatus === 1 ? "Vendor activated successfully!" : "Vendor deactivated successfully!");
     } catch (err) {
       console.error("Error updating vendor status:", err);
       alert("Failed to update vendor status. Please try again.");
@@ -153,233 +122,157 @@ const VendorDetails = () => {
     }
   };
 
-  // PAGINATION
-  const items = [...Array(50).keys()]; // Example data (50 items)
-
-  const PaginationComponent = () => {
-    const [currentPage, setCurrentPage] = useState(0);
-    const itemsPerPage = 5;
-
-    const handlePageClick = (event) => {
-      setCurrentPage(event.selected);
-    };
-
-    const offset = currentPage * itemsPerPage;
-    const currentItems = items.slice(offset, offset + itemsPerPage);
-
-    return (
-      <div>
-        <ul>
-          {currentItems.map((item, index) => (
-            <li key={index}>Item {item + 1}</li>
-          ))}
-        </ul>
-
-        <ReactPaginate
-          previousLabel={"← Previous"}
-          nextLabel={"Next →"}
-          breakLabel={"..."}
-          pageCount={Math.ceil(items.length / itemsPerPage)}
-          marginPagesDisplayed={2}
-          pageRangeDisplayed={3}
-          onPageChange={handlePageClick}
-          containerClassName={"pagination"}
-          activeClassName={"active"}
-        />
-      </div>
-    );
-  };
-
-
   return (
     <div className="vendor-details-page-body">
-      <div className="d-flex justify-content-between align-items-center">
-        <h1 className="vendor-details-h1 page-main-head">Vendor Details</h1>
+      <div className="d-flex justify-content-between align-items-center flex-wrap">
+        <h1 className="vendor-details-h1 page-main-head text-muted">Vendor Details</h1>
 
-        <div className="vendor-details-add-category">
-          <input
-            type="text"
-            placeholder="Search by name, location, or contact"
-            className="vendor-details-search-bar"
-            value={searchTerm}
-            onChange={handleSearchChange}
-          />
+        <div className="d-flex align-items-center gap-4 mb-4" >
+         
+
+          <div className="vendor-details-add-category">
+            <input
+              type="text"
+              placeholder="Search by name, location, or contact"
+              className="vendor-details-search-bar"
+              value={searchTerm}
+              onChange={handleSearchChange}
+            />
+          </div>
+
+          <div className="vendor-details-per-page">
+            <select className="requiredData-dropdown"
+              id="vendorsPerPage"
+              value={vendorsPerPage}
+              onChange={handleVendorsPerPageChange}
+            >
+              <option value="10">10</option>
+              <option value="50">50</option>
+              <option value="100">100</option>
+              <option value="200">200</option>
+              <option value="500">500</option>
+
+            </select>
+          </div>
         </div>
       </div>
+
+
 
       {error && <div className="error-message">{error}</div>}
 
       <div className="vendor-details-table-container">
         <div className="table-responsive">
-        {loading ? (
-          // <div className="loading-message">Loading vendors...</div>
-          <div className="loader-container">
-            <div className="loading-box"><i class="fa-solid fa-circle-notch"></i></div>
-          </div>
-        ) : (
-          <table className="vendor-details-table">
-            <thead>
-              <tr>
-                <th>Sr. No.</th>
-                <th>Full Name</th>
-                <th>Category</th>
-                <th>Business Name</th>
-                <th>Phone</th>
-                <th>Email</th>
-                <th>City</th>
-                <th>Address</th>
-                <th>Pin Code</th>
-                <th>Car Number</th>
-                <th>Gender</th>
-                <th>Aadhaar</th>
-                <th>Subscription</th>
-                <th>Sub. Date</th>
-                <th>Status</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {vendors.length > 0 ? (
-                vendors.map((vendor, index) => (
-                  <tr key={vendor.id || index}>
-                    <td>{(currentPage - 1) * vendorsPerPage + index + 1}</td>
-                    <td>{vendor.fullname || "N/A"}</td>
-                    <td>{vendor.vendor_cat || "N/A"}</td>
-                    <td>{vendor.businessName || "N/A"}</td>
-                    <td>{vendor.phone || "N/A"}</td>
-                    <td>{vendor.email || "N/A"}</td>
-                    <td>{vendor.city || "N/A"}</td>
-                    <td class="common-adress-col">{vendor.currentAddress || "N/A"}</td>
-                    <td>{vendor.pin_code || "N/A"}</td>
-                    <td>{vendor.carnumber || "N/A"}</td>
-                    <td>{vendor.vendor_gender || "N/A"}</td>
-                    <td>{vendor.aadhaar_number || "N/A"}</td>
-                    <td>{vendor.subscriptionPlan || "N/A"}</td>
-                    <td>{formatDate(vendor.subscription_date)}</td>
-                    <td>
-                      {/* <span
-                        style={{
-                          backgroundColor: vendor.status === 1 ? '#d4edda' : '#f8d7da',
-                          color: vendor.status === 1 ? '#155724' : '#721c24',
-                          padding: '3px 8px',
-                          borderRadius: '4px',
-                          fontWeight: 'bold'
-                        }}
-                      >
-                        {vendor.status === 1 ? "Active" : "Inactive"}
-                      </span> */}
-
-                      <button class="text-nowrap"
-                        onClick={() => handleStatusToggle(vendor.id, vendor.status)}
-                        style={{
-                          backgroundColor: vendor.status === 1 ? '#f8d7da' : '#d4edda',
-                          color: vendor.status === 1 ? '#721c24' : '#155724',
-                          border: vendor.status === 1 ? '1px solid #f5c6cb' : '1px solid #c3e6cb',
-                          borderRadius: '4px',
-                          margin: '0 5px',
-                          padding: '5px 10px',
-                          cursor: 'pointer'
-                        }}
-                      >
-                        {vendor.status === 1 ? '🔴 Deactivate' : '🟢 Activate'}
-                      </button>
-                    </td>
-                    <td>
-                      <button class="text-nowrap"
-                        onClick={() => handleDeleteVendor(vendor.id)}
-                        style={{
-                          backgroundColor: '#f8d7da',
-                          color: '#721c24',
-                          border: '1px solid #f5c6cb',
-                          borderRadius: '4px',
-                          margin: '0 5px',
-                          padding: '5px 10px',
-                          cursor: 'pointer'
-                        }}
-                      >
-                        {/* 🗑️ Delete */}
-                        <i class="fa-solid fa-trash"></i> Delete
-                      </button>
-                      {/* <button
-                        onClick={() => handleStatusToggle(vendor.id, vendor.status)}
-                        style={{
-                          backgroundColor: vendor.status === 1 ? '#f8d7da' : '#d4edda',
-                          color: vendor.status === 1 ? '#721c24' : '#155724',
-                          border: vendor.status === 1 ? '1px solid #f5c6cb' : '1px solid #c3e6cb',
-                          borderRadius: '4px',
-                          margin: '0 5px',
-                          padding: '5px 10px',
-                          cursor: 'pointer'
-                        }}
-                      >
-                        {vendor.status === 1 ? '🔴 Deactivate' : '🟢 Activate'}
-                      </button> */}
-                    </td>
-                  </tr>
-                ))
-              ) : (
+          {loading ? (
+            <div className="loader-container">
+              <div className="loading-box"><i className="fa-solid fa-circle-notch"></i></div>
+            </div>
+          ) : (
+            <table className="vendor-details-table">
+              <thead>
                 <tr>
-                  <td colSpan="16" style={{ textAlign: "center", fontWeight: "bold" }}>No vendors found</td>
+                  <th>Sr. No.</th>
+                  <th>Full Name</th>
+                  <th>Category</th>
+                  <th>Business Name</th>
+                  <th>Phone</th>
+                  <th>Email</th>
+                  <th>City</th>
+                  <th>Address</th>
+                  <th>Pin Code</th>
+                  <th>Car Number</th>
+                  <th>Gender</th>
+                  <th>Aadhaar</th>
+                  <th>Subscription</th>
+                  <th>Sub. Date</th>
+                  <th>Status</th>
+                  <th>Actions</th>
                 </tr>
-              )}
-            </tbody>
-          </table>
-        )}
+              </thead>
+              <tbody>
+                {vendors.length > 0 ? (
+                  vendors.map((vendor, index) => (
+                    <tr key={vendor.id || index}>
+                      {/* <td>{(currentPage * vendorsPerPage) +   index + 1}</td> */}
+                      <td>{'QCKSRV000' + vendor.id || index + 1}</td>
+                      <td>{vendor.fullname || "N/A"}</td>
+                      <td>{vendor.vendor_cat || "N/A"}</td>
+                      <td>{vendor.businessName || "N/A"}</td>
+                      <td>{vendor.phone || "N/A"}</td>
+                      <td>{vendor.email || "N/A"}</td>
+                      <td>{vendor.city || "N/A"}</td>
+                      <td>{vendor.currentAddress || "N/A"}</td>
+                      <td>{vendor.pin_code || "N/A"}</td>
+                      <td>{vendor.carnumber || "N/A"}</td>
+                      <td>{vendor.vendor_gender || "N/A"}</td>
+                      <td>{vendor.aadhaar_number || "N/A"}</td>
+                      <td>{vendor.subscriptionPlan || "N/A"}</td>
+                      <td>{formatDate(vendor.subscription_date)}</td>
+                      <td>
+                        <button
+                          onClick={() => handleStatusToggle(vendor.id, vendor.status)}
+                          style={{
+                            backgroundColor: vendor.status === 1 ? '#f8d7da' : '#d4edda',
+                            color: vendor.status === 1 ? '#721c24' : '#155724',
+                            border: vendor.status === 1 ? '1px solid #f5c6cb' : '1px solid #c3e6cb',
+                            borderRadius: '4px',
+                            margin: '0 5px',
+                            padding: '5px 10px',
+                            cursor: 'pointer',
+                            whiteSpace: 'nowrap'
+                          }}
+                        >
+                          {vendor.status === 1 ? '🔴 Deactivate' : '🟢 Activate'}
+                        </button>
+                      </td>
+                      <td>
+
+
+                        <button
+                          className="text-nowrap"
+                          onClick={() => handleDeleteVendor(vendor.id)}
+                          style={{
+                            backgroundColor: '#b80000cc',
+                            color: 'white',
+                            border: '1px solid #f5c6cb',
+                            borderRadius: '4px',
+                            margin: '0 5px',
+                            padding: '5px 10px',
+                            cursor: 'pointer',
+                          }}
+                        >
+                          <i className="fa-solid fa-trash"></i> Delete
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="16" style={{ textAlign: "center", fontWeight: "bold" }}>No vendors found</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          )}
         </div>
       </div>
 
       <div className="vendor-details-pagination">
-        <button
-          onClick={() => paginate("prev")}
-          disabled={currentPage === 1}
-          className="pagination-button"
-        >
-          <i class="fa-solid fa-chevron-left"></i>
-        </button>
-        <span className="page-info" class="mx-4">Page {currentPage} of {totalPages || 1}</span>
-        <button
-          onClick={() => paginate("next")}
-          disabled={currentPage === totalPages || totalPages === 0}
-          className="pagination-button"
-        >
-          <i class="fa-solid fa-angle-right"></i>
-        </button>
-      </div>
-
-      {/* PAGINATION */}
-      {/* Updated Pagination */}
-      {/* <div className="vendor-details-pagination">
         <ReactPaginate
-          previousLabel={<i className="fa fa-angle-left"></i>}
-          nextLabel={<i className="fa fa-angle-right"></i>}
+          previousLabel={"← Previous"}
+          nextLabel={"Next →"}
           breakLabel={"..."}
-          pageCount={totalPages || 1}
+          pageCount={Math.ceil(allVendors.length / vendorsPerPage)}
           marginPagesDisplayed={2}
           pageRangeDisplayed={3}
-          onPageChange={handlePageClick}
-          containerClassName={"pagination justify-content-center mt-3"}
-          pageClassName={"page-item"}
-          pageLinkClassName={"page-link"}
-          previousClassName={"page-item"}
-          previousLinkClassName={"page-link"}
-          nextClassName={"page-item"}
-          nextLinkClassName={"page-link"}
-          breakClassName={"page-item"}
-          breakLinkClassName={"page-link"}
+          onPageChange={handlePageChange}
+          containerClassName={"pagination"}
           activeClassName={"active"}
         />
-      </div> */}
-
-
+      </div>
 
       <div className="vendor-details-footer">© 2025 Vendor Services. All rights reserved.</div>
     </div>
-
-
-    // 
-
-
-
   );
 };
 

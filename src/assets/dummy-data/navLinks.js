@@ -32,7 +32,7 @@ const navLinks = [
   {
     path: "/sub-packages",
     icon: "ri-gift-line",
-    display: "Sub Packages",
+    display: "Subscribe",
   },
     {
     path: "/advertisements",

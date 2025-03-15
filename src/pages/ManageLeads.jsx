@@ -9,7 +9,7 @@ const ManageLeads = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(0);
-  const [leadsPerPage, setLeadsPerPage] = useState(10);
+  const [leadsPerPage, setLeadsPerPage] = useState(500);
 
   useEffect(() => {
     fetchLeads();
@@ -68,21 +68,19 @@ const ManageLeads = () => {
 
   return (
     <div className="categories-page-body h-screen h-screen-2 ">
-      <div className="d-flex justify-between items-center mb-2 w-100">
-        <div class="w-100"> 
+      <div className="d-flex justify-content-between items-center mb-2 w-100 flex-wrap">
+        <div class="">
           <h1 calss="text-muted " className="page-main-head">Manage Leads</h1>
         </div>
 
         {/* Leads per page selector */}
-        <div className="leads-per-page-selector d-flex gap-3">
-          <label class="text-nowrap mt-1 mb-0 fs-6">Show per page: </label>
+        <div className="leads-per-page-selector d-flex gap-3"> 
           <select class="requiredData-dropdown" value={leadsPerPage} onChange={handleLeadsPerPageChange}>
             <option value="10">10</option>
             <option value="50">50</option>
             <option value="100">100</option>
             <option value="200">200</option>
-            <option value="400">400</option>
-            <option value="600">600</option>
+            <option value="500">500</option>
           </select>
         </div>
       </div>

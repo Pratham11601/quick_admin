@@ -176,6 +176,14 @@ tr:nth-child(even) {
   margin-top: 20px;
 }
 
+.vendor-details-search-bar{
+  min-width: 300px;
+}
+
+.editBtn{
+  font-size: 13px;
+}
+
 /* 📱 Mobile & Tablet Responsiveness */
 @media (max-width: 1024px) {
   .table-container {

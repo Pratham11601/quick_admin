@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import ReactPaginate from "react-paginate"; // Import ReactPaginate
 import "../styles/cities.css";
 
 const API_URL = "https://quickcabpune.com/admin/api/cities";
@@ -11,10 +12,10 @@ const ManageCities = () => {
   const [editCity, setEditCity] = useState(null);
   const [editCityName, setEditCityName] = useState("");
   const [editStateName, setEditStateName] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const citiesPerPage = 10;
+  const [currentPage, setCurrentPage] = useState(0); // Page starts from 0 in ReactPaginate
+  const [citiesPerPage, setCitiesPerPage] = useState(500); // State for number of cities per page
   const [filteredCities, setFilteredCities] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
 
   // Fetch all cities from API
   useEffect(() => {
@@ -23,10 +24,9 @@ const ManageCities = () => {
 
   // Update filtered cities when cities or pagination changes
   useEffect(() => {
-    const startIndex = (currentPage - 1) * citiesPerPage;
+    const startIndex = currentPage * citiesPerPage;
     const endIndex = startIndex + citiesPerPage;
     setFilteredCities(cities.slice(startIndex, endIndex));
-    setTotalPages(Math.ceil(cities.length / citiesPerPage));
   }, [cities, currentPage, citiesPerPage]);
 
   const fetchAllCities = async () => {
@@ -100,18 +100,109 @@ const ManageCities = () => {
     }
   };
 
-  // Pagination handlers
-  const nextPage = () => {
-    if (currentPage < totalPages) setCurrentPage((prev) => prev + 1);
+  // SEARCH  
+  useEffect(() => {
+    const filtered = cities.filter(city =>
+      city.city_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      city.state_name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    setFilteredCities(filtered);
+    setCurrentPage(0); // Reset to first page when search changes
+  }, [searchTerm, cities]);
+
+  // Handle page change in ReactPaginate
+  const handlePageChange = (selectedPage) => {
+    setCurrentPage(selectedPage.selected); // ReactPaginate gives 0-based page number
   };
 
-  const prevPage = () => {
-    if (currentPage > 1) setCurrentPage((prev) => prev - 1);
+  // Handle the change in the number of cities per page
+  const handleCitiesPerPageChange = (e) => {
+    setCitiesPerPage(parseInt(e.target.value)); // Update citiesPerPage based on user selection
+    setCurrentPage(0); // Reset to the first page whenever cities per page change
   };
 
   return (
     <div className="container">
-      <h1 style={{ marginTop: "35px" }}>Manage Cities</h1>
+      <div className="d-flex justify-content-between align-items-center ">
+        <h1 style={{ marginTop: "35px" }}>Manage Cities</h1>
+
+
+        <div className="d-flex align-items-center gap-4" >
+          {/* Cities per page dropdown */}
+          <div className="cities-per-page"> 
+            <select className="requiredData-dropdown"
+              id="citiesPerPage"
+              value={citiesPerPage}
+              onChange={handleCitiesPerPageChange}
+            >
+              <option value={10}>10</option>
+              <option value={50}>50</option>
+              <option value={100}>100</option>
+              <option value={200}>200</option>
+              <option value={500}>500</option>
+
+            </select>
+          </div>
+
+          {/* Search Filter */}
+          <div className="search-container vendor-details-search-bar">
+            <input
+              type="text"
+              placeholder="Search by city or state..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* <button className="btn btn-primary mb-3 text-nowrap" data-bs-toggle="modal" data-bs-target="#cityModel">
+        Add Advertisement
+      </button> */}
+
+      {/* Bootstrap Modal */}
+      {/* <div className="modal fade" id="cityModel" tabIndex="-1" aria-labelledby="addAdModalLabel" aria-hidden="true">
+        <div className="modal-dialog">
+          <div className="modal-content">
+            <div className="modal-header border-0">
+              <h5 className="modal-title" id="addAdModalLabel">Add Advertisement</h5>
+              <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div className="modal-body">
+              <form >
+                <div className="mb-3">
+                  <label className="form-label text-start ">Name</label>
+                  <input
+                    type="text"
+                    className="form-control border border-black"
+                    placeholder="Enter city name"
+                    value={newCity}
+                    onChange={(e) => setNewCity(e.target.value)} required
+                  />
+                </div>
+                <div className="mb-3">
+                  <label className="form-label text-start">Image</label>
+
+
+                  <input
+                    type="text"
+                    placeholder="Enter state name" className="form-control border border-black"
+                    value={newState}
+                    onChange={(e) => setNewState(e.target.value)}
+                  />
+                </div>
+
+                <div className="text-start">
+                   
+                  <button onClick={addCity}>Add</button>
+
+                </div>
+
+              </form>
+            </div>
+          </div>
+        </div>
+      </div> */}
 
       {/* Add City Form */}
       <div className="add-city">
@@ -130,6 +221,8 @@ const ManageCities = () => {
         <button onClick={addCity}>Add</button>
       </div>
 
+
+
       {/* Cities Table */}
       <div className="table-container">
         <table>
@@ -145,7 +238,7 @@ const ManageCities = () => {
             {filteredCities.length > 0 ? (
               filteredCities.map((city, index) => (
                 <tr key={city.city_id}>
-                  <td>{(currentPage - 1) * citiesPerPage + index + 1}</td>
+                  <td>{currentPage * citiesPerPage + index + 1}</td>
                   <td>
                     {editCity === city.city_id ? (
                       <input
@@ -170,11 +263,25 @@ const ManageCities = () => {
                   </td>
                   <td>
                     {editCity === city.city_id ? (
-                      <button className="update-btn" onClick={updateCity}>Save</button>
+                      <button className="update-btn py-1" onClick={updateCity}>Save</button>
                     ) : (
-                      <button className="edit-btn" onClick={() => startEdit(city)}>✏️</button>
+                      <button className="editBtn btn btn-warning py-1" onClick={() => startEdit(city)}><i class="fa-solid fa-pen me-1"></i> Edit</button>
                     )}
-                    <button className="delete-btn" onClick={() => removeCity(city.city_id)}>🗑️</button>
+                    <button
+                      className="text-nowrap"
+                      onClick={() => removeCity(city.city_id)}
+                      style={{
+                        backgroundColor: '#b80000cc',
+                        color: 'white',
+                        border: '1px solid #f5c6cb',
+                        borderRadius: '4px',
+                        margin: '0 5px',
+                        padding: '5px 10px',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      <i className="fa-solid fa-trash"></i> Delete
+                    </button>
                   </td>
                 </tr>
               ))
@@ -187,11 +294,19 @@ const ManageCities = () => {
         </table>
       </div>
 
-      {/* Pagination Controls */}
-      <div className="pagination">
-        <button onClick={prevPage} disabled={currentPage === 1}>⬅️ Previous</button>
-        <span>Page {currentPage} of {totalPages}</span>
-        <button onClick={nextPage} disabled={currentPage >= totalPages}>Next ➡️</button>
+      {/* Pagination Controls using ReactPaginate */}
+      <div className="vendor-details-pagination">
+        <ReactPaginate
+          previousLabel={"← Previous"}
+          nextLabel={"Next →"}
+          breakLabel={"..."}
+          pageCount={Math.ceil(cities.length / citiesPerPage)} // Total pages
+          marginPagesDisplayed={2} // Number of pages to display on the edges
+          pageRangeDisplayed={3} // Number of pages to display in the middle
+          onPageChange={handlePageChange} // Page change handler
+          containerClassName={"pagination"} // Class for the pagination container
+          activeClassName={"active"} // Class for active page
+        />
       </div>
 
       <div className="footer">© 2024 Quick Cab Services. All rights reserved.</div>

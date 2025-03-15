@@ -92,7 +92,7 @@ const ManageSubPackages = () => {
 
   return (
     <div className="container">
-      <h2 className="title">Manage Sub-Packages</h2>
+      <h2 className="fs-4 fw-semibold page-main-head">Manage Sub-Packages</h2>
       <div className="input-group">
         <input
           type="text"
@@ -140,8 +140,23 @@ const ManageSubPackages = () => {
               <td>{pkg.price_per_day}</td>
               <td>{pkg.total_price}</td>
               <td>
-                <button className="edit-btn" onClick={() => editPackage(index)}>✏️</button>
-                <button className="delete-btn" onClick={() => deletePackage(pkg.id)}>🗑️</button>
+                <button className="editBtn btn btn-warning py-1" onClick={() => editPackage(index)}><i class="fa-solid fa-pen me-1"></i> Edit</button>
+
+                <button
+                  className="text-nowrap"
+                  onClick={() => deletePackage(pkg.id)}
+                  style={{
+                    backgroundColor: '#b80000cc',
+                    color: 'white',
+                    border: '1px solid #f5c6cb',
+                    borderRadius: '4px',
+                    margin: '0 5px',
+                    padding: '5px 10px',
+                    cursor: 'pointer',
+                  }}
+                >
+                  <i className="fa-solid fa-trash"></i> Delete
+                </button> 
               </td>
             </tr>
           ))}
@@ -149,7 +164,7 @@ const ManageSubPackages = () => {
       </table>
 
       {/* Pagination Controls */}
-      <div className="pagination">
+      {/* <div className="pagination">
         <button className="page-btn" onClick={prevPage} disabled={currentPage === 1}>
           Previous
         </button>
@@ -157,7 +172,7 @@ const ManageSubPackages = () => {
         <button className="page-btn" onClick={nextPage} disabled={currentPage === totalPages}>
           Next
         </button>
-      </div>
+      </div> */}
     </div>
   );
 };
