@@ -34,7 +34,7 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const login = (email, password) => {
-    if (email === 'quicklabs@mail.com' && password === 'quicklabs!2025') {
+    if (email === 'quickcabsservices@gmail.com' && password === 'quickcab@9168') {
       setIsAuthenticated(true);
       
       // Set session with 30-minute expiry

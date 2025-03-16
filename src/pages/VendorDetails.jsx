@@ -12,6 +12,8 @@ const VendorDetails = () => {
   const [vendorsPerPage, setVendorsPerPage] = useState(500); // Default to 500 vendors per page
   const API_BASE_URL = "https://quickcabpune.com/app/vendordetails";
   const [currentPage, setCurrentPage] = useState(0);
+  const [editingVendor, setEditingVendor] = useState(null);
+  const [showEditModal, setShowEditModal] = useState(false);
 
   useEffect(() => {
     const fetchVendors = async () => {
@@ -109,6 +111,66 @@ const VendorDetails = () => {
     } catch (err) {
       console.error("Error updating vendor status:", err);
       alert("Failed to update vendor status. Please try again.");
+    }
+  };
+
+  const handleEdit = async (vendorId) => {
+    try {
+      const vendorToEdit = allVendors.find(vendor => vendor.id === vendorId);
+      if (vendorToEdit) {
+        setEditingVendor(vendorToEdit);
+        setShowEditModal(true);
+      }
+    } catch (err) {
+      console.error("Error in edit process:", err);
+      alert("Error loading vendor details: " + err.message);
+    }
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setEditingVendor(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleSaveEdit = async () => {
+    try {
+      // Remove any undefined or null values
+      const cleanedData = Object.fromEntries(
+        Object.entries(editingVendor).filter(([_, value]) => value != null)
+      );
+
+      // Log the request data for debugging
+      console.log('Sending update request:', cleanedData);
+
+      // Update the API endpoint to match your backend
+      const response = await axios.put(
+        `https://quickcabpune.com/admin/api/vendor/${editingVendor.id}`, 
+        cleanedData,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          }
+        }
+      );
+
+      if (response.data) {
+        // Update the local state
+        const updatedVendors = allVendors.map(vendor => 
+          vendor.id === editingVendor.id ? { ...vendor, ...cleanedData } : vendor
+        );
+        setAllVendors(updatedVendors);
+        setShowEditModal(false);
+        setEditingVendor(null);
+        alert("Vendor updated successfully!");
+      } else {
+        throw new Error('No response data received');
+      }
+    } catch (err) {
+      console.error("Error saving vendor updates:", err);
+      alert(`Failed to save updates: ${err.response?.data?.message || err.message}`);
     }
   };
 
@@ -226,8 +288,21 @@ const VendorDetails = () => {
                         </button>
                       </td>
                       <td>
-
-
+                        <button
+                          className="text-nowrap me-2"
+                          onClick={() => handleEdit(vendor.id)}
+                          style={{
+                            backgroundColor: '#007bff',
+                            color: 'white',
+                            border: '1px solid #0056b3',
+                            borderRadius: '4px',
+                            margin: '0 5px',
+                            padding: '5px 10px',
+                            cursor: 'pointer',
+                          }}
+                        >
+                          <i className="fa-solid fa-edit"></i> Edit
+                        </button>
                         <button
                           className="text-nowrap"
                           onClick={() => handleDeleteVendor(vendor.id)}
@@ -272,6 +347,193 @@ const VendorDetails = () => {
       </div>
 
       <div className="vendor-details-footer">© 2025 Vendor Services. All rights reserved.</div>
+
+      {showEditModal && editingVendor && (
+        <div className="modal show d-block" tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
+          <div className="modal-dialog modal-lg">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">Edit Vendor Details</h5>
+                <button 
+                  type="button" 
+                  className="btn-close" 
+                  onClick={() => setShowEditModal(false)}
+                ></button>
+              </div>
+              <div className="modal-body">
+                <form className="row g-3">
+                  <div className="col-md-6">
+                    <label className="form-label">Full Name</label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      name="fullname"
+                      value={editingVendor.fullname || ''}
+                      onChange={handleInputChange}
+                    />
+                  </div>
+
+                  <div className="col-md-6">
+                    <label className="form-label">Phone</label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      name="phone"
+                      value={editingVendor.phone || ''}
+                      onChange={handleInputChange}
+                    />
+                  </div>
+
+                  <div className="col-md-6">
+                    <label className="form-label">Email</label>
+                    <input
+                      type="email"
+                      className="form-control"
+                      name="email"
+                      value={editingVendor.email || ''}
+                      onChange={handleInputChange}
+                    />
+                  </div>
+
+                  <div className="col-md-6">
+                    <label className="form-label">Aadhaar Number</label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      name="aadhaar_number"
+                      value={editingVendor.aadhaar_number || ''}
+                      onChange={handleInputChange}
+                    />
+                  </div>
+
+                  <div className="col-md-6">
+                    <label className="form-label">Business Name</label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      name="businessName"
+                      value={editingVendor.businessName || ''}
+                      onChange={handleInputChange}
+                    />
+                  </div>
+
+                  <div className="col-md-6">
+                    <label className="form-label">Category</label>
+                    <select
+                      className="form-select"
+                      name="vendor_cat"
+                      value={editingVendor.vendor_cat || ''}
+                      onChange={handleInputChange}
+                    >
+                      <option value="">Select Category</option>
+                      <option value="Cab">Cab</option>
+                      <option value="Auto">Auto</option>
+                      <option value="Bike">Bike</option>
+                    </select>
+                  </div>
+
+                  <div className="col-md-6">
+                    <label className="form-label">City</label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      name="city"
+                      value={editingVendor.city || ''}
+                      onChange={handleInputChange}
+                    />
+                  </div>
+
+                  <div className="col-md-6">
+                    <label className="form-label">Pin Code</label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      name="pin_code"
+                      value={editingVendor.pin_code || ''}
+                      onChange={handleInputChange}
+                    />
+                  </div>
+
+                  <div className="col-md-6">
+                    <label className="form-label">Car Number</label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      name="carnumber"
+                      value={editingVendor.carnumber || ''}
+                      onChange={handleInputChange}
+                    />
+                  </div>
+
+                  <div className="col-md-6">
+                    <label className="form-label">Gender</label>
+                    <select
+                      className="form-select"
+                      name="vendor_gender"
+                      value={editingVendor.vendor_gender || ''}
+                      onChange={handleInputChange}
+                    >
+                      <option value="">Select Gender</option>
+                      <option value="Male">Male</option>
+                      <option value="Female">Female</option>
+                      <option value="Other">Other</option>
+                    </select>
+                  </div>
+
+                  <div className="col-12">
+                    <label className="form-label">Current Address</label>
+                    <textarea
+                      className="form-control"
+                      name="currentAddress"
+                      value={editingVendor.currentAddress || ''}
+                      onChange={handleInputChange}
+                      rows="3"
+                    ></textarea>
+                  </div>
+
+                  <div className="col-md-6">
+                    <label className="form-label">Subscription Plan</label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      name="subscriptionPlan"
+                      value={editingVendor.subscriptionPlan || ''}
+                      onChange={handleInputChange}
+                    />
+                  </div>
+
+                  <div className="col-md-6">
+                    <label className="form-label">Subscription Date</label>
+                    <input
+                      type="date"
+                      className="form-control"
+                      name="subscription_date"
+                      value={editingVendor.subscription_date ? editingVendor.subscription_date.split('T')[0] : ''}
+                      onChange={handleInputChange}
+                    />
+                  </div>
+                </form>
+              </div>
+              <div className="modal-footer">
+                <button 
+                  type="button" 
+                  className="btn btn-secondary" 
+                  onClick={() => setShowEditModal(false)}
+                >
+                  Close
+                </button>
+                <button 
+                  type="button" 
+                  className="btn btn-primary" 
+                  onClick={handleSaveEdit}
+                >
+                  Save Changes
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
