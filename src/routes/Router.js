@@ -1,4 +1,6 @@
 import { Routes, Route, Navigate } from "react-router-dom";
+import { AuthProvider } from "../context/AuthContext";
+import ProtectedRoute from "../components/ProtectedRoute";
 
 import AdminLogin from "../pages/AdminLogin";
 import Dashboard from "../pages/Dashboard";
@@ -18,31 +20,83 @@ import Advertisements from "../pages/Advertisements";
 
 const Router = () => {
   return (
-     <Routes>
-       <Route path="/" element={<Navigate to="/dashboard" />} />
-     
-        <Route path="/admin/*" element={<AdminLogin />} />
-        // <Route path="/admin-login" element={<AdminLogin />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/dashboard/*" element={<Dashboard />} />
-        <Route path="/sell-car" element={<SellCar />} />
-        <Route path="/settings" element={<Settings />} />
-        <Route path="/cities" element={<Cities />} />
-       <Route path="/category" element={<Category />} /> 
-       <Route path="/sub-packages" element={<Subpackages />} /> 
-       <Route path="/subscriptions" element={<Subscriptions />} /> 
-       <Route path="/leads" element={<ManageLeads />} /> 
-       <Route path="/vendor-details" element={<VendorDetails />} /> 
-       <Route path="/help-support" element={<HelpSupport />} />
-       <Route path="/password-settings" element={<PasswordSettings />} />
-       <Route path="/email-settings" element={<EmailSettings />} />
-       <Route path="/advertisements" element={<Advertisements />} />
-       
-     </Routes>
-   );
- };
- 
- export default Router;
+    <AuthProvider>
+      <Routes>
+        <Route path="/" element={<Navigate to="/dashboard" />} />
+        <Route path="/admin" element={<AdminLogin />} />
+        
+        {/* Protected Routes */}
+        <Route path="/dashboard" element={
+          <ProtectedRoute>
+            <Dashboard />
+          </ProtectedRoute>
+        } />
+        <Route path="/sell-car" element={
+          <ProtectedRoute>
+            <SellCar />
+          </ProtectedRoute>
+        } />
+        <Route path="/settings" element={
+          <ProtectedRoute>
+            <Settings />
+          </ProtectedRoute>
+        } />
+        <Route path="/cities" element={
+          <ProtectedRoute>
+            <Cities />
+          </ProtectedRoute>
+        } />
+        <Route path="/category" element={
+          <ProtectedRoute>
+            <Category />
+          </ProtectedRoute>
+        } />
+        <Route path="/sub-packages" element={
+          <ProtectedRoute>
+            <Subpackages />
+          </ProtectedRoute>
+        } />
+        <Route path="/subscriptions" element={
+          <ProtectedRoute>
+            <Subscriptions />
+          </ProtectedRoute>
+        } />
+        <Route path="/leads" element={
+          <ProtectedRoute>
+            <ManageLeads />
+          </ProtectedRoute>
+        } />
+        <Route path="/vendor-details" element={
+          <ProtectedRoute>
+            <VendorDetails />
+          </ProtectedRoute>
+        } />
+        <Route path="/help-support" element={
+          <ProtectedRoute>
+            <HelpSupport />
+          </ProtectedRoute>
+        } />
+        <Route path="/password-settings" element={
+          <ProtectedRoute>
+            <PasswordSettings />
+          </ProtectedRoute>
+        } />
+        <Route path="/email-settings" element={
+          <ProtectedRoute>
+            <EmailSettings />
+          </ProtectedRoute>
+        } />
+        <Route path="/advertisements" element={
+          <ProtectedRoute>
+            <Advertisements />
+          </ProtectedRoute>
+        } />
+      </Routes>
+    </AuthProvider>
+  );
+};
+
+export default Router;
 
 //  <Route path="/" element={<Navigate to="/dashboard" />} />
    // <Route path="/admin/*" element={<AdminRoutes />} />

@@ -1,14 +1,24 @@
 import React, { useState } from "react";
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 import navLinks from "../../assets/dummy-data/navLinks";
 import "./Sidebar.css";
 import logo from "../../assets/images/quickcab.png"; // Replace with your actual logo path
 
 const Sidebar = () => {
   const location = useLocation();
+  const { logout } = useAuth();
+  const navigate = useNavigate();
   const isLoginPage = location.pathname === "/AdminLogin"; // Ensure this matches your Router.jsx
 
   const [isOpen, setIsOpen] = useState(false); // Keep hooks at the top
+
+  const handleLogout = () => {
+    if (window.confirm('Are you sure you want to logout?')) {
+      logout();
+      navigate('/admin');
+    }
+  };
 
   if (isLoginPage) return null; // Now return null here
 
@@ -50,7 +60,7 @@ const Sidebar = () => {
             </ul>
           </div>
 
-          <div className="sidebar__bottom">
+          <div className="sidebar__bottom" onClick={handleLogout} style={{ cursor: 'pointer' }}>
             <span>
               <i className="ri-logout-circle-r-line"></i> Logout
             </span>
