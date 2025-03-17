@@ -351,7 +351,7 @@ export default function QuickCabsAdvertise() {
               <td>{ad.postedFrom || "No Name"}</td>
               <td>
                 {ad.image ? (
-                  <img src={`https://quickcabpune.com${ad.image}`} alt={ad.name} className="img-thumbnail" style={{ height: "50px" }} />
+                  <img src={`https://quickcabpune.com/app/${ad.image}`} alt={ad.name} className="img-thumbnail" style={{ height: "50px" }} />
                 ) : (
                   "No Image"
                 )}

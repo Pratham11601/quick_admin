@@ -92,15 +92,18 @@ const ManageSubPackages = () => {
 
   return (
     <div className="container">
-      <h2 className="fs-4 fw-semibold page-main-head">Manage Sub-Packages</h2>
-      <div className="input-group">
-        <input
-          type="text"
-          name="name"
-          value={newPackage.name}
-          onChange={handleChange}
-          placeholder="Enter package name"
-        />
+      <h2 className="fs-4 fw-semibold page-main-head">Manage Subscription</h2>
+      <div className="input-group mt-5">
+         
+        {editingIndex == null  && (
+          <input
+            type="text"
+            name="name"
+            value={newPackage.name}
+            onChange={handleChange}
+            placeholder="Enter package name"
+          />
+        )}
         <input
           type="number"
           name="duration"
@@ -156,7 +159,7 @@ const ManageSubPackages = () => {
                   }}
                 >
                   <i className="fa-solid fa-trash"></i> Delete
-                </button> 
+                </button>
               </td>
             </tr>
           ))}

@@ -287,7 +287,7 @@ const VendorDetails = () => {
                           {vendor.status === 1 ? '🔴 Deactivate' : '🟢 Activate'}
                         </button>
                       </td>
-                      <td>
+                      <td className="d-flex align-items-center">
                         <button
                           className="text-nowrap me-2"
                           onClick={() => handleEdit(vendor.id)}
@@ -303,6 +303,7 @@ const VendorDetails = () => {
                         >
                           <i className="fa-solid fa-edit"></i> Edit
                         </button>
+
                         <button
                           className="text-nowrap"
                           onClick={() => handleDeleteVendor(vendor.id)}
