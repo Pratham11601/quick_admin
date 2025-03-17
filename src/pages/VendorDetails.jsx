@@ -289,12 +289,12 @@ const VendorDetails = () => {
                       </td>
                       <td className="d-flex align-items-center">
                         <button
-                          className="text-nowrap me-2"
+                          className="text-nowrap btn btn-warning me-2"
                           onClick={() => handleEdit(vendor.id)}
-                          style={{
-                            backgroundColor: '#007bff',
+                          style={{ 
                             color: 'white',
-                            border: '1px solid #0056b3',
+                            // border: '1px solid #0056b3',
+                            fontSize: '14px',
                             borderRadius: '4px',
                             margin: '0 5px',
                             padding: '5px 10px',
