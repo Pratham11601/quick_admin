@@ -14,6 +14,8 @@ const VendorDetails = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const [editingVendor, setEditingVendor] = useState(null);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [showViewModal, setShowViewModal] = useState(false);
+  const [viewingVendor, setViewingVendor] = useState(null);
 
   useEffect(() => {
     const fetchVendors = async () => {
@@ -127,6 +129,21 @@ const VendorDetails = () => {
     }
   };
 
+  const handleView = (vendor) => {
+    setViewingVendor(vendor);
+    setShowViewModal(true);
+  };
+
+  const handleWhatsApp = (phone) => {
+    if (phone && phone !== "N/A") {
+      // Format phone number correctly (remove any non-digit characters)
+      const formattedPhone = phone.replace(/\D/g, '');
+      window.open(`https://wa.me/${formattedPhone}`, '_blank');
+    } else {
+      alert("No valid phone number available for this vendor");
+    }
+  };
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setEditingVendor(prev => ({
@@ -174,6 +191,21 @@ const VendorDetails = () => {
     }
   };
 
+  const downloadImage = (url, fileName) => {
+    if (!url) {
+      alert("Image not available");
+      return;
+    }
+    
+    // Create a temporary anchor element
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = fileName || 'download.jpg';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  };
+
   // Format date safely
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";
@@ -191,7 +223,6 @@ const VendorDetails = () => {
 
         <div className="d-flex align-items-center gap-4 mb-4" >
          
-
           <div className="vendor-details-add-category">
             <input
               type="text"
@@ -213,13 +244,10 @@ const VendorDetails = () => {
               <option value="100">100</option>
               <option value="200">200</option>
               <option value="500">500</option>
-
             </select>
           </div>
         </div>
       </div>
-
-
 
       {error && <div className="error-message">{error}</div>}
 
@@ -233,6 +261,7 @@ const VendorDetails = () => {
             <table className="vendor-details-table">
               <thead>
                 <tr>
+                  <th>Actions</th>
                   <th>Sr. No.</th>
                   <th>Full Name</th>
                   <th>Category</th>
@@ -247,30 +276,13 @@ const VendorDetails = () => {
                   <th>Aadhaar</th>
                   <th>Subscription</th>
                   <th>Sub. Date</th>
-                  <th>Status</th>
-                  <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {vendors.length > 0 ? (
                   vendors.map((vendor, index) => (
                     <tr key={vendor.id || index}>
-                      {/* <td>{(currentPage * vendorsPerPage) +   index + 1}</td> */}
-                      <td>{'QCKSRV000' + vendor.id || index + 1}</td>
-                      <td>{vendor.fullname || "N/A"}</td>
-                      <td>{vendor.vendor_cat || "N/A"}</td>
-                      <td>{vendor.businessName || "N/A"}</td>
-                      <td>{vendor.phone || "N/A"}</td>
-                      <td>{vendor.email || "N/A"}</td>
-                      <td>{vendor.city || "N/A"}</td>
-                      <td>{vendor.currentAddress || "N/A"}</td>
-                      <td>{vendor.pin_code || "N/A"}</td>
-                      <td>{vendor.carnumber || "N/A"}</td>
-                      <td>{vendor.vendor_gender || "N/A"}</td>
-                      <td>{vendor.aadhaar_number || "N/A"}</td>
-                      <td>{vendor.subscriptionPlan || "N/A"}</td>
-                      <td>{formatDate(vendor.subscription_date)}</td>
-                      <td>
+                      <td className="d-flex align-items-center">
                         <button
                           onClick={() => handleStatusToggle(vendor.id, vendor.status)}
                           style={{
@@ -286,14 +298,26 @@ const VendorDetails = () => {
                         >
                           {vendor.status === 1 ? '🔴 Deactivate' : '🟢 Activate'}
                         </button>
-                      </td>
-                      <td className="d-flex align-items-center">
+
+                        <button
+                          className="text-nowrap btn btn-success me-2"
+                          onClick={() => handleWhatsApp(vendor.phone)}
+                          style={{ 
+                            fontSize: '14px',
+                            borderRadius: '4px',
+                            margin: '0 5px',
+                            padding: '5px 10px',
+                            cursor: 'pointer',
+                          }}
+                        >
+                          <i className="fa-brands fa-whatsapp"></i>
+                        </button>
+
                         <button
                           className="text-nowrap btn btn-warning me-2"
                           onClick={() => handleEdit(vendor.id)}
                           style={{ 
                             color: 'white',
-                            // border: '1px solid #0056b3',
                             fontSize: '14px',
                             borderRadius: '4px',
                             margin: '0 5px',
@@ -320,11 +344,26 @@ const VendorDetails = () => {
                           <i className="fa-solid fa-trash"></i> Delete
                         </button>
                       </td>
+                      <td>{'QCKSRV000' + vendor.id || index + 1}</td>
+
+                      <td>{vendor.fullname || "N/A"}</td>
+                      <td>{vendor.vendor_cat || "N/A"}</td>
+                      <td>{vendor.businessName || "N/A"}</td>
+                      <td>{vendor.phone || "N/A"}</td>
+                      <td>{vendor.email || "N/A"}</td>
+                      <td>{vendor.city || "N/A"}</td>
+                      <td>{vendor.currentAddress || "N/A"}</td>
+                      <td>{vendor.pin_code || "N/A"}</td>
+                      <td>{vendor.carnumber || "N/A"}</td>
+                      <td>{vendor.vendor_gender || "N/A"}</td>
+                      <td>{vendor.aadhaar_number || "N/A"}</td>
+                      <td>{vendor.subscriptionPlan || "N/A"}</td>
+                      <td>{formatDate(vendor.subscription_date)}</td>
                     </tr>
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="16" style={{ textAlign: "center", fontWeight: "bold" }}>No vendors found</td>
+                    <td colSpan="15" style={{ textAlign: "center", fontWeight: "bold" }}>No vendors found</td>
                   </tr>
                 )}
               </tbody>
@@ -349,6 +388,124 @@ const VendorDetails = () => {
 
       <div className="vendor-details-footer">© 2025 Vendor Services. All rights reserved.</div>
 
+      {/* View Modal */}
+      {showViewModal && viewingVendor && (
+        <div className="modal show d-block" tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
+          <div className="modal-dialog modal-lg">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">Vendor Documents</h5>
+                <button 
+                  type="button" 
+                  className="btn-close" 
+                  onClick={() => setShowViewModal(false)}
+                ></button>
+              </div>
+              <div className="modal-body">
+                <div className="row">
+                  <div className="col-md-4 mb-3">
+                    <div className="card">
+                      <div className="card-header">Profile Image</div>
+                      <div className="card-body d-flex flex-column align-items-center justify-content-center" style={{ height: '250px' }}>
+                        {viewingVendor.profileImgUrl ? (
+                          <img 
+                            src={viewingVendor.profileImgUrl} 
+                            alt="Profile" 
+                            className="img-fluid mb-2" 
+                            style={{ maxHeight: '180px', maxWidth: '100%', objectFit: 'contain' }}
+                            onError={(e) => {
+                              e.target.onerror = null;
+                              e.target.src = "https://via.placeholder.com/150?text=No+Image";
+                            }}
+                          />
+                        ) : (
+                          <p className="text-center text-muted">No profile image available</p>
+                        )}
+                        <button 
+                          className="btn btn-primary w-100 mt-2" 
+                          onClick={() => downloadImage(viewingVendor.profileImgUrl, `${viewingVendor.fullname}-profile.jpg`)}
+                          disabled={!viewingVendor.profileImgUrl}
+                        >
+                          <i className="fa-solid fa-download"></i> Download
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="col-md-4 mb-3">
+                    <div className="card">
+                      <div className="card-header">Document Image</div>
+                      <div className="card-body d-flex flex-column align-items-center justify-content-center" style={{ height: '250px' }}>
+                        {viewingVendor.documentImgUrl ? (
+                          <img 
+                            src={viewingVendor.documentImgUrl} 
+                            alt="Document" 
+                            className="img-fluid mb-2" 
+                            style={{ maxHeight: '180px', maxWidth: '100%', objectFit: 'contain' }}
+                            onError={(e) => {
+                              e.target.onerror = null;
+                              e.target.src = "https://via.placeholder.com/150?text=No+Image";
+                            }}
+                          />
+                        ) : (
+                          <p className="text-center text-muted">No document image available</p>
+                        )}
+                        <button 
+                          className="btn btn-primary w-100 mt-2" 
+                          onClick={() => downloadImage(viewingVendor.documentImgUrl, `${viewingVendor.fullname}-document.jpg`)}
+                          disabled={!viewingVendor.documentImgUrl}
+                        >
+                          <i className="fa-solid fa-download"></i> Download
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="col-md-4 mb-3">
+                    <div className="card">
+                      <div className="card-header">License Image</div>
+                      <div className="card-body d-flex flex-column align-items-center justify-content-center" style={{ height: '250px' }}>
+                        {viewingVendor.licenseImgUrl ? (
+                          <img 
+                            src={viewingVendor.licenseImgUrl} 
+                            alt="License" 
+                            className="img-fluid mb-2" 
+                            style={{ maxHeight: '180px', maxWidth: '100%', objectFit: 'contain' }}
+                            onError={(e) => {
+                              e.target.onerror = null;
+                              e.target.src = "https://via.placeholder.com/150?text=No+Image";
+                            }}
+                          />
+                        ) : (
+                          <p className="text-center text-muted">No license image available</p>
+                        )}
+                        <button 
+                          className="btn btn-primary w-100 mt-2" 
+                          onClick={() => downloadImage(viewingVendor.licenseImgUrl, `${viewingVendor.fullname}-license.jpg`)}
+                          disabled={!viewingVendor.licenseImgUrl}
+                        >
+                          <i className="fa-solid fa-download"></i> Download
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="modal-footer">
+                <button 
+                  type="button" 
+                  className="btn btn-secondary" 
+                  onClick={() => setShowViewModal(false)}
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Modal */}
       {showEditModal && editingVendor && (
         <div className="modal show d-block" tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
           <div className="modal-dialog modal-lg">
@@ -500,6 +657,7 @@ const VendorDetails = () => {
                       name="subscriptionPlan"
                       value={editingVendor.subscriptionPlan || ''}
                       onChange={handleInputChange}
+                      disabled={true}
                     />
                   </div>
 
@@ -511,6 +669,7 @@ const VendorDetails = () => {
                       name="subscription_date"
                       value={editingVendor.subscription_date ? editingVendor.subscription_date.split('T')[0] : ''}
                       onChange={handleInputChange}
+                      disabled={true}
                     />
                   </div>
                 </form>
