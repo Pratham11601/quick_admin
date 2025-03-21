@@ -130,7 +130,27 @@ const VendorDetails = () => {
   };
 
   const handleView = (vendor) => {
-    setViewingVendor(vendor);
+    // Create a copy of the vendor with properly formatted image URLs
+    const viewVendor = {
+      ...vendor,
+      profileImgUrl: vendor.profileImgUrl ? `https://quickcabpune.com/app/${vendor.profileImgUrl.replace(/^\/+/, '')}` : null,
+      documentImgUrl: vendor.documentImgUrl ? `https://quickcabpune.com/app/${vendor.documentImgUrl.replace(/^\/+/, '')}` : null,
+      licenseImgUrl: vendor.licenseImgUrl ? `https://quickcabpune.com/app/${vendor.licenseImgUrl.replace(/^\/+/, '')}` : null
+    };
+    
+    // Add console logging to debug image URLs
+    console.log('Original URLs:', {
+      profile: vendor.profileImgUrl,
+      document: vendor.documentImgUrl,
+      license: vendor.licenseImgUrl
+    });
+    console.log('Formatted URLs:', {
+      profile: viewVendor.profileImgUrl,
+      document: viewVendor.documentImgUrl,
+      license: viewVendor.licenseImgUrl
+    });
+    
+    setViewingVendor(viewVendor);
     setShowViewModal(true);
   };
 
@@ -191,21 +211,6 @@ const VendorDetails = () => {
     }
   };
 
-  const downloadImage = (url, fileName) => {
-    if (!url) {
-      alert("Image not available");
-      return;
-    }
-    
-    // Create a temporary anchor element
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = fileName || 'download.jpg';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-  };
-
   // Format date safely
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";
@@ -213,6 +218,28 @@ const VendorDetails = () => {
       return new Date(dateString).toLocaleDateString();
     } catch (error) {
       return "Invalid Date";
+    }
+  };
+
+  // Function to handle image download
+  const handleAutoDownload = async (imageUrl, filename) => {
+    try {
+      const response = await fetch(imageUrl);
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Download failed:', error);
+      alert('Failed to download image. Please try again.');
     }
   };
 
@@ -314,6 +341,21 @@ const VendorDetails = () => {
                         </button>
 
                         <button
+                          className="text-nowrap btn btn-info me-2"
+                          onClick={() => handleView(vendor)}
+                          style={{ 
+                            color: 'white',
+                            fontSize: '14px',
+                            borderRadius: '4px',
+                            margin: '0 5px',
+                            padding: '5px 10px',
+                            cursor: 'pointer',
+                          }}
+                        >
+                          <i className="fa-solid fa-eye"></i> View
+                        </button>
+
+                        <button
                           className="text-nowrap btn btn-warning me-2"
                           onClick={() => handleEdit(vendor.id)}
                           style={{ 
@@ -388,101 +430,59 @@ const VendorDetails = () => {
 
       <div className="vendor-details-footer">© 2025 Vendor Services. All rights reserved.</div>
 
-      {/* View Modal */}
-      {showViewModal && viewingVendor && (
-        <div className="modal show d-block" tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
-          <div className="modal-dialog modal-lg">
-            <div className="modal-content">
-              <div className="modal-header">
-                <h5 className="modal-title">Vendor Documents</h5>
-                <button 
-                  type="button" 
-                  className="btn-close" 
-                  onClick={() => setShowViewModal(false)}
-                ></button>
-              </div>
-              <div className="modal-body">
-                <div className="row">
-                  <div className="col-md-4 mb-3">
-                    <div className="card">
-                      <div className="card-header">Profile Image</div>
-                      <div className="card-body d-flex flex-column align-items-center justify-content-center" style={{ height: '250px' }}>
-                        {viewingVendor.profileImgUrl ? (
-                          <img 
-                            src={viewingVendor.profileImgUrl} 
-                            alt="Profile" 
-                            className="img-fluid mb-2" 
-                            style={{ maxHeight: '180px', maxWidth: '100%', objectFit: 'contain' }}
-                            onError={(e) => {
-                              e.target.onerror = null;
-                              e.target.src = "https://via.placeholder.com/150?text=No+Image";
-                            }}
-                          />
-                        ) : (
-                          <p className="text-center text-muted">No profile image available</p>
-                        )}
-                        <button 
-                          className="btn btn-primary w-100 mt-2" 
-                          onClick={() => downloadImage(viewingVendor.profileImgUrl, `${viewingVendor.fullname}-profile.jpg`)}
-                          disabled={!viewingVendor.profileImgUrl}
-                        >
-                          <i className="fa-solid fa-download"></i> Download
-                        </button>
-                      </div>
+
+{/* View Modal - Improved UI */}
+{showViewModal && viewingVendor && (
+  <div className="modal show d-block" tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
+    <div className="modal-dialog modal-lg">
+      <div className="modal-content shadow-lg border-0 rounded-3">
+        <div className="modal-header bg-primary text-white">
+          <h5 className="modal-title fw-bold">Vendor Documents</h5>
+          <button
+            type="button"
+            className="btn-close"
+            onClick={() => setShowViewModal(false)}
+          ></button>
+        </div>
+        <div className="modal-body">
+          <div className="row g-3">
+            {[
+              { label: "Profile Image", key: "profileImgUrl", defaultName: "profile" },
+              { label: "Document Image", key: "documentImgUrl", defaultName: "document" },
+              { label: "License Image", key: "licenseImgUrl", defaultName: "license" },
+            ].map((image, index) => (
+              viewingVendor[image.key] && (
+                <div className="col-md-4" key={index}>
+                  <div className="card shadow-sm border-0 rounded-3 overflow-hidden">
+                    <div className="card-header bg-light text-center fw-bold">
+                      {image.label}
                     </div>
-                  </div>
-                  
-                  <div className="col-md-4 mb-3">
-                    <div className="card">
-                      <div className="card-header">Document Image</div>
-                      <div className="card-body d-flex flex-column align-items-center justify-content-center" style={{ height: '250px' }}>
-                        {viewingVendor.documentImgUrl ? (
-                          <img 
-                            src={viewingVendor.documentImgUrl} 
-                            alt="Document" 
-                            className="img-fluid mb-2" 
-                            style={{ maxHeight: '180px', maxWidth: '100%', objectFit: 'contain' }}
-                            onError={(e) => {
-                              e.target.onerror = null;
-                              e.target.src = "https://via.placeholder.com/150?text=No+Image";
-                            }}
-                          />
-                        ) : (
-                          <p className="text-center text-muted">No document image available</p>
-                        )}
-                        <button 
-                          className="btn btn-primary w-100 mt-2" 
-                          onClick={() => downloadImage(viewingVendor.documentImgUrl, `${viewingVendor.fullname}-document.jpg`)}
-                          disabled={!viewingVendor.documentImgUrl}
+                    <div className="card-body d-flex flex-column align-items-center justify-content-center">
+                      {/* <div className="image-container position-relative" style={{ width: '100%', backgroundColor: '#f8f9fa', padding: '10px', borderRadius: '8px' }}>
+                        <img
+                          src={viewingVendor[image.key]}
+                          alt={image.label}
+                          className="img-fluid rounded"
+                          style={{ maxHeight: '180px', maxWidth: '100%', objectFit: 'cover' }}
+                          onError={(e) => {
+                            console.error(`Error loading ${image.label.toLowerCase()}:`, e);
+                            e.target.onerror = null;
+                            e.target.src = "https://via.placeholder.com/150?text=No+Image";
+                          }}
+                          loading="eager"
+                        />
+                      </div> */}
+                      {/* Buttons */}
+                      <div className="d-flex gap-2 w-100 mt-3">
+                        <button
+                          onClick={() => window.open(viewingVendor[image.key], '_blank')}
+                          className="btn btn-outline-info w-100"
                         >
-                          <i className="fa-solid fa-download"></i> Download
+                          <i className="fa-solid fa-eye"></i> View
                         </button>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="col-md-4 mb-3">
-                    <div className="card">
-                      <div className="card-header">License Image</div>
-                      <div className="card-body d-flex flex-column align-items-center justify-content-center" style={{ height: '250px' }}>
-                        {viewingVendor.licenseImgUrl ? (
-                          <img 
-                            src={viewingVendor.licenseImgUrl} 
-                            alt="License" 
-                            className="img-fluid mb-2" 
-                            style={{ maxHeight: '180px', maxWidth: '100%', objectFit: 'contain' }}
-                            onError={(e) => {
-                              e.target.onerror = null;
-                              e.target.src = "https://via.placeholder.com/150?text=No+Image";
-                            }}
-                          />
-                        ) : (
-                          <p className="text-center text-muted">No license image available</p>
-                        )}
-                        <button 
-                          className="btn btn-primary w-100 mt-2" 
-                          onClick={() => downloadImage(viewingVendor.licenseImgUrl, `${viewingVendor.fullname}-license.jpg`)}
-                          disabled={!viewingVendor.licenseImgUrl}
+                        <button
+                          onClick={() => handleAutoDownload(viewingVendor[image.key], `${viewingVendor.fullname || 'vendor'}-${image.defaultName}.jpg`)}
+                          className="btn btn-primary w-100"
                         >
                           <i className="fa-solid fa-download"></i> Download
                         </button>
@@ -490,210 +490,214 @@ const VendorDetails = () => {
                     </div>
                   </div>
                 </div>
-              </div>
-              <div className="modal-footer">
-                <button 
-                  type="button" 
-                  className="btn btn-secondary" 
-                  onClick={() => setShowViewModal(false)}
-                >
-                  Close
-                </button>
-              </div>
-            </div>
+              )
+            ))}
           </div>
         </div>
-      )}
-
-      {/* Edit Modal */}
-      {showEditModal && editingVendor && (
-        <div className="modal show d-block" tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
-          <div className="modal-dialog modal-lg">
-            <div className="modal-content">
-              <div className="modal-header">
-                <h5 className="modal-title">Edit Vendor Details</h5>
-                <button 
-                  type="button" 
-                  className="btn-close" 
-                  onClick={() => setShowEditModal(false)}
-                ></button>
-              </div>
-              <div className="modal-body">
-                <form className="row g-3">
-                  <div className="col-md-6">
-                    <label className="form-label">Full Name</label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      name="fullname"
-                      value={editingVendor.fullname || ''}
-                      onChange={handleInputChange}
-                    />
-                  </div>
-
-                  <div className="col-md-6">
-                    <label className="form-label">Phone</label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      name="phone"
-                      value={editingVendor.phone || ''}
-                      onChange={handleInputChange}
-                    />
-                  </div>
-
-                  <div className="col-md-6">
-                    <label className="form-label">Email</label>
-                    <input
-                      type="email"
-                      className="form-control"
-                      name="email"
-                      value={editingVendor.email || ''}
-                      onChange={handleInputChange}
-                    />
-                  </div>
-
-                  <div className="col-md-6">
-                    <label className="form-label">Aadhaar Number</label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      name="aadhaar_number"
-                      value={editingVendor.aadhaar_number || ''}
-                      onChange={handleInputChange}
-                    />
-                  </div>
-
-                  <div className="col-md-6">
-                    <label className="form-label">Business Name</label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      name="businessName"
-                      value={editingVendor.businessName || ''}
-                      onChange={handleInputChange}
-                    />
-                  </div>
-
-                  <div className="col-md-6">
-                    <label className="form-label">Category</label>
-                    <select
-                      className="form-select"
-                      name="vendor_cat"
-                      value={editingVendor.vendor_cat || ''}
-                      onChange={handleInputChange}
-                    >
-                      <option value="">Select Category</option>
-                      <option value="Cab">Cab</option>
-                      <option value="Auto">Auto</option>
-                      <option value="Bike">Bike</option>
-                    </select>
-                  </div>
-
-                  <div className="col-md-6">
-                    <label className="form-label">City</label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      name="city"
-                      value={editingVendor.city || ''}
-                      onChange={handleInputChange}
-                    />
-                  </div>
-
-                  <div className="col-md-6">
-                    <label className="form-label">Pin Code</label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      name="pin_code"
-                      value={editingVendor.pin_code || ''}
-                      onChange={handleInputChange}
-                    />
-                  </div>
-
-                  <div className="col-md-6">
-                    <label className="form-label">Car Number</label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      name="carnumber"
-                      value={editingVendor.carnumber || ''}
-                      onChange={handleInputChange}
-                    />
-                  </div>
-
-                  <div className="col-md-6">
-                    <label className="form-label">Gender</label>
-                    <select
-                      className="form-select"
-                      name="vendor_gender"
-                      value={editingVendor.vendor_gender || ''}
-                      onChange={handleInputChange}
-                    >
-                      <option value="">Select Gender</option>
-                      <option value="Male">Male</option>
-                      <option value="Female">Female</option>
-                      <option value="Other">Other</option>
-                    </select>
-                  </div>
-
-                  <div className="col-12">
-                    <label className="form-label">Current Address</label>
-                    <textarea
-                      className="form-control"
-                      name="currentAddress"
-                      value={editingVendor.currentAddress || ''}
-                      onChange={handleInputChange}
-                      rows="3"
-                    ></textarea>
-                  </div>
-
-                  <div className="col-md-6">
-                    <label className="form-label">Subscription Plan</label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      name="subscriptionPlan"
-                      value={editingVendor.subscriptionPlan || ''}
-                      onChange={handleInputChange}
-                      disabled={true}
-                    />
-                  </div>
-
-                  <div className="col-md-6">
-                    <label className="form-label">Subscription Date</label>
-                    <input
-                      type="date"
-                      className="form-control"
-                      name="subscription_date"
-                      value={editingVendor.subscription_date ? editingVendor.subscription_date.split('T')[0] : ''}
-                      onChange={handleInputChange}
-                      disabled={true}
-                    />
-                  </div>
-                </form>
-              </div>
-              <div className="modal-footer">
-                <button 
-                  type="button" 
-                  className="btn btn-secondary" 
-                  onClick={() => setShowEditModal(false)}
-                >
-                  Close
-                </button>
-                <button 
-                  type="button" 
-                  className="btn btn-primary" 
-                  onClick={handleSaveEdit}
-                >
-                  Save Changes
-                </button>
-              </div>
-            </div>
-          </div>
+        <div className="modal-footer">
+          <button
+            type="button"
+            className="btn btn-secondary"
+            onClick={() => setShowViewModal(false)}
+          >
+            Close
+          </button>
         </div>
-      )}
+      </div>
+    </div>
+  </div>
+)}
+
+
+
+{showEditModal && editingVendor && (
+  <div className="modal show d-block" tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
+    <div className="modal-dialog modal-lg">
+      <div className="modal-content">
+        <div className="modal-header">
+          <h5 className="modal-title">Edit Vendor Details</h5>
+          <button 
+            type="button" 
+            className="btn-close" 
+            onClick={() => setShowEditModal(false)}
+          ></button>
+        </div>
+        <div className="modal-body">
+          <form className="row g-3">
+            <div className="col-md-6">
+              <label className="form-label">Full Name</label>
+              <input
+                type="text"
+                className="form-control"
+                name="fullname"
+                value={editingVendor.fullname || ''}
+                onChange={handleInputChange}
+              />
+            </div>
+
+            <div className="col-md-6">
+              <label className="form-label">Phone</label>
+              <input
+                type="text"
+                className="form-control"
+                name="phone"
+                value={editingVendor.phone || ''}
+                onChange={handleInputChange}
+              />
+            </div>
+
+            <div className="col-md-6">
+              <label className="form-label">Email</label>
+              <input
+                type="email"
+                className="form-control"
+                name="email"
+                value={editingVendor.email || ''}
+                onChange={handleInputChange}
+              />
+            </div>
+
+            <div className="col-md-6">
+              <label className="form-label">Aadhaar Number</label>
+              <input
+                type="text"
+                className="form-control"
+                name="aadhaar_number"
+                value={editingVendor.aadhaar_number || ''}
+                onChange={handleInputChange}
+              />
+            </div>
+
+            <div className="col-md-6">
+              <label className="form-label">Business Name</label>
+              <input
+                type="text"
+                className="form-control"
+                name="businessName"
+                value={editingVendor.businessName || ''}
+                onChange={handleInputChange}
+              />
+            </div>
+
+            <div className="col-md-6">
+              <label className="form-label">Category</label>
+              <select
+                className="form-select"
+                name="vendor_cat"
+                value={editingVendor.vendor_cat || ''}
+                onChange={handleInputChange}
+              >
+                <option value="">Select Category</option>
+                <option value="Cab">Cab</option>
+                <option value="Auto">Auto</option>
+                <option value="Bike">Bike</option>
+              </select>
+            </div>
+
+            <div className="col-md-6">
+              <label className="form-label">City</label>
+              <input
+                type="text"
+                className="form-control"
+                name="city"
+                value={editingVendor.city || ''}
+                onChange={handleInputChange}
+              />
+            </div>
+
+            <div className="col-md-6">
+              <label className="form-label">Pin Code</label>
+              <input
+                type="text"
+                className="form-control"
+                name="pin_code"
+                value={editingVendor.pin_code || ''}
+                onChange={handleInputChange}
+              />
+            </div>
+
+            <div className="col-md-6">
+              <label className="form-label">Car Number</label>
+              <input
+                type="text"
+                className="form-control"
+                name="carnumber"
+                value={editingVendor.carnumber || ''}
+                onChange={handleInputChange}
+              />
+            </div>
+
+            <div className="col-md-6">
+              <label className="form-label">Gender</label>
+              <select
+                className="form-select"
+                name="vendor_gender"
+                value={editingVendor.vendor_gender || ''}
+                onChange={handleInputChange}
+              >
+                <option value="">Select Gender</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+
+            <div className="col-12">
+              <label className="form-label">Current Address</label>
+              <textarea
+                className="form-control"
+                name="currentAddress"
+                value={editingVendor.currentAddress || ''}
+                onChange={handleInputChange}
+                rows="3"
+              ></textarea>
+            </div>
+
+            <div className="col-md-6">
+              <label className="form-label">Subscription Plan</label>
+              <input
+                type="text"
+                className="form-control"
+                name="subscriptionPlan"
+                value={editingVendor.subscriptionPlan || ''}
+                onChange={handleInputChange}
+                disabled={true}
+              />
+            </div>
+
+            <div className="col-md-6">
+              <label className="form-label">Subscription Date</label>
+              <input
+                type="date"
+                className="form-control"
+                name="subscription_date"
+                value={editingVendor.subscription_date ? editingVendor.subscription_date.split('T')[0] : ''}
+                onChange={handleInputChange}
+                disabled={true}
+              />
+            </div>
+          </form>
+        </div>
+        <div className="modal-footer">
+          <button 
+            type="button" 
+            className="btn btn-secondary" 
+            onClick={() => setShowEditModal(false)}
+          >
+            Close
+          </button>
+          <button 
+            type="button" 
+            className="btn btn-primary" 
+            onClick={handleSaveEdit}
+          >
+            Save Changes
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+)}
     </div>
   );
 };
