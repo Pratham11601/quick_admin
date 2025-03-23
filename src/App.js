@@ -47,10 +47,12 @@
     return (
       <Routes>
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/" element={<LoginPage />} />
+
         {isAuthenticated ? (
           <Route element={<PrivateRoute />}>
             <Route element={<Layout />}>
-              <Route path="/admin" element={<LoginPage />} />
+              <Route path="/admin" element={<LoginPage />} /> 
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/sell-car" element={<SellCar />} />
               <Route path="/settings" element={<Settings />} />

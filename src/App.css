@@ -47,9 +47,9 @@ img {
 /* COMMON STYLES FOR DASHBOARD */
 body *::-webkit-scrollbar {
   width: 4px;
-  height: 4px;
+  height: 8px;
   -webkit-transition: .3s;
-  transition: .3s;
+  transition: .3s; 
 }
 
 body *:hover::-webkit-scrollbar-thumb {
