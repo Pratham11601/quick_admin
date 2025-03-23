@@ -335,7 +335,7 @@ export default function QuickCabsAdvertise() {
         </div>
       </div>
 
-      <table className="table table-bordered">
+      <table className="table table-bordered table-responsive">
         <thead className="table-light">
           <tr>
             <th>ID</th>
@@ -350,11 +350,14 @@ export default function QuickCabsAdvertise() {
               <td>{ad.id || "N/A"}</td>
               <td>{ad.postedFrom || "No Name"}</td>
               <td>
-                {ad.image ? (
-                  <img src={`https://quickcabpune.com/app/${ad.image}`} alt={ad.name} className="img-thumbnail" style={{ height: "50px" }} />
+                <a target="_blank" href={`https://quickcabpune.com/app/${ad.image}`}>Advertisements {index + 1}</a>
+                {/* {ad.image ? (
+                  <img src={`https://quickcabpune.com/app/${ad.image}`} alt={ad.name} target="_blank" className="img-thumbnail" style={{ height: "50px" }} />
                 ) : (
                   "No Image"
-                )}
+                )} */}
+
+                
               </td>
               <td>
                 <button className="btn btn-danger" onClick={() => handleDelete(ad.id)}>

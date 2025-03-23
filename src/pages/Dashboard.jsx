@@ -1,11 +1,21 @@
 import React, { useEffect, useState } from "react";
 import "../styles/Dashboard.css";
 import SingleCard from "../components/reuseable/SingleCard";
+import { useNavigate } from 'react-router-dom';
+// import { logout } from '../context/authService';
+// import { useAuth } from '../context/AuthContext';
 
 const Dashboard = () => {
   const [leadsData, setLeadsData] = useState(null);
   const [vendorCount, setVendorCount] = useState(0);
   const [loading, setLoading] = useState(true);
+  // const navigate = useNavigate();
+  // const { logout } = useAuth();
+  // const handleLogout = () => {
+  //   logout();
+  //   navigate('/login');
+  // };
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -77,6 +87,8 @@ const Dashboard = () => {
 
   return (
     <div className="dashboard common-main-content-wrapper">
+
+      {/* <button onClick={handleLogout}>Logout</button> */}
       <div className="dashboard__wrapper">
         <div className="dashboard__cards">
           <SingleCard item={vendorCardData} />

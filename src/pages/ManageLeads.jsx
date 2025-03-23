@@ -94,7 +94,7 @@ const ManageLeads = () => {
 
 
 
-      <div className="table-container">
+      <div className="table-container table-responsive">
         {loading ? (
           <div className="loader-container">
             <div className="loading-box"><i className="fa-solid fa-circle-notch"></i></div>

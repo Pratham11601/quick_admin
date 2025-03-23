@@ -3,7 +3,7 @@ import "../styles/VendorDetails.css";
 import axios from "axios";
 import ReactPaginate from "react-paginate";
 
-const VendorDetails = () => {
+const VendorDetails = ({ selectedCategory, onCategoryChange }) => {
   const [vendors, setVendors] = useState([]);
   const [allVendors, setAllVendors] = useState([]); // Store all vendors for client-side pagination
   const [searchTerm, setSearchTerm] = useState("");
@@ -15,6 +15,15 @@ const VendorDetails = () => {
   const [editingVendor, setEditingVendor] = useState(null);
   const [showEditModal, setShowEditModal] = useState(false);
 
+
+  const handleScroll = (e) => {
+    const scrollLeft = e.target.scrollLeft;
+    document.querySelector('.top-scrollbar').scrollLeft = scrollLeft;
+    document.querySelector('.content-scroll').scrollLeft = scrollLeft;
+  };
+
+
+  // 
   useEffect(() => {
     const fetchVendors = async () => {
       setLoading(true);
@@ -147,7 +156,7 @@ const VendorDetails = () => {
 
       // Update the API endpoint to match your backend
       const response = await axios.put(
-        `https://quickcabpune.com/admin/api/vendor/${editingVendor.id}`, 
+        `https://quickcabpune.com/admin/api/vendor/${editingVendor.id}`,
         cleanedData,
         {
           headers: {
@@ -158,7 +167,7 @@ const VendorDetails = () => {
 
       if (response.data) {
         // Update the local state
-        const updatedVendors = allVendors.map(vendor => 
+        const updatedVendors = allVendors.map(vendor =>
           vendor.id === editingVendor.id ? { ...vendor, ...cleanedData } : vendor
         );
         setAllVendors(updatedVendors);
@@ -184,13 +193,37 @@ const VendorDetails = () => {
     }
   };
 
+
+
+  // GET CATEGORY DATA
+  const [categoryList, setCategoryList] = useState([]);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await axios.get("https://quickcabpune.com/app/categories/all");
+        // console.log("API Response:", response.data); // Debug log
+        setCategoryList(Array.isArray(response.data.data) ? response.data.data : []);
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+        setCategoryList([]);
+      }
+    };
+
+    fetchCategories();
+  }, []);
+
+
   return (
     <div className="vendor-details-page-body">
       <div className="d-flex justify-content-between align-items-center flex-wrap">
         <h1 className="vendor-details-h1 page-main-head text-muted">Vendor Details</h1>
 
+
+
         <div className="d-flex align-items-center gap-4 mb-4" >
-         
+
+
 
           <div className="vendor-details-add-category">
             <input
@@ -224,113 +257,124 @@ const VendorDetails = () => {
       {error && <div className="error-message">{error}</div>}
 
       <div className="vendor-details-table-container">
-        <div className="table-responsive">
-          {loading ? (
-            <div className="loader-container">
-              <div className="loading-box"><i className="fa-solid fa-circle-notch"></i></div>
-            </div>
-          ) : (
-            <table className="vendor-details-table">
-              <thead>
-                <tr>
-                  <th>Sr. No.</th>
-                  <th>Full Name</th>
-                  <th>Category</th>
-                  <th>Business Name</th>
-                  <th>Phone</th>
-                  <th>Email</th>
-                  <th>City</th>
-                  <th>Address</th>
-                  <th>Pin Code</th>
-                  <th>Car Number</th>
-                  <th>Gender</th>
-                  <th>Aadhaar</th>
-                  <th>Subscription</th>
-                  <th>Sub. Date</th>
-                  <th>Status</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {vendors.length > 0 ? (
-                  vendors.map((vendor, index) => (
-                    <tr key={vendor.id || index}>
-                      {/* <td>{(currentPage * vendorsPerPage) +   index + 1}</td> */}
-                      <td>{'QCKSRV000' + vendor.id || index + 1}</td>
-                      <td>{vendor.fullname || "N/A"}</td>
-                      <td>{vendor.vendor_cat || "N/A"}</td>
-                      <td>{vendor.businessName || "N/A"}</td>
-                      <td>{vendor.phone || "N/A"}</td>
-                      <td>{vendor.email || "N/A"}</td>
-                      <td>{vendor.city || "N/A"}</td>
-                      <td>{vendor.currentAddress || "N/A"}</td>
-                      <td>{vendor.pin_code || "N/A"}</td>
-                      <td>{vendor.carnumber || "N/A"}</td>
-                      <td>{vendor.vendor_gender || "N/A"}</td>
-                      <td>{vendor.aadhaar_number || "N/A"}</td>
-                      <td>{vendor.subscriptionPlan || "N/A"}</td>
-                      <td>{formatDate(vendor.subscription_date)}</td>
-                      <td>
-                        <button
-                          onClick={() => handleStatusToggle(vendor.id, vendor.status)}
-                          style={{
-                            backgroundColor: vendor.status === 1 ? '#f8d7da' : '#d4edda',
-                            color: vendor.status === 1 ? '#721c24' : '#155724',
-                            border: vendor.status === 1 ? '1px solid #f5c6cb' : '1px solid #c3e6cb',
-                            borderRadius: '4px',
-                            margin: '0 5px',
-                            padding: '5px 10px',
-                            cursor: 'pointer',
-                            whiteSpace: 'nowrap'
-                          }}
-                        >
-                          {vendor.status === 1 ? '🔴 Deactivate' : '🟢 Activate'}
-                        </button>
-                      </td>
-                      <td className="d-flex align-items-center">
-                        <button
-                          className="text-nowrap btn btn-warning me-2"
-                          onClick={() => handleEdit(vendor.id)}
-                          style={{ 
-                            color: 'white',
-                            // border: '1px solid #0056b3',
-                            fontSize: '14px',
-                            borderRadius: '4px',
-                            margin: '0 5px',
-                            padding: '5px 10px',
-                            cursor: 'pointer',
-                          }}
-                        >
-                          <i className="fa-solid fa-edit"></i> Edit
-                        </button>
 
-                        <button
-                          className="text-nowrap"
-                          onClick={() => handleDeleteVendor(vendor.id)}
-                          style={{
-                            backgroundColor: '#b80000cc',
-                            color: 'white',
-                            border: '1px solid #f5c6cb',
-                            borderRadius: '4px',
-                            margin: '0 5px',
-                            padding: '5px 10px',
-                            cursor: 'pointer',
-                          }}
-                        >
-                          <i className="fa-solid fa-trash"></i> Delete
-                        </button>
-                      </td>
-                    </tr>
-                  ))
-                ) : (
+        <div className="horizontal-scroll-container">
+          {/* Top Scrollbar */}
+          <div className="top-scrollbar" onScroll={handleScroll}>
+            <div className="scroll-shadow"></div>
+          </div>
+
+
+          {/* CONTENT */}
+          <div className="table-responsive content-scroll" onScroll={handleScroll}>
+            {loading ? (
+              <div className="loader-container">
+                <div className="loading-box"><i className="fa-solid fa-circle-notch"></i></div>
+              </div>
+            ) : (
+              <table className="vendor-details-table">
+                <thead>
                   <tr>
-                    <td colSpan="16" style={{ textAlign: "center", fontWeight: "bold" }}>No vendors found</td>
+                    <th>Sr. No.</th>
+                    <th>Full Name</th>
+                    <th>Category</th>
+                    <th>Business Name</th>
+                    <th>Phone</th>
+                    <th>Email</th>
+                    <th>City</th>
+                    <th>Address</th>
+                    <th>Pin Code</th>
+                    <th>Car Number</th>
+                    <th>Gender</th>
+                    <th>Aadhaar</th>
+                    <th>Subscription</th>
+                    <th>Sub. Date</th>
+                    <th>Status</th>
+                    <th>Actions</th>
                   </tr>
-                )}
-              </tbody>
-            </table>
-          )}
+                </thead>
+                <tbody>
+                  {vendors.length > 0 ? (
+                    vendors.map((vendor, index) => (
+                      <tr key={vendor.id || index}>
+                        {/* <td>{(currentPage * vendorsPerPage) +   index + 1}</td> */}
+                        <td>{'QCKSRV000' + vendor.id || index + 1}</td>
+                        <td>{vendor.fullname || "N/A"}</td>
+                        <td>{vendor.vendor_cat || "N/A"}</td>
+                        <td>{vendor.businessName || "N/A"}</td>
+                        <td>{vendor.phone || "N/A"}</td>
+                        <td>{vendor.email || "N/A"}</td>
+                        <td>{vendor.city || "N/A"}</td>
+                        <td>{vendor.currentAddress || "N/A"}</td>
+                        <td>{vendor.pin_code || "N/A"}</td>
+                        <td>{vendor.carnumber || "N/A"}</td>
+                        <td>{vendor.vendor_gender || "N/A"}</td>
+                        <td>{vendor.aadhaar_number || "N/A"}</td>
+                        <td>{vendor.subscriptionPlan || "N/A"}</td>
+                        <td>{formatDate(vendor.subscription_date)}</td>
+                        <td>
+                          <button
+                            onClick={() => handleStatusToggle(vendor.id, vendor.status)}
+                            style={{
+                              backgroundColor: vendor.status === 1 ? '#f8d7da' : '#d4edda',
+                              color: vendor.status === 1 ? '#721c24' : '#155724',
+                              border: vendor.status === 1 ? '1px solid #f5c6cb' : '1px solid #c3e6cb',
+                              borderRadius: '4px',
+                              margin: '0 5px',
+                              padding: '5px 10px',
+                              cursor: 'pointer',
+                              whiteSpace: 'nowrap'
+                            }}
+                          >
+                            {vendor.status === 1 ? '🔴 Deactivate' : '🟢 Activate'}
+                          </button>
+                        </td>
+                        <td className="d-flex align-items-center">
+                          <button
+                            className="text-nowrap btn btn-warning me-2"
+                            onClick={() => handleEdit(vendor.id)}
+                            style={{
+                              color: 'white',
+                              // border: '1px solid #0056b3',
+                              fontSize: '14px',
+                              borderRadius: '4px',
+                              margin: '0 5px',
+                              padding: '5px 10px',
+                              cursor: 'pointer',
+                            }}
+                          >
+                            <i className="fa-solid fa-edit"></i> Edit
+                          </button>
+
+                          <button
+                            className="text-nowrap"
+                            onClick={() => handleDeleteVendor(vendor.id)}
+                            style={{
+                              backgroundColor: '#b80000cc',
+                              color: 'white',
+                              border: '1px solid #f5c6cb',
+                              borderRadius: '4px',
+                              margin: '0 5px',
+                              padding: '5px 10px',
+                              cursor: 'pointer',
+                            }}
+                          >
+                            <i className="fa-solid fa-trash"></i> Delete
+                          </button>
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan="16" style={{ textAlign: "center", fontWeight: "bold" }}>No vendors found</td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            )}
+          </div>
         </div>
+
       </div>
 
       <div className="vendor-details-pagination">
@@ -355,9 +399,9 @@ const VendorDetails = () => {
             <div className="modal-content">
               <div className="modal-header">
                 <h5 className="modal-title">Edit Vendor Details</h5>
-                <button 
-                  type="button" 
-                  className="btn-close" 
+                <button
+                  type="button"
+                  className="btn-close"
                   onClick={() => setShowEditModal(false)}
                 ></button>
               </div>
@@ -420,7 +464,7 @@ const VendorDetails = () => {
 
                   <div className="col-md-6">
                     <label className="form-label">Category</label>
-                    <select
+                    {/* <select
                       className="form-select"
                       name="vendor_cat"
                       value={editingVendor.vendor_cat || ''}
@@ -430,6 +474,21 @@ const VendorDetails = () => {
                       <option value="Cab">Cab</option>
                       <option value="Auto">Auto</option>
                       <option value="Bike">Bike</option>
+                    </select> */}
+
+                    <select
+                      className="form-select"
+                      // name="category"
+                      name="vendor_cat"
+
+                      value={editingVendor.vendor_cat || ''}
+                      onChange={handleInputChange}
+                    >
+                      <option value="]">Select Category</option>
+
+                      {categoryList.map((category) => (
+                        <option value={category.cat_name}>{category.cat_name}</option>
+                      ))}
                     </select>
                   </div>
 
@@ -516,16 +575,16 @@ const VendorDetails = () => {
                 </form>
               </div>
               <div className="modal-footer">
-                <button 
-                  type="button" 
-                  className="btn btn-secondary" 
+                <button
+                  type="button"
+                  className="btn btn-secondary"
                   onClick={() => setShowEditModal(false)}
                 >
                   Close
                 </button>
-                <button 
-                  type="button" 
-                  className="btn btn-primary" 
+                <button
+                  type="button"
+                  className="btn btn-primary"
                   onClick={handleSaveEdit}
                 >
                   Save Changes

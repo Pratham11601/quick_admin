@@ -122,7 +122,7 @@ const HelpSupport = () => {
       </div>
 
       <div className="data-container">
-        <div className="table-container">
+        <div className="table-container table-responsive">
           <table>
             <thead>
               <tr>

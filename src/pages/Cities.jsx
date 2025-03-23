@@ -224,7 +224,7 @@ const ManageCities = () => {
 
 
       {/* Cities Table */}
-      <div className="table-container">
+      <div className="table-container table-responsive  ">
         <table>
           <thead>
             <tr>

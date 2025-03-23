@@ -143,7 +143,7 @@ const Categories = () => {
         <button onClick={handleCategory}>{editId ? "Save" : "Add"}</button>
       </div> */}
 
-      <div className="table-container">
+      <div className="table-container table-responsive">
         <table>
           <thead>
             <tr>

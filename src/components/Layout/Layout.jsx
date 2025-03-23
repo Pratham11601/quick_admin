@@ -1,5 +1,5 @@
 import React from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation,Outlet } from "react-router-dom";
 import Router from "../../routes/Router";
 import Sidebar from "../Sidebar/Sidebarr";
 import TopNav from "../TopNav/TopNav";
@@ -14,7 +14,8 @@ const Layout = () => {
       <div className="main__layout">
         {!isAdminLogin && <TopNav />} {/* Hide TopNav on AdminLogin */}
         <div className="content">
-          <Router />
+          {/* <Router /> */}
+          <Outlet />
         </div>   
       </div>
     </div>

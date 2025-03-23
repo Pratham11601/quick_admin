@@ -1,72 +1,57 @@
 import { createContext, useState, useContext, useEffect } from 'react';
 
-const AuthContext = createContext(null);
+const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
-    // Check if there's an existing session
-    const session = localStorage.getItem('session');
-    if (session) {
-      const { expiryTime } = JSON.parse(session);
-      if (new Date().getTime() < expiryTime) {
-        return true;
+    const authStatus = localStorage.getItem('isAuthenticated') === 'true';
+    const lastLogin = localStorage.getItem('lastLogin');
+    if (authStatus && lastLogin) {
+      const currentTime = new Date().getTime();
+      const thirtyMinutes = 30 * 60 * 1000;
+      if (currentTime - parseInt(lastLogin, 10) > thirtyMinutes) {
+        localStorage.removeItem('isAuthenticated');
+        localStorage.removeItem('lastLogin');
+        return false;
       }
-      // Remove expired session
-      localStorage.removeItem('session');
     }
-    return false;
+    return authStatus;
   });
 
-  // Check session expiry every minute
   useEffect(() => {
-    const interval = setInterval(() => {
-      const session = localStorage.getItem('session');
-      if (session) {
-        const { expiryTime } = JSON.parse(session);
-        if (new Date().getTime() >= expiryTime) {
-          setIsAuthenticated(false);
-          localStorage.removeItem('session');
+    if (isAuthenticated) {
+      const interval = setInterval(() => {
+        const lastLogin = localStorage.getItem('lastLogin');
+        if (lastLogin) {
+          const currentTime = new Date().getTime();
+          const thirtyMinutes = 30 * 60 * 1000;
+          if (currentTime - parseInt(lastLogin, 10) > thirtyMinutes) {
+            logout();
+          }
         }
-      }
-    }, 60000); // Check every minute
+      }, 1000);
+      return () => clearInterval(interval);
+    }
+  }, [isAuthenticated]);
 
-    return () => clearInterval(interval);
-  }, []);
-
-  const login = (email, password) => {
-    if (email === 'quickcabsservices@gmail.com' && password === 'quickcab@9168') {
+  const login = (username, password) => {
+    if (username === 'quickcabsservices@gmail.com' && password === 'quickcab@9168') {
+      localStorage.setItem('isAuthenticated', 'true');
+      localStorage.setItem('lastLogin', new Date().getTime().toString());
       setIsAuthenticated(true);
-      
-      // Set session with 30-minute expiry
-      const expiryTime = new Date().getTime() + (30 * 60 * 1000); // 30 minutes
-      localStorage.setItem('session', JSON.stringify({
-        isAuthenticated: true,
-        expiryTime
-      }));
-      
       return true;
     }
     return false;
   };
 
   const logout = () => {
+    localStorage.removeItem('isAuthenticated');
+    localStorage.removeItem('lastLogin');
     setIsAuthenticated(false);
-    localStorage.removeItem('session');
-  };
-
-  // Reset session timer when there's user activity
-  const resetSessionTimer = () => {
-    if (isAuthenticated) {
-      const expiryTime = new Date().getTime() + (30 * 60 * 1000); // 30 minutes
-      localStorage.setItem('session', JSON.stringify({
-        isAuthenticated: true,
-        expiryTime
-      }));
-    }
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, login, logout, resetSessionTimer }}>
+    <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
