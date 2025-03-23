@@ -418,22 +418,8 @@ const VendorDetails = ({ selectedCategory, onCategoryChange }) => {
                           >
                             <i className="fa-solid fa-trash"></i> Delete
                           </button>
-                        </td>
-                        <td>{'QCKSRV000' + vendor.id || index + 1}</td>
-
-                      <td>{vendor.fullname || "N/A"}</td>
-                      <td>{vendor.vendor_cat || "N/A"}</td>
-                      <td>{vendor.businessName || "N/A"}</td>
-                      <td>{vendor.phone || "N/A"}</td>
-                      <td>{vendor.email || "N/A"}</td>
-                      <td>{vendor.city || "N/A"}</td>
-                      <td>{vendor.currentAddress || "N/A"}</td>
-                      <td>{vendor.pin_code || "N/A"}</td>
-                      <td>{vendor.carnumber || "N/A"}</td>
-                      <td>{vendor.vendor_gender || "N/A"}</td>
-                      <td>{vendor.aadhaar_number || "N/A"}</td>
-                      <td>{vendor.subscriptionPlan || "N/A"}</td>
-                      <td>{formatDate(vendor.subscription_date)}</td>
+                        </td> 
+ 
                     </tr>
                     ))
                   ) : (
