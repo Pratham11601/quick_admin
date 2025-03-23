@@ -1,28 +1,10 @@
 import "./App.css";
-// import Layout from "./components/Layout/Layout";
-import { AuthProvider ,useAuth} from './context/AuthContext';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import { SessionTimeout } from './components/SessionTimeout';
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route,Navigate } from 'react-router-dom';
-
-// import AdminLogin from "./pages/AdminLogin";
-// import Dashboard from "../pages/Dashboard";
-// import SellCar from "../pages/SellCar";
-// import Settings from "../pages/Settings";
-// import Cities from "../pages/Cities";
-// import Category from "../pages/Category";
-// import Subpackages from "../pages/Sub-packages";
-// import Subscriptions from "../pages/Subscriptions";
-// import ManageLeads from "../pages/ManageLeads";
-// import VendorDetails from "../pages/VendorDetails";
-// import HelpSupport from "../pages/HelpSupport";
-// import PasswordSettings from "../pages/PasswordSettings";
-// import EmailSettings from "../pages/EmailSettings";
-// import Advertisements from "../pages/Advertisements";
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import LoginPage from './pages/LoginPage';
-import PrivateRoute from './context/PrivateRoute'; 
-
-
+import PrivateRoute from './context/PrivateRoute';
 import Dashboard from './pages/Dashboard';
 import SellCar from './pages/SellCar';
 import Settings from './pages/Settings';
@@ -38,18 +20,19 @@ import EmailSettings from './pages/EmailSettings';
 import Advertisements from './pages/Advertisements';
 import Layout from './components/Layout/Layout';
 
-// import Sidebar from "./components/Sidebar/Sidebarr";
-
-
 function App() {
   const { isAuthenticated } = useAuth();
 
   return ( 
       <Routes>
+        {/* Public Routes */}
         <Route path="/login" element={<LoginPage />} />
+
+        {/* Private Routes */}
         {isAuthenticated ? (
           <Route element={<PrivateRoute />}>
             <Route element={<Layout />}>
+              <Route path="/admin" element={<LoginPage />} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/sell-car" element={<SellCar />} />
               <Route path="/settings" element={<Settings />} />
@@ -68,6 +51,9 @@ function App() {
         ) : (
           <Route path="*" element={<Navigate to="/login" />} />
         )}
+
+        {/* Catch-all Route */}
+        <Route path="*" element={isAuthenticated ? <Navigate to="/dashboard" /> : <Navigate to="/login" />} />
       </Routes> 
   );
 }
