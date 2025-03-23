@@ -14,6 +14,8 @@ const VendorDetails = ({ selectedCategory, onCategoryChange }) => {
   const [currentPage, setCurrentPage] = useState(0);
   const [editingVendor, setEditingVendor] = useState(null);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [showViewModal, setShowViewModal] = useState(false);
+  const [viewingVendor, setViewingVendor] = useState(null);
 
 
   const handleScroll = (e) => {
@@ -136,6 +138,41 @@ const VendorDetails = ({ selectedCategory, onCategoryChange }) => {
     }
   };
 
+  const handleView = (vendor) => {
+    // Create a copy of the vendor with properly formatted image URLs
+    const viewVendor = {
+      ...vendor,
+      profileImgUrl: vendor.profileImgUrl ? `https://quickcabpune.com/app/${vendor.profileImgUrl.replace(/^\/+/, '')}` : null,
+      documentImgUrl: vendor.documentImgUrl ? `https://quickcabpune.com/app/${vendor.documentImgUrl.replace(/^\/+/, '')}` : null,
+      licenseImgUrl: vendor.licenseImgUrl ? `https://quickcabpune.com/app/${vendor.licenseImgUrl.replace(/^\/+/, '')}` : null
+    };
+    
+    // Add console logging to debug image URLs
+    console.log('Original URLs:', {
+      profile: vendor.profileImgUrl,
+      document: vendor.documentImgUrl,
+      license: vendor.licenseImgUrl
+    });
+    console.log('Formatted URLs:', {
+      profile: viewVendor.profileImgUrl,
+      document: viewVendor.documentImgUrl,
+      license: viewVendor.licenseImgUrl
+    });
+    
+    setViewingVendor(viewVendor);
+    setShowViewModal(true);
+  };
+
+  const handleWhatsApp = (phone) => {
+    if (phone && phone !== "N/A") {
+      // Format phone number correctly (remove any non-digit characters)
+      const formattedPhone = phone.replace(/\D/g, '');
+      window.open(`https://wa.me/${formattedPhone}`, '_blank');
+    } else {
+      alert("No valid phone number available for this vendor");
+    }
+  };
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setEditingVendor(prev => ({
@@ -193,6 +230,28 @@ const VendorDetails = ({ selectedCategory, onCategoryChange }) => {
     }
   };
 
+  // Function to handle image download
+  const handleAutoDownload = async (imageUrl, filename) => {
+    try {
+      const response = await fetch(imageUrl);
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Download failed:', error);
+      alert('Failed to download image. Please try again.');
+    }
+  };
+
 
 
   // GET CATEGORY DATA
@@ -222,6 +281,7 @@ const VendorDetails = ({ selectedCategory, onCategoryChange }) => {
 
 
         <div className="d-flex align-items-center gap-4 mb-4" >
+         
 
 
 
@@ -246,13 +306,10 @@ const VendorDetails = ({ selectedCategory, onCategoryChange }) => {
               <option value="100">100</option>
               <option value="200">200</option>
               <option value="500">500</option>
-
             </select>
           </div>
         </div>
       </div>
-
-
 
       {error && <div className="error-message">{error}</div>}
 
@@ -362,11 +419,26 @@ const VendorDetails = ({ selectedCategory, onCategoryChange }) => {
                             <i className="fa-solid fa-trash"></i> Delete
                           </button>
                         </td>
-                      </tr>
+                        <td>{'QCKSRV000' + vendor.id || index + 1}</td>
+
+                      <td>{vendor.fullname || "N/A"}</td>
+                      <td>{vendor.vendor_cat || "N/A"}</td>
+                      <td>{vendor.businessName || "N/A"}</td>
+                      <td>{vendor.phone || "N/A"}</td>
+                      <td>{vendor.email || "N/A"}</td>
+                      <td>{vendor.city || "N/A"}</td>
+                      <td>{vendor.currentAddress || "N/A"}</td>
+                      <td>{vendor.pin_code || "N/A"}</td>
+                      <td>{vendor.carnumber || "N/A"}</td>
+                      <td>{vendor.vendor_gender || "N/A"}</td>
+                      <td>{vendor.aadhaar_number || "N/A"}</td>
+                      <td>{vendor.subscriptionPlan || "N/A"}</td>
+                      <td>{formatDate(vendor.subscription_date)}</td>
+                    </tr>
                     ))
                   ) : (
                     <tr>
-                      <td colSpan="16" style={{ textAlign: "center", fontWeight: "bold" }}>No vendors found</td>
+                      <td colSpan="15" style={{ textAlign: "center", fontWeight: "bold" }}>No vendors found</td>
                     </tr>
                   )}
                 </tbody>
@@ -393,74 +465,154 @@ const VendorDetails = ({ selectedCategory, onCategoryChange }) => {
 
       <div className="vendor-details-footer">© 2025 Vendor Services. All rights reserved.</div>
 
-      {showEditModal && editingVendor && (
-        <div className="modal show d-block" tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
-          <div className="modal-dialog modal-lg">
-            <div className="modal-content">
-              <div className="modal-header">
-                <h5 className="modal-title">Edit Vendor Details</h5>
-                <button
-                  type="button"
-                  className="btn-close"
-                  onClick={() => setShowEditModal(false)}
-                ></button>
-              </div>
-              <div className="modal-body">
-                <form className="row g-3">
-                  <div className="col-md-6">
-                    <label className="form-label">Full Name</label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      name="fullname"
-                      value={editingVendor.fullname || ''}
-                      onChange={handleInputChange}
-                    />
-                  </div>
 
-                  <div className="col-md-6">
-                    <label className="form-label">Phone</label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      name="phone"
-                      value={editingVendor.phone || ''}
-                      onChange={handleInputChange}
-                    />
+{/* View Modal - Improved UI */}
+{showViewModal && viewingVendor && (
+  <div className="modal show d-block" tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
+    <div className="modal-dialog modal-lg">
+      <div className="modal-content shadow-lg border-0 rounded-3">
+        <div className="modal-header bg-primary text-white">
+          <h5 className="modal-title fw-bold">Vendor Documents</h5>
+          <button
+            type="button"
+            className="btn-close"
+            onClick={() => setShowViewModal(false)}
+          ></button>
+        </div>
+        <div className="modal-body">
+          <div className="row g-3">
+            {[
+              { label: "Profile Image", key: "profileImgUrl", defaultName: "profile" },
+              { label: "Document Image", key: "documentImgUrl", defaultName: "document" },
+              { label: "License Image", key: "licenseImgUrl", defaultName: "license" },
+            ].map((image, index) => (
+              viewingVendor[image.key] && (
+                <div className="col-md-4" key={index}>
+                  <div className="card shadow-sm border-0 rounded-3 overflow-hidden">
+                    <div className="card-header bg-light text-center fw-bold">
+                      {image.label}
+                    </div>
+                    <div className="card-body d-flex flex-column align-items-center justify-content-center">
+                      {/* <div className="image-container position-relative" style={{ width: '100%', backgroundColor: '#f8f9fa', padding: '10px', borderRadius: '8px' }}>
+                        <img
+                          src={viewingVendor[image.key]}
+                          alt={image.label}
+                          className="img-fluid rounded"
+                          style={{ maxHeight: '180px', maxWidth: '100%', objectFit: 'cover' }}
+                          onError={(e) => {
+                            console.error(`Error loading ${image.label.toLowerCase()}:`, e);
+                            e.target.onerror = null;
+                            e.target.src = "https://via.placeholder.com/150?text=No+Image";
+                          }}
+                          loading="eager"
+                        />
+                      </div> */}
+                      {/* Buttons */}
+                      <div className="d-flex gap-2 w-100 mt-3">
+                        <button
+                          onClick={() => window.open(viewingVendor[image.key], '_blank')}
+                          className="btn btn-outline-info w-100"
+                        >
+                          <i className="fa-solid fa-eye"></i> View
+                        </button>
+                        <button
+                          onClick={() => handleAutoDownload(viewingVendor[image.key], `${viewingVendor.fullname || 'vendor'}-${image.defaultName}.jpg`)}
+                          className="btn btn-primary w-100"
+                        >
+                          <i className="fa-solid fa-download"></i> Download
+                        </button>
+                      </div>
+                    </div>
                   </div>
+                </div>
+              )
+            ))}
+          </div>
+        </div>
+        <div className="modal-footer">
+          <button
+            type="button"
+            className="btn btn-secondary"
+            onClick={() => setShowViewModal(false)}
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+)}
 
-                  <div className="col-md-6">
-                    <label className="form-label">Email</label>
-                    <input
-                      type="email"
-                      className="form-control"
-                      name="email"
-                      value={editingVendor.email || ''}
-                      onChange={handleInputChange}
-                    />
-                  </div>
 
-                  <div className="col-md-6">
-                    <label className="form-label">Aadhaar Number</label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      name="aadhaar_number"
-                      value={editingVendor.aadhaar_number || ''}
-                      onChange={handleInputChange}
-                    />
-                  </div>
 
-                  <div className="col-md-6">
-                    <label className="form-label">Business Name</label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      name="businessName"
-                      value={editingVendor.businessName || ''}
-                      onChange={handleInputChange}
-                    />
-                  </div>
+{showEditModal && editingVendor && (
+  <div className="modal show d-block" tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
+    <div className="modal-dialog modal-lg">
+      <div className="modal-content">
+        <div className="modal-header">
+          <h5 className="modal-title">Edit Vendor Details</h5>
+          <button
+            type="button"
+            className="btn-close"
+            onClick={() => setShowEditModal(false)}
+          ></button>
+        </div>
+        <div className="modal-body">
+          <form className="row g-3">
+            <div className="col-md-6">
+              <label className="form-label">Full Name</label>
+              <input
+                type="text"
+                className="form-control"
+                name="fullname"
+                value={editingVendor.fullname || ''}
+                onChange={handleInputChange}
+              />
+            </div>
+
+            <div className="col-md-6">
+              <label className="form-label">Phone</label>
+              <input
+                type="text"
+                className="form-control"
+                name="phone"
+                value={editingVendor.phone || ''}
+                onChange={handleInputChange}
+              />
+            </div>
+
+            <div className="col-md-6">
+              <label className="form-label">Email</label>
+              <input
+                type="email"
+                className="form-control"
+                name="email"
+                value={editingVendor.email || ''}
+                onChange={handleInputChange}
+              />
+            </div>
+
+            <div className="col-md-6">
+              <label className="form-label">Aadhaar Number</label>
+              <input
+                type="text"
+                className="form-control"
+                name="aadhaar_number"
+                value={editingVendor.aadhaar_number || ''}
+                onChange={handleInputChange}
+              />
+            </div>
+
+            <div className="col-md-6">
+              <label className="form-label">Business Name</label>
+              <input
+                type="text"
+                className="form-control"
+                name="businessName"
+                value={editingVendor.businessName || ''}
+                onChange={handleInputChange}
+              />
+            </div>
 
                   <div className="col-md-6">
                     <label className="form-label">Category</label>
@@ -492,108 +644,110 @@ const VendorDetails = ({ selectedCategory, onCategoryChange }) => {
                     </select>
                   </div>
 
-                  <div className="col-md-6">
-                    <label className="form-label">City</label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      name="city"
-                      value={editingVendor.city || ''}
-                      onChange={handleInputChange}
-                    />
-                  </div>
-
-                  <div className="col-md-6">
-                    <label className="form-label">Pin Code</label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      name="pin_code"
-                      value={editingVendor.pin_code || ''}
-                      onChange={handleInputChange}
-                    />
-                  </div>
-
-                  <div className="col-md-6">
-                    <label className="form-label">Car Number</label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      name="carnumber"
-                      value={editingVendor.carnumber || ''}
-                      onChange={handleInputChange}
-                    />
-                  </div>
-
-                  <div className="col-md-6">
-                    <label className="form-label">Gender</label>
-                    <select
-                      className="form-select"
-                      name="vendor_gender"
-                      value={editingVendor.vendor_gender || ''}
-                      onChange={handleInputChange}
-                    >
-                      <option value="">Select Gender</option>
-                      <option value="Male">Male</option>
-                      <option value="Female">Female</option>
-                      <option value="Other">Other</option>
-                    </select>
-                  </div>
-
-                  <div className="col-12">
-                    <label className="form-label">Current Address</label>
-                    <textarea
-                      className="form-control"
-                      name="currentAddress"
-                      value={editingVendor.currentAddress || ''}
-                      onChange={handleInputChange}
-                      rows="3"
-                    ></textarea>
-                  </div>
-
-                  <div className="col-md-6">
-                    <label className="form-label">Subscription Plan</label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      name="subscriptionPlan"
-                      value={editingVendor.subscriptionPlan || ''}
-                      onChange={handleInputChange}
-                    />
-                  </div>
-
-                  <div className="col-md-6">
-                    <label className="form-label">Subscription Date</label>
-                    <input
-                      type="date"
-                      className="form-control"
-                      name="subscription_date"
-                      value={editingVendor.subscription_date ? editingVendor.subscription_date.split('T')[0] : ''}
-                      onChange={handleInputChange}
-                    />
-                  </div>
-                </form>
-              </div>
-              <div className="modal-footer">
-                <button
-                  type="button"
-                  className="btn btn-secondary"
-                  onClick={() => setShowEditModal(false)}
-                >
-                  Close
-                </button>
-                <button
-                  type="button"
-                  className="btn btn-primary"
-                  onClick={handleSaveEdit}
-                >
-                  Save Changes
-                </button>
-              </div>
+            <div className="col-md-6">
+              <label className="form-label">City</label>
+              <input
+                type="text"
+                className="form-control"
+                name="city"
+                value={editingVendor.city || ''}
+                onChange={handleInputChange}
+              />
             </div>
-          </div>
+
+            <div className="col-md-6">
+              <label className="form-label">Pin Code</label>
+              <input
+                type="text"
+                className="form-control"
+                name="pin_code"
+                value={editingVendor.pin_code || ''}
+                onChange={handleInputChange}
+              />
+            </div>
+
+            <div className="col-md-6">
+              <label className="form-label">Car Number</label>
+              <input
+                type="text"
+                className="form-control"
+                name="carnumber"
+                value={editingVendor.carnumber || ''}
+                onChange={handleInputChange}
+              />
+            </div>
+
+            <div className="col-md-6">
+              <label className="form-label">Gender</label>
+              <select
+                className="form-select"
+                name="vendor_gender"
+                value={editingVendor.vendor_gender || ''}
+                onChange={handleInputChange}
+              >
+                <option value="">Select Gender</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+
+            <div className="col-12">
+              <label className="form-label">Current Address</label>
+              <textarea
+                className="form-control"
+                name="currentAddress"
+                value={editingVendor.currentAddress || ''}
+                onChange={handleInputChange}
+                rows="3"
+              ></textarea>
+            </div>
+
+            <div className="col-md-6">
+              <label className="form-label">Subscription Plan</label>
+              <input
+                type="text"
+                className="form-control"
+                name="subscriptionPlan"
+                value={editingVendor.subscriptionPlan || ''}
+                onChange={handleInputChange}
+                disabled={true}
+              />
+            </div>
+
+            <div className="col-md-6">
+              <label className="form-label">Subscription Date</label>
+              <input
+                type="date"
+                className="form-control"
+                name="subscription_date"
+                value={editingVendor.subscription_date ? editingVendor.subscription_date.split('T')[0] : ''}
+                onChange={handleInputChange}
+                disabled={true}
+              />
+            </div>
+          </form>
         </div>
-      )}
+        <div className="modal-footer">
+          <button 
+            type="button" 
+            className="btn btn-secondary" 
+            onClick={() => setShowEditModal(false)}
+          >
+            Close
+          </button>
+          <button 
+            type="button" 
+            className="btn btn-primary" 
+            onClick={handleSaveEdit}
+          >
+            Save Changes
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+)}
     </div>
   );
 };
