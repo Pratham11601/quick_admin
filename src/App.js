@@ -23,7 +23,7 @@
   import PrivateRoute from './context/PrivateRoute';
 
 
-  import Dashboard from './pages/Dashboard';
+  //import Dashboard from './pages/Dashboard';
   import SellCar from './pages/SellCar';
   import Settings from './pages/Settings';
   import Cities from './pages/Cities';
@@ -53,7 +53,7 @@
           <Route element={<PrivateRoute />}>
             <Route element={<Layout />}>
               <Route path="/admin" element={<LoginPage />} /> 
-              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/dashboard" element={<VendorDetails />} /> 
               <Route path="/sell-car" element={<SellCar />} />
               <Route path="/settings" element={<Settings />} />
               <Route path="/cities" element={<Cities />} />
@@ -66,10 +66,13 @@
               <Route path="/password-settings" element={<PasswordSettings />} />
               <Route path="/email-settings" element={<EmailSettings />} />
               <Route path="/advertisements" element={<Advertisements />} />
+              {/* <Route path="/dashboard" element={<Dashboard />} />  */}
             </Route>
           </Route>
         ) : (
           <Route path="*" element={<Navigate to="/login" />} />
+          
+
         )}
       </Routes>
     );

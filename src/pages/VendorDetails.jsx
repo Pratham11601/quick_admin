@@ -101,20 +101,20 @@ const VendorDetails = ({ selectedCategory, onCategoryChange }) => {
     }
   };
 
-  const handleStatusToggle = async (vendorId, currentStatus) => {
-    try {
-      const newStatus = currentStatus === 1 ? 0 : 1;
-      await axios.put(`https://quickcabpune.com/admin/api/vendor/${vendorId}`, { status: newStatus });
-      const updatedAllVendors = allVendors.map(vendor =>
-        vendor.id === vendorId ? { ...vendor, status: newStatus } : vendor
-      );
-      setAllVendors(updatedAllVendors);
-      alert(newStatus === 1 ? "Vendor activated successfully!" : "Vendor deactivated successfully!");
-    } catch (err) {
-      console.error("Error updating vendor status:", err);
-      alert("Failed to update vendor status. Please try again.");
-    }
-  };
+  // const handleStatusToggle = async (vendorId, currentStatus) => {
+  //   try {
+  //     const newStatus = currentStatus === 1 ? 0 : 1;
+  //     await axios.put(`https://quickcabpune.com/admin/api/vendor/${vendorId}`, { status: newStatus });
+  //     const updatedAllVendors = allVendors.map(vendor =>
+  //       vendor.id === vendorId ? { ...vendor, status: newStatus } : vendor
+  //     );
+  //     setAllVendors(updatedAllVendors);
+  //     alert(newStatus === 1 ? "Vendor activated successfully!" : "Vendor deactivated successfully!");
+  //   } catch (err) {
+  //     console.error("Error updating vendor status:", err);
+  //     alert("Failed to update vendor status. Please try again.");
+  //   }
+  // };
 
   const handleEdit = async (vendorId) => {
     try {
@@ -128,6 +128,38 @@ const VendorDetails = ({ selectedCategory, onCategoryChange }) => {
       alert("Error loading vendor details: " + err.message);
     }
   };
+
+  const handleStatusToggle = async (vendorId, currentStatus) => {
+  try {
+    const newStatus = currentStatus === 1 ? 0 : 1;
+    console.log("Sending status update:", {
+      vendorId,
+      status: newStatus,
+    });
+
+    const response = await axios.put(
+      `https://quickcabpune.com/admin/api/vendor/${vendorId}`,
+      { status: newStatus },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      }
+    );
+
+    console.log("Response:", response.data);
+
+    const updatedAllVendors = allVendors.map(vendor =>
+      vendor.id === vendorId ? { ...vendor, status: newStatus } : vendor
+    );
+    setAllVendors(updatedAllVendors);
+    alert(newStatus === 1 ? "Vendor activated successfully!" : "Vendor deactivated successfully!");
+  } catch (err) {
+    console.error("Error updating vendor status:", err.response?.data || err.message);
+    alert("Failed to update vendor status. Please try again.");
+  }
+};
+
 
   const handleView = (vendor) => {
     // Create a copy of the vendor with properly formatted image URLs

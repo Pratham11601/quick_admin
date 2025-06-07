@@ -1,9 +1,9 @@
 const navLinks = [
-  {
-    path: "/dashboard",
-    icon: "ri-building-line",
-    display: "Dashboard",
-  },
+  // {
+  //   path: "/dashboard",
+  //   icon: "ri-building-line",
+  //   display: "Dashboard",
+  // },
   {
     path: "/vendor-details",
     icon: "ri-building-line",
