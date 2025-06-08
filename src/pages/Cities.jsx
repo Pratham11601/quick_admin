@@ -3,7 +3,8 @@ import axios from "axios";
 import ReactPaginate from "react-paginate"; // Import ReactPaginate
 import "../styles/cities.css";
 
-const API_URL = "https://quickcabpune.com/admin/api/cities";
+ //const API_URL = "https://quickcabpune.com/admin/api/cities";
+const API_URL = "https://quickcabpune.com/app/cities/all?page=1&limit=500";
 
 const ManageCities = () => {
   const [cities, setCities] = useState([]);
