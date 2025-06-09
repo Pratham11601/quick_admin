@@ -219,7 +219,7 @@ const HelpSupport = () => {
   const [remarkText, setRemarkText] = useState("");
   const [rowsPerPage, setRowsPerPage] = useState(500);
 
-  const BASE_URL = "https://quickcabpune.com/app/help_support?page=1&limit=500&search=a";
+  const BASE_URL = "https://quickcabpune.com/app/help_support?page=1&limit=500";
 
 const fetchData = async (page, limit) => {
   try {
