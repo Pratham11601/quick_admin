@@ -213,7 +213,7 @@ const handleEdit = async (vendorId) => {
 
     // Use your localhost API here:
     const response = await axios.put(
-      `http://localhost:1840/vendorDetails/edit/${editingVendor.id}`,
+      `https://quickcabpune.com/app/vendorDetails/edit/${editingVendor?.id}`,
       cleanedData,
       {
         headers: {
