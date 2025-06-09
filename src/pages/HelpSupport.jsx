@@ -219,22 +219,28 @@ const HelpSupport = () => {
   const [remarkText, setRemarkText] = useState("");
   const [rowsPerPage, setRowsPerPage] = useState(500);
 
-  const BASE_URL = "https://quickcabpune.com/app/help_support";
+  const BASE_URL = "https://quickcabpune.com/app/help_support?page=1&limit=500&search=a";
 
-  const fetchData = async (page, limit) => {
-    try {
-      const response = await axios.get(`${BASE_URL}?page=${page}&limit=${limit}`);
-      if (response.data.success) {
-        setData(response.data.data || []);
-        setTotalPages(response.data.totalPages || Math.ceil((response.data.totalCount || 0) / limit));
-      } else {
-        setData([]);
-        setTotalPages(1);
-      }
-    } catch (error) {
-      console.error("Error fetching help support data:", error);
+const fetchData = async (page, limit) => {
+  try {
+   const response = await axios.get(`${BASE_URL}?page=${page}&limit=${limit}`);
+
+   
+    if (response.data && response.data.data) {
+      setData(response.data.data);
+      setTotalPages(
+        response.data.totalPages || Math.ceil((response.data.totalCount || 0) / limit)
+      );
+    } else {
+      setData([]);
+      setTotalPages(1);
     }
-  };
+  } catch (error) {
+    console.error("Error fetching help support data:", error);
+  }
+};
+
+
 
   useEffect(() => {
     fetchData(currentPage, rowsPerPage);

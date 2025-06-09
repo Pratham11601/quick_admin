@@ -16,6 +16,7 @@ const VendorDetails = ({ selectedCategory, onCategoryChange }) => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [showViewModal, setShowViewModal] = useState(false);
   const [viewingVendor, setViewingVendor] = useState(null);
+  
 
   useEffect(() => {
     const fetchVendors = async () => {
@@ -116,7 +117,7 @@ const VendorDetails = ({ selectedCategory, onCategoryChange }) => {
   //   }
   // };
 
-  const handleEdit = async (vendorId) => {
+const handleEdit = async (vendorId) => {
     try {
       const vendorToEdit = allVendors.find(vendor => vendor.id === vendorId);
       if (vendorToEdit) {
@@ -129,17 +130,17 @@ const VendorDetails = ({ selectedCategory, onCategoryChange }) => {
     }
   };
 
-  const handleStatusToggle = async (vendorId, currentStatus) => {
+
+ const handleStatusToggle = async (vendorId, carnumber) => {
   try {
-    const newStatus = currentStatus === 1 ? 0 : 1;
-    console.log("Sending status update:", {
+    console.log("Toggling vendor block status:", {
       vendorId,
-      status: newStatus,
+      carnumber,
     });
 
     const response = await axios.put(
-      `https://quickcabpune.com/admin/api/vendor/${vendorId}`,
-      { status: newStatus },
+      `https://quickcabpune.com/app/vendorDetails/toggle-block/${vendorId}`,
+      { carnumber },
       {
         headers: {
           'Content-Type': 'application/json',
@@ -147,18 +148,16 @@ const VendorDetails = ({ selectedCategory, onCategoryChange }) => {
       }
     );
 
-    console.log("Response:", response.data);
+    console.log("Toggle Block Response:", response.data);
 
-    const updatedAllVendors = allVendors.map(vendor =>
-      vendor.id === vendorId ? { ...vendor, status: newStatus } : vendor
-    );
-    setAllVendors(updatedAllVendors);
-    alert(newStatus === 1 ? "Vendor activated successfully!" : "Vendor deactivated successfully!");
+    // Optional: You can refresh or update local state here if needed
+    alert("Vendor block/unblock status updated successfully!");
   } catch (err) {
-    console.error("Error updating vendor status:", err.response?.data || err.message);
-    alert("Failed to update vendor status. Please try again.");
+    console.error("Error toggling vendor status:", err.response?.data || err.message);
+    alert("Failed to toggle vendor status. Please try again.");
   }
 };
+
 
 
   const handleView = (vendor) => {
@@ -205,43 +204,42 @@ const VendorDetails = ({ selectedCategory, onCategoryChange }) => {
   };
 
   const handleSaveEdit = async () => {
-    try {
-      // Remove any undefined or null values
-      const cleanedData = Object.fromEntries(
-        Object.entries(editingVendor).filter(([_, value]) => value != null)
-      );
+  try {
+    const cleanedData = Object.fromEntries(
+      Object.entries(editingVendor).filter(([_, value]) => value != null)
+    );
 
-      // Log the request data for debugging
-      console.log('Sending update request:', cleanedData);
+    console.log('Sending update request:', cleanedData);
 
-      // Update the API endpoint to match your backend
-      const response = await axios.put(
-        `https://quickcabpune.com/admin/api/vendor/${editingVendor.id}`, 
-        cleanedData,
-        {
-          headers: {
-            'Content-Type': 'application/json',
-          }
-        }
-      );
-
-      if (response.data) {
-        // Update the local state
-        const updatedVendors = allVendors.map(vendor => 
-          vendor.id === editingVendor.id ? { ...vendor, ...cleanedData } : vendor
-        );
-        setAllVendors(updatedVendors);
-        setShowEditModal(false);
-        setEditingVendor(null);
-        alert("Vendor updated successfully!");
-      } else {
-        throw new Error('No response data received');
+    // Use your localhost API here:
+    const response = await axios.put(
+      `http://localhost:1840/vendorDetails/edit/${editingVendor.id}`,
+      cleanedData,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
       }
-    } catch (err) {
-      console.error("Error saving vendor updates:", err);
-      alert(`Failed to save updates: ${err.response?.data?.message || err.message}`);
+    );
+
+    if (response.data) {
+      // Update local vendor list state
+      const updatedVendors = allVendors.map(vendor =>
+        vendor.id === editingVendor.id ? { ...vendor, ...cleanedData } : vendor
+      );
+      setAllVendors(updatedVendors);
+      setShowEditModal(false);
+      setEditingVendor(null);
+      alert("Vendor updated successfully!");
+    } else {
+      throw new Error('No response data received');
     }
-  };
+  } catch (err) {
+    console.error("Error saving vendor updates:", err);
+    alert(`Failed to save updates: ${err.response?.data?.message || err.message}`);
+  }
+};
+
 
   // Format date safely
   const formatDate = (dateString) => {
@@ -404,10 +402,9 @@ const VendorDetails = ({ selectedCategory, onCategoryChange }) => {
                         >
                           <i className="fa-solid fa-eye"></i> View
                         </button>
-
-                        <button
+<button
                           className="text-nowrap btn btn-warning me-2"
-                          onClick={() => handleEdit(vendor.id)}
+                         onClick={() => handleEdit(vendor.id, vendor.carnumber)}
                           style={{ 
                             color: 'white',
                             fontSize: '14px',
