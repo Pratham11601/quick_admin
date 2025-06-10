@@ -5,6 +5,7 @@ import "../styles/cities.css";
 
  //const API_URL = "https://quickcabpune.com/admin/api/cities";
 const API_URL = "https://quickcabpune.com/app/cities/all?page=1&limit=500";
+const ADD_CITY_URL = "https://quickcabpune.com/app/cities/add";
 
 const ManageCities = () => {
   const [cities, setCities] = useState([]);
@@ -45,23 +46,35 @@ const ManageCities = () => {
 
   // Add new city
   const addCity = async () => {
-    if (!newCity.trim() || !newState.trim()) {
-      alert("Please enter both city name and state name.");
-      return;
-    }
+  if (!newCity.trim() || !newState.trim()) {
+    alert("Please enter both city name and state name.");
+    return;
+  }
 
-    try {
-      await axios.post(API_URL, {
+  try {
+    await axios.post(
+      ADD_CITY_URL,
+      {
         city_name: newCity,
         state_name: newState,
-      });
-      setNewCity("");
-      setNewState("");
-      fetchAllCities();
-    } catch (error) {
-      console.error("Error adding city:", error);
-    }
-  };
+      },
+      {
+        headers: {
+          "Content-Type": "application/json",
+          // If client gives token: Authorization: "Bearer YOUR_TOKEN_HERE"
+        }
+      }
+    );
+
+    setNewCity("");
+    setNewState("");
+    fetchAllCities(); // Refresh the list after adding
+  } catch (error) {
+    console.error("Error adding city:", error);
+    alert("Failed to add city.");
+  }
+};
+
 
   // Delete city
   const removeCity = async (city_id) => {
