@@ -5,78 +5,56 @@ import ReactPaginate from "react-paginate";
 
 const VendorDetails = ({ selectedCategory, onCategoryChange }) => {
   const [vendors, setVendors] = useState([]);
-  const [allVendors, setAllVendors] = useState([]); // Store all vendors for client-side pagination
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [vendorsPerPage, setVendorsPerPage] = useState(500); // Default to 500 vendors per page
-  const API_BASE_URL = "https://quickcabpune.com/app/vendordetails";
+ const [vendorsPerPage, setVendorsPerPage] = useState(10);
+  const API_BASE_URL = "https://quickcabpune.com/app/vendorDetails/admin";
   const [currentPage, setCurrentPage] = useState(0);
   const [editingVendor, setEditingVendor] = useState(null);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showViewModal, setShowViewModal] = useState(false);
   const [viewingVendor, setViewingVendor] = useState(null);
+  const [totalVendors, setTotalVendors] = useState(0); 
+  const [totalPages, setTotalPages] = useState(0);
   
 
-  useEffect(() => {
-    const fetchVendors = async () => {
-      setLoading(true);
-      try {
-        // Fetch all vendors from the API
-        const response = await axios.get(API_BASE_URL);
+useEffect(() => {
+  const fetchVendors = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.get("https://quickcabpune.com/app/vendorDetails/admin", {
+        params: {
+          page: currentPage + 1,
+          size: vendorsPerPage,
+        },
+      });
 
-        // Check if the response contains data
-        if (response.data && Array.isArray(response.data)) {
-          setAllVendors(response.data);
-        } else if (response.data && Array.isArray(response.data.data)) {
-          setAllVendors(response.data.data);
-        } else if (typeof response.data === 'object') {
-          const possibleData = Object.values(response.data).find(val => Array.isArray(val));
-          if (possibleData) {
-            setAllVendors(possibleData);
-          } else {
-            console.error("Unexpected API response format:", response.data);
-            setAllVendors([]);
-          }
-        } else {
-          console.error("Unexpected API response format:", response.data);
-          setAllVendors([]);
-        }
-        setError(null);
-      } catch (err) {
-        console.error("Error fetching vendors:", err);
-        setError("Failed to load vendors. Please try again later.");
-        setAllVendors([]);
-      } finally {
-        setLoading(false);
-      }
-    };
+      console.log("Raw API response:", response.data);
 
-    fetchVendors();
-  }, []);
+      const data = Array.isArray(response.data?.vendors) ? response.data.vendors : [];
+      setVendors(data);
 
-  useEffect(() => {
-    let filteredVendors = allVendors;
-
-    if (searchTerm) {
-      filteredVendors = allVendors.filter(vendor =>
-        (vendor.fullname && vendor.fullname.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        (vendor.city && vendor.city.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        (vendor.phone && vendor.phone.includes(searchTerm)) ||
-        (vendor.email && vendor.email.toLowerCase().includes(searchTerm.toLowerCase()))
-      );
+      // Set total counts for pagination
+      setTotalVendors(response.data?.totalItems || data.length);
+      setTotalPages(response.data?.totalPages || Math.ceil(data.length / vendorsPerPage));
+    } catch (err) {
+      console.error("Error fetching vendors:", err);
+      setError("Failed to load vendors.");
+      setVendors([]);
+    } finally {
+      setLoading(false);
     }
-
-    // Paginate vendors: Slice data according to current page and vendorsPerPage
-    const offset = currentPage * vendorsPerPage;
-    const currentVendors = filteredVendors.slice(offset, offset + vendorsPerPage);
-    setVendors(currentVendors);
-
-  }, [allVendors, searchTerm, currentPage, vendorsPerPage]);
-
-  const handlePageChange = (selectedPage) => {
-    setCurrentPage(selectedPage.selected);
   };
+
+  fetchVendors();
+}, [currentPage, vendorsPerPage]);
+
+
+ const handlePageChange = (selectedPage) => {
+  setCurrentPage(selectedPage.selected); // ReactPaginate is 0-based
+};
+
 
   const handleSearchChange = (e) => {
     setSearchTerm(e.target.value);
@@ -88,19 +66,19 @@ const VendorDetails = ({ selectedCategory, onCategoryChange }) => {
     setCurrentPage(0); // Reset to the first page when vendors per page is changed
   };
 
-  const handleDeleteVendor = async (vendorId) => {
-    if (window.confirm("Are you sure you want to delete this vendor?")) {
-      try {
-        await axios.delete(`https://quickcabpune.com/admin/api/vendor/${vendorId}`);
-        const updatedAllVendors = allVendors.filter(vendor => vendor.id !== vendorId);
-        setAllVendors(updatedAllVendors);
-        alert("Vendor deleted successfully!");
-      } catch (err) {
-        console.error("Error deleting vendor:", err);
-        alert("Failed to delete vendor. Please try again.");
-      }
+ const handleDeleteVendor = async (vendorId) => {
+  if (window.confirm("Are you sure you want to delete this vendor?")) {
+    try {
+      await axios.delete(`https://quickcabpune.com/admin/api/vendor/${vendorId}`);
+      setVendors(prev => prev.filter(v => v.id !== vendorId));
+      alert("Vendor deleted successfully!");
+    } catch (err) {
+      console.error("Error deleting vendor:", err);
+      alert("Failed to delete vendor. Please try again.");
     }
-  };
+  }
+};
+
 
   // const handleStatusToggle = async (vendorId, currentStatus) => {
   //   try {
@@ -119,7 +97,8 @@ const VendorDetails = ({ selectedCategory, onCategoryChange }) => {
 
 const handleEdit = async (vendorId) => {
     try {
-      const vendorToEdit = allVendors.find(vendor => vendor.id === vendorId);
+     const vendorToEdit = vendors.find(vendor => vendor.id === vendorId);
+
       if (vendorToEdit) {
         setEditingVendor(vendorToEdit);
         setShowEditModal(true);
@@ -158,6 +137,25 @@ const handleEdit = async (vendorId) => {
   }
 };
 
+// const handleApproveVendor = async (vendorId) => {
+//   try {
+//     const response = await axios.put(
+//       `https://quickcabpune.com/admin/api/vendor/${vendorId}`,
+//       { status: 1 },
+//       {
+//         headers: {
+//           'Content-Type': 'application/json',
+//         }
+//       }
+//     );
+
+//     console.log("Vendor Approved:", response.data);
+//     alert("Vendor approved successfully!");
+//   } catch (err) {
+//     console.error("Error approving vendor:", err.response?.data || err.message);
+//     alert("Failed to approve vendor. Please check console.");
+//   }
+// };
 
 
   const handleView = (vendor) => {
@@ -224,10 +222,10 @@ const handleEdit = async (vendorId) => {
 
     if (response.data) {
       // Update local vendor list state
-      const updatedVendors = allVendors.map(vendor =>
-        vendor.id === editingVendor.id ? { ...vendor, ...cleanedData } : vendor
-      );
-      setAllVendors(updatedVendors);
+      const updatedVendors = vendors.map(vendor =>
+  vendor.id === editingVendor.id ? { ...vendor, ...cleanedData } : vendor
+);
+setVendors(updatedVendors);
       setShowEditModal(false);
       setEditingVendor(null);
       alert("Vendor updated successfully!");
@@ -371,7 +369,7 @@ const handleEdit = async (vendorId) => {
                             whiteSpace: 'nowrap'
                           }}
                         >
-                          {vendor.status === 1 ? '🔴 Deactivate' : '🟢 Activate'}
+                          {vendor.status === 1 ? '🔴 Unverify' : '🟢 Verify'}
                         </button>
 
                         <button
@@ -387,6 +385,24 @@ const handleEdit = async (vendorId) => {
                         >
                           <i className="fa-brands fa-whatsapp"></i>
                         </button>
+
+                     {/* <button
+  className="text-nowrap btn me-2"
+  onClick={() => handleApproveVendor(vendor.id)}
+  disabled={vendor.is_approved === 1}
+  style={{
+    backgroundColor: vendor.is_approved === 1 ? '#ccc' : '#28a745',
+    color: 'white',
+    fontSize: '14px',
+    borderRadius: '4px',
+    margin: '0 5px',
+    padding: '5px 10px',
+    cursor: vendor.is_approved === 1 ? 'not-allowed' : 'pointer',
+  }}
+>
+  {vendor.is_approved === 1 ? '✅ Approved' : '✔️ Approve'}
+</button> */}
+
 
                         <button
                           className="text-nowrap btn btn-info me-2"
@@ -462,17 +478,17 @@ const handleEdit = async (vendorId) => {
       </div>
 
       <div className="vendor-details-pagination">
-        <ReactPaginate
-          previousLabel={"← Previous"}
-          nextLabel={"Next →"}
-          breakLabel={"..."}
-          pageCount={Math.ceil(allVendors.length / vendorsPerPage)}
-          marginPagesDisplayed={2}
-          pageRangeDisplayed={3}
-          onPageChange={handlePageChange}
-          containerClassName={"pagination"}
-          activeClassName={"active"}
-        />
+       <ReactPaginate
+  previousLabel={"← Previous"}
+  nextLabel={"Next →"}
+  breakLabel={"..."}
+pageCount={totalPages}
+  marginPagesDisplayed={2}
+  pageRangeDisplayed={3}
+  onPageChange={handlePageChange}
+  containerClassName={"pagination"}
+  activeClassName={"active"}
+/>
       </div>
 
       <div className="vendor-details-footer">© 2025 Vendor Services. All rights reserved.</div>
