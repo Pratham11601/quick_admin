@@ -27,6 +27,7 @@ useEffect(() => {
         params: {
           page: currentPage + 1,
           size: vendorsPerPage,
+          search: searchTerm,
         },
       });
 
@@ -48,7 +49,7 @@ useEffect(() => {
   };
 
   fetchVendors();
-}, [currentPage, vendorsPerPage]);
+}, [currentPage, vendorsPerPage,searchTerm]);
 
 
  const handlePageChange = (selectedPage) => {
@@ -129,6 +130,12 @@ const handleEdit = async (vendorId) => {
 
     console.log("Toggle Block Response:", response.data);
 
+    setVendors(prev =>
+      prev.map(v =>
+        v.id === vendorId ? { ...v, status: v.status === 1 ? 0 : 1 } : v
+      )
+    );
+
     // Optional: You can refresh or update local state here if needed
     alert("Vendor block/unblock status updated successfully!");
   } catch (err) {
@@ -159,29 +166,25 @@ const handleEdit = async (vendorId) => {
 
 
   const handleView = (vendor) => {
-    // Create a copy of the vendor with properly formatted image URLs
-    const viewVendor = {
-      ...vendor,
-      profileImgUrl: vendor.profileImgUrl ? `https://quickcabpune.com/app/${vendor.profileImgUrl.replace(/^\/+/, '')}` : null,
-      documentImgUrl: vendor.documentImgUrl ? `https://quickcabpune.com/app/${vendor.documentImgUrl.replace(/^\/+/, '')}` : null,
-      licenseImgUrl: vendor.licenseImgUrl ? `https://quickcabpune.com/app/${vendor.licenseImgUrl.replace(/^\/+/, '')}` : null
-    };
-    
-    // Add console logging to debug image URLs
-    console.log('Original URLs:', {
-      profile: vendor.profileImgUrl,
-      document: vendor.documentImgUrl,
-      license: vendor.licenseImgUrl
-    });
-    console.log('Formatted URLs:', {
-      profile: viewVendor.profileImgUrl,
-      document: viewVendor.documentImgUrl,
-      license: viewVendor.licenseImgUrl
-    });
-    
-    setViewingVendor(viewVendor);
-    setShowViewModal(true);
+  const viewVendor = {
+    ...vendor,
+    profileImgUrl: vendor.profileImgUrl ? `https://quickcabpune.com/app/${vendor.profileImgUrl.replace(/^\/+/, '')}` : null,
+    documentImgUrl: vendor.documentImgUrl ? `https://quickcabpune.com/app/${vendor.documentImgUrl.replace(/^\/+/, '')}` : null,
+    licenseImgUrl: vendor.licenseImgUrl ? `https://quickcabpune.com/app/${vendor.licenseImgUrl.replace(/^\/+/, '')}` : null,
+    createdAt: vendor.createdAt || vendor.created_date || null  
   };
+
+  console.log('Full Vendor Object:', vendor); 
+  console.log('Formatted URLs:', {
+    profile: viewVendor.profileImgUrl,
+    document: viewVendor.documentImgUrl,
+    license: viewVendor.licenseImgUrl
+  });
+
+  setViewingVendor(viewVendor);
+  setShowViewModal(true);
+};
+
 
   const handleWhatsApp = (phone) => {
     if (phone && phone !== "N/A") {
@@ -240,14 +243,16 @@ setVendors(updatedVendors);
 
 
   // Format date safely
-  const formatDate = (dateString) => {
-    if (!dateString) return "N/A";
-    try {
-      return new Date(dateString).toLocaleDateString();
-    } catch (error) {
-      return "Invalid Date";
-    }
-  };
+ const formatDate = (dateString) => {
+  if (!dateString) return "N/A";
+  try {
+    const options = { day: 'numeric', month: 'long', year: 'numeric' };
+    return new Date(dateString).toLocaleDateString('en-GB', options);
+  } catch (error) {
+    return "Invalid Date";
+  }
+};
+
 
   // Function to handle image download
   const handleAutoDownload = async (imageUrl, filename) => {
@@ -349,6 +354,7 @@ setVendors(updatedVendors);
                   <th>Aadhaar</th>
                   <th>Subscription</th>
                   <th>Sub. Date</th>
+                  <th>Created At</th>
                 </tr>
               </thead>
               <tbody>
@@ -464,6 +470,7 @@ setVendors(updatedVendors);
                       <td>{vendor.aadhaar_number || "N/A"}</td>
                       <td>{vendor.subscriptionPlan || "N/A"}</td>
                       <td>{formatDate(vendor.subscription_date)}</td>
+                       <td>{formatDate(vendor.createdAt || vendor.created_date)}</td>
                     </tr>
                   ))
                 ) : (
@@ -482,6 +489,7 @@ setVendors(updatedVendors);
   previousLabel={"← Previous"}
   nextLabel={"Next →"}
   breakLabel={"..."}
+  pageCount={searchTerm ? 1 : totalPages} 
 pageCount={totalPages}
   marginPagesDisplayed={2}
   pageRangeDisplayed={3}
@@ -507,8 +515,11 @@ pageCount={totalPages}
             onClick={() => setShowViewModal(false)}
           ></button>
         </div>
+
         <div className="modal-body">
+
           <div className="row g-3">
+            {/* Image Cards */}
             {[
               { label: "Profile Image", key: "profileImgUrl", defaultName: "profile" },
               { label: "Document Image", key: "documentImgUrl", defaultName: "document" },
@@ -521,20 +532,7 @@ pageCount={totalPages}
                       {image.label}
                     </div>
                     <div className="card-body d-flex flex-column align-items-center justify-content-center">
-                      {/* <div className="image-container position-relative" style={{ width: '100%', backgroundColor: '#f8f9fa', padding: '10px', borderRadius: '8px' }}>
-                        <img
-                          src={viewingVendor[image.key]}
-                          alt={image.label}
-                          className="img-fluid rounded"
-                          style={{ maxHeight: '180px', maxWidth: '100%', objectFit: 'cover' }}
-                          onError={(e) => {
-                            console.error(`Error loading ${image.label.toLowerCase()}:`, e);
-                            e.target.onerror = null;
-                            e.target.src = "https://via.placeholder.com/150?text=No+Image";
-                          }}
-                          loading="eager"
-                        />
-                      </div> */}
+
                       {/* Buttons */}
                       <div className="d-flex gap-2 w-100 mt-3">
                         <button
@@ -557,6 +555,7 @@ pageCount={totalPages}
             ))}
           </div>
         </div>
+
         <div className="modal-footer">
           <button
             type="button"
@@ -570,6 +569,7 @@ pageCount={totalPages}
     </div>
   </div>
 )}
+
 
 
 
