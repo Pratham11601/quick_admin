@@ -8,7 +8,7 @@ const VendorDetails = ({ selectedCategory, onCategoryChange }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
- const [vendorsPerPage, setVendorsPerPage] = useState(10);
+ const [vendorsPerPage, setVendorsPerPage] = useState(50);
   const API_BASE_URL = "https://quickcabpune.com/app/vendorDetails/admin";
   const [currentPage, setCurrentPage] = useState(0);
   const [editingVendor, setEditingVendor] = useState(null);
