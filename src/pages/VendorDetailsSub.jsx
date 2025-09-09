@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
-import "../styles/VendorDetails.css";
+import "../styles/VendorDetailsSub.css";
 import axios from "axios";
 import ReactPaginate from "react-paginate";
 
-const VendorDetails = ({ selectedCategory, onCategoryChange }) => {
+const VendorDetailsSub = ({ selectedCategory, onCategoryChange }) => {
   const [vendors, setVendors] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
@@ -17,28 +17,32 @@ const VendorDetails = ({ selectedCategory, onCategoryChange }) => {
   const [viewingVendor, setViewingVendor] = useState(null);
   const [totalVendors, setTotalVendors] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
-
+  const [vendorStats, setVendorStats] = useState(null)
 
   useEffect(() => {
     const fetchVendors = async () => {
       setLoading(true);
       try {
-        const response = await axios.get("https://quickcabpune.com/app/vendorDetails/admin", {
+        const response = await axios.get("https://quickcabpune.com/dev/api/vendordetails/referred-vendors", {
           params: {
             page: currentPage + 1,
             size: vendorsPerPage,
             search: searchTerm,
           },
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+          }
         });
 
         console.log("Raw API response:", response.data);
 
-        const data = Array.isArray(response.data?.vendors) ? response.data.vendors : [];
+        const data = Array.isArray(response.data?.data) ? response.data.data : [];
         setVendors(data);
 
         // Set total counts for pagination
         setTotalVendors(response.data?.totalItems || data.length);
         setTotalPages(response.data?.totalPages || Math.ceil(data.length / vendorsPerPage));
+        setVendorStats(response.data?.stats || null);
       } catch (err) {
         console.error("Error fetching vendors:", err);
         setError("Failed to load vendors.");
@@ -296,7 +300,21 @@ const VendorDetails = ({ selectedCategory, onCategoryChange }) => {
 
   return (
     <div className="vendor-details-page-body">
-      <div className="d-flex justify-content-between align-items-center flex-wrap">
+      <div className="sub-vender-details-counts">
+        <div className="sub-vender-details-count-box">
+          <p className="heading">Total</p>
+          <p className="count">{vendorStats?.totalCount || 0}</p>
+        </div>
+        <div className="sub-vender-details-count-box">
+          <p className="heading">Verified</p>
+          <p className="count">{vendorStats?.verifiedCount || 0}</p>
+        </div>
+        <div className="sub-vender-details-count-box">
+          <p className="heading">Not Verified</p>
+          <p className="count">{vendorStats?.notVerifiedCount || 0}</p>
+        </div>
+      </div>
+      <div className="d-flex justify-content-between align-items-center flex-wrap mt-4">
         <h1 className="vendor-details-h1 page-main-head text-muted">Vendor Details</h1>
 
         <div className="d-flex align-items-center gap-4 mb-4" >
@@ -439,7 +457,7 @@ const VendorDetails = ({ selectedCategory, onCategoryChange }) => {
                           <i className="fa-solid fa-edit"></i> Edit
                         </button>
 
-                        <button
+                        {/* <button
                           className="text-nowrap"
                           onClick={() => handleDeleteVendor(vendor.id)}
                           style={{
@@ -453,7 +471,7 @@ const VendorDetails = ({ selectedCategory, onCategoryChange }) => {
                           }}
                         >
                           <i className="fa-solid fa-trash"></i> Delete
-                        </button>
+                        </button> */}
                       </td>
                       <td>{'QCKSRV000' + vendor.id || index + 1}</td>
 
@@ -767,4 +785,4 @@ const VendorDetails = ({ selectedCategory, onCategoryChange }) => {
   );
 };
 
-export default VendorDetails;
+export default VendorDetailsSub;

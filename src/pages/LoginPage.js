@@ -1,49 +1,51 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-// import { login } from '../assets/images/quickcab.png';
 import { useAuth } from '../context/AuthContext';
 import '../styles/AdminLogin.css';
 import logo from '../assets/images/quickcab.png';
+import AdminLoginForm from './AdminLoginForm';
+import SubAdminLoginForm from './SubAdminLoginForm';
 
 const LoginPage = () => {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const [activeTab, setActiveTab] = useState('admin'); // 'admin' | 'sub-admin'
   const navigate = useNavigate();
   const { login } = useAuth();
 
-  const handleLogin = (e) => {
-    e.preventDefault();
-    if (login(username, password)) {
+  const handleLogin = (username, password, role) => {
+    const success = login(username, password, role);
+    if (success) {
       navigate('/dashboard');
     } else {
-      alert('Invalid credentials');
+      alert(`Invalid ${role} credentials`);
     }
   };
 
   return (
-    <div className='admin-login-container'>
-      <div className='admin-login-box'>
+    <div className="admin-login-container">
+      <div className="admin-login-box">
         <img src={logo} alt="Quick Cabs Logo" className="admin-logo" />
-        <h2>Admin Login</h2>
-        <form onSubmit={handleLogin}>
-          <div>
-            <label>Username:</label>
-            <input
-              type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-            />
-          </div>
-          <div>
-            <label>Password:</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-          </div>
-          <button type="submit">Login</button>
-        </form>
+
+        {/* Tabs */}
+        <div className="login-tabs">
+          <button
+            className={activeTab === 'admin' ? 'active' : ''}
+            onClick={() => setActiveTab('admin')}
+          >
+            Admin
+          </button>
+          <button
+            className={activeTab === 'sub-admin' ? 'active' : ''}
+            onClick={() => setActiveTab('sub-admin')}
+          >
+            Sub-Admin
+          </button>
+        </div>
+
+        {activeTab === 'admin' ? (
+          <AdminLoginForm onLogin={(u, p) => handleLogin(u, p, 'admin')} />
+        ) : (
+          <SubAdminLoginForm onLogin={(u, p) => handleLogin(u, p, 'sub-admin')} />
+        )}
       </div>
     </div>
   );

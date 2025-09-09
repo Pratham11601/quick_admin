@@ -113,3 +113,33 @@
         font-size: 21px;
     }
 }
+
+
+/* Tabs */
+.login-tabs {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 15px;
+    border-bottom: 2px solid #ddd;
+}
+
+.login-tabs button {
+    flex: 1;
+    padding: 10px;
+    background: none;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: #555;
+}
+
+.login-tabs button.active {
+    font-weight: bold;
+    color: #ffa500;
+    border-bottom: 3px solid #ffa500;
+}
+
+.login-tabs button:hover {
+    background-color: #f1f1f1;
+}
