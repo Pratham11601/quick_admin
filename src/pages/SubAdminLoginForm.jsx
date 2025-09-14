@@ -20,7 +20,6 @@ const SubAdminLoginForm = ({ onLogin }) => {
             })
             const json = await response.json();
             if (json.status === 1) {
-                alert("Login successful");
                 localStorage.setItem('token', json.token)
                 localStorage.setItem('role', 'sub-admin')
                 navigate('/sub-admin/vendor-details', { replace: true })

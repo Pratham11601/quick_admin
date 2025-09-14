@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../../context/AuthContext";
-import navLinks from "../../../assets/dummy-data/navLinks";
 import "./Sidebar.css";
 import logo from "../../../assets/images/quickcab.png";
+import navLinksSub from "../../../assets/dummy-data/navLinksSub";
 
 const Sidebar = () => {
   const location = useLocation();
@@ -59,7 +59,7 @@ const Sidebar = () => {
         <div className="sidebar__content">
           <div className="menu">
             <ul className="nav__list ps-0">
-              {navLinks.map((item, index) => (
+              {navLinksSub.map((item, index) => (
                 <li className="nav__item" key={index}>
                   <NavLink
                     to={item.path}
