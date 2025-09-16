@@ -40,6 +40,7 @@ import Layout from './components/Layout/Layout';
 import SubLayout from './components/subadmin/Layout/Layout';
 import ProtectedRoute from "./components/ProtectedRouteSub";
 import VendorDetailsSub from "./pages/VendorDetailsSub";
+import SubAdmins from "./pages/SubAdmins";
 
 // import Sidebar from "./components/Sidebar/Sidebarr";
 
@@ -73,6 +74,7 @@ function App() {
             <Route path="/password-settings" element={<PasswordSettings />} />
             <Route path="/email-settings" element={<EmailSettings />} />
             <Route path="/advertisements" element={<Advertisements />} />
+            <Route path="/sub-admins" element={<SubAdmins />} />
             {/* <Route path="/dashboard" element={<Dashboard />} />  */}
           </Route>
 

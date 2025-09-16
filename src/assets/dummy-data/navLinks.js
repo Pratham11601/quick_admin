@@ -36,12 +36,17 @@ const navLinks = [
     icon: "ri-gift-line",
     display: "Subscribe",
   },
-    {
+  {
     path: "/advertisements",
     icon: "ri-megaphone-line",
     display: "Advertisements",
+  },
+  {
+    path: "/sub-admins",
+    icon: "ri-admin-line",
+    display: "Sub Admins",
   }
-  
+
 ];
 
 export default navLinks;
