@@ -288,6 +288,7 @@ const SubAdmins = () => {
                   <th>Sr. No.</th>
                   <th>Full Name</th>
                   <th>Phone</th>
+                  <th>Vendors</th>
                   <th>Created At</th>
                   <th>Updated At</th>
                 </tr>
@@ -334,6 +335,7 @@ const SubAdmins = () => {
 
                       <td>{vendor.name || "N/A"}</td>
                       <td>{vendor.phone || "N/A"}</td>
+                      <td>{vendor.vendorCount || 0}</td>
 
                       <td>{formatDate(vendor.createdAt || vendor.created_date)}</td>
                       <td>{formatDate(vendor.updatedAt || vendor.updated_date)}</td>
