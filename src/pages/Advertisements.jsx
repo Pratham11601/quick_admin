@@ -251,9 +251,9 @@ export default function QuickCabsAdvertise() {
 
   const fetchAds = async () => {
     try {
-      const response = await axios.get("https://quickcabpune.com/app/advertise/");
+      const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/advertise/get`);
       console.log("Fetched Ads:", response.data);
-      setAds(response.data);
+      setAds(response.data.formattedAdvertisements);
     } catch (error) {
       console.error("Error fetching ads:", error);
     }
@@ -261,7 +261,7 @@ export default function QuickCabsAdvertise() {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`https://quickcabpune.com/app/advertise/delete/${id}`);
+      await axios.delete(`${process.env.REACT_APP_BACKEND_URL}/advertise/delete/${id}`);
       fetchAds();
     } catch (error) {
       console.error("Error deleting ad:", error);
@@ -275,7 +275,7 @@ export default function QuickCabsAdvertise() {
     if (form.image) formData.append("image", form.image);
 
     try {
-      await axios.post("https://quickcabpune.com/app/advertise/", formData);
+      await axios.post(`${process.env.REACT_APP_BACKEND_URL}/advertise/`, formData);
       fetchAds();
       setForm({ name: "", image: null });
       window.bootstrap.Modal.getInstance(document.getElementById('addAdModal')).hide();
@@ -345,12 +345,12 @@ export default function QuickCabsAdvertise() {
           </tr>
         </thead>
         <tbody>
-          {ads.map((ad, index) => (
+          {ads?.map((ad, index) => (
             <tr key={index}>
               <td>{ad.id || "N/A"}</td>
               <td>{ad.postedFrom || "No Name"}</td>
               <td>
-                <a target="_blank" href={`https://quickcabpune.com/app/${ad.image}`}>Advertisements {index + 1}</a>
+                <a target="_blank" href={`${process.env.REACT_APP_BACKEND_URL}/${ad.image}`}>Advertisements {index + 1}</a>
                 {/* {ad.image ? (
                   <img src={`https://quickcabpune.com/app/${ad.image}`} alt={ad.name} target="_blank" className="img-thumbnail" style={{ height: "50px" }} />
                 ) : (
