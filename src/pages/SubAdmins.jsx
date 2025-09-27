@@ -216,6 +216,8 @@ const SubAdmins = () => {
     }
   };
 
+  const [showPass, setShowPass] = useState(false)
+
   return (
     <div className="vendor-details-page-body">
       <div className="d-flex justify-content-between align-items-center flex-wrap">
@@ -250,31 +252,46 @@ const SubAdmins = () => {
 
 
       </div>
-        <div className="add-city">
+      <div className="add-city">
+        <input
+          type="text"
+          placeholder="Enter sub admin name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+        />
+        <input
+          type="text"
+          placeholder="Enter phone number"
+          value={phone}
+          onChange={(e) => setPhone(e.target.value)}
+        />
+        <div className="password-input">
           <input
-            type="text"
-            placeholder="Enter sub admin name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-          />
-          <input
-            type="text"
-            placeholder="Enter phone number"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-          />
-          <input
-            type="password"
+            type={showPass ? "text" :"password"}
             placeholder="Enter password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
-          <button onClick={addSubAdmin}>Add</button>
+          <button
+            onClick={() => setShowPass(prev => !prev)}
+            style={{
+              fontSize: '22px',
+              borderRadius: '4px',
+              margin: '0 5px',
+              color:'grey',
+              padding: '5px 10px',
+              cursor: 'pointer',
+            }}
+          >
+            {showPass ? <i class="ri-eye-off-line"></i> :<i class="ri-eye-line"></i>}
+          </button>
         </div>
+        <button onClick={addSubAdmin}>Add</button>
+      </div>
 
       {error && <div className="error-message">{error}</div>}
 
-      <div className="vendor-details-table-container" style={{marginTop:'20px'}}>
+      <div className="vendor-details-table-container" style={{ marginTop: '20px' }}>
         <div className="table-responsive">
           {loading ? (
             <div className="loader-container">

@@ -9,7 +9,7 @@ const VendorDetailsSub = ({ selectedCategory, onCategoryChange }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [vendorsPerPage, setVendorsPerPage] = useState(50);
-  const API_BASE_URL = "https://quickcabpune.com/app/vendorDetails/admin";
+  const API_BASE_URL = "https://quickcabpune.com/dev/api";
   const [currentPage, setCurrentPage] = useState(0);
   const [editingVendor, setEditingVendor] = useState(null);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -172,9 +172,9 @@ const VendorDetailsSub = ({ selectedCategory, onCategoryChange }) => {
   const handleView = (vendor) => {
     const viewVendor = {
       ...vendor,
-      profileImgUrl: vendor.profileImgUrl ? `https://quickcabpune.com/app/${vendor.profileImgUrl.replace(/^\/+/, '')}` : null,
-      documentImgUrl: vendor.documentImgUrl ? `https://quickcabpune.com/app/${vendor.documentImgUrl.replace(/^\/+/, '')}` : null,
-      licenseImgUrl: vendor.licenseImgUrl ? `https://quickcabpune.com/app/${vendor.licenseImgUrl.replace(/^\/+/, '')}` : null,
+      profileImgUrl: vendor.profileImgUrl ? `${API_BASE_URL}/${vendor.profileImgUrl.replace(/^\/+/, '')}` : null,
+      documentImgUrl: vendor.documentImgUrl ? `${API_BASE_URL}/${vendor.documentImgUrl.replace(/^\/+/, '')}` : null,
+      licenseImgUrl: vendor.licenseImgUrl ? `${API_BASE_URL}/${vendor.licenseImgUrl.replace(/^\/+/, '')}` : null,
       createdAt: vendor.createdAt || vendor.created_date || null
     };
 

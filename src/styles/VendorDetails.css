@@ -548,4 +548,16 @@ td {
   border-radius: 5px;
 }
 
+.password-input{
+  position: relative;
 
+}
+
+.password-input button{
+  position: absolute;
+  right: 6px;
+  top: 5px;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: black;
+}
