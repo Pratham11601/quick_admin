@@ -170,6 +170,7 @@ const VendorDetails = ({ selectedCategory, onCategoryChange }) => {
       ...vendor,
       profileImgUrl: vendor.profileImgUrl ? `${API_BASE_URL}${vendor.profileImgUrl.replace(/^\/+/, '')}` : null,
       documentImgUrl: vendor.documentImgUrl ? `${API_BASE_URL}${vendor.documentImgUrl.replace(/^\/+/, '')}` : null,
+      documentImgUrlBack: vendor.documentImgUrlBack ? `${API_BASE_URL}${vendor.documentImgUrlBack.replace(/^\/+/, '')}` : null,
       licenseImgUrl: vendor.licenseImgUrl ? `${API_BASE_URL}${vendor.licenseImgUrl.replace(/^\/+/, '')}` : null,
       createdAt: vendor.createdAt || vendor.created_date || null
     };
@@ -522,6 +523,7 @@ const VendorDetails = ({ selectedCategory, onCategoryChange }) => {
                   {[
                     { label: "Profile Image", key: "profileImgUrl", defaultName: "profile" },
                     { label: "Document Image", key: "documentImgUrl", defaultName: "document" },
+                    { label: "Document Image Back", key: "documentImgUrlBack", defaultName: "document-back" },
                     { label: "License Image", key: "licenseImgUrl", defaultName: "license" },
                   ].map((image, index) => (
                     viewingVendor[image.key] && (
