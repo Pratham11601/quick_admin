@@ -35,7 +35,7 @@ export const AuthProvider = ({ children }) => {
   }, [isAuthenticated]);
 
   const login = (username, password) => {
-    if (username === 'quickcabsservices@gmail.com' && password === 'quickcab@9168') {
+    if (username === 'quickcabsservices@gmail.com' && password === 'quickcab@2025') {
       localStorage.setItem('isAuthenticated', 'true');
       localStorage.setItem('lastLogin', new Date().getTime().toString());
       setIsAuthenticated(true);

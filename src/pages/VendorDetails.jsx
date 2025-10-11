@@ -23,7 +23,7 @@ const VendorDetails = ({ selectedCategory, onCategoryChange }) => {
     const fetchVendors = async () => {
       setLoading(true);
       try {
-        const response = await axios.get("https://quickcabpune.com/app/vendorDetails/admin", {
+        const response = await axios.get("https://quickcabpune.com/app/vendorDetails/get-all-vendors", {
           params: {
             page: currentPage + 1,
             size: vendorsPerPage,
@@ -110,17 +110,17 @@ const VendorDetails = ({ selectedCategory, onCategoryChange }) => {
     }
   };
 
+  const [rejected_message, setRejected_message] = useState('')
 
-  const handleStatusToggle = async (vendorId, carnumber) => {
+  const handleStatusToggle = async (vendorId, status) => {
     try {
       console.log("Toggling vendor block status:", {
         vendorId,
-        carnumber,
       });
 
       const response = await axios.put(
         `https://quickcabpune.com/app/vendorDetails/toggle-block/${vendorId}`,
-        { carnumber },
+        { status, rejected_message },
         {
           headers: {
             'Content-Type': 'application/json',
@@ -137,6 +137,7 @@ const VendorDetails = ({ selectedCategory, onCategoryChange }) => {
       );
 
       // Optional: You can refresh or update local state here if needed
+      setRejected_message('')
       alert("Vendor block/unblock status updated successfully!");
     } catch (err) {
       console.error("Error toggling vendor status:", err.response?.data || err.message);
@@ -363,21 +364,70 @@ const VendorDetails = ({ selectedCategory, onCategoryChange }) => {
                   vendors.map((vendor, index) => (
                     <tr key={vendor.id || index}>
                       <td className="d-flex align-items-center">
-                        <button
-                          onClick={() => handleStatusToggle(vendor.id, vendor.status)}
-                          style={{
-                            backgroundColor: vendor.status === 1 ? '#f8d7da' : '#d4edda',
-                            color: vendor.status === 1 ? '#721c24' : '#155724',
-                            border: vendor.status === 1 ? '1px solid #f5c6cb' : '1px solid #c3e6cb',
-                            borderRadius: '4px',
-                            margin: '0 5px',
-                            padding: '5px 10px',
-                            cursor: 'pointer',
-                            whiteSpace: 'nowrap'
-                          }}
-                        >
-                          {vendor.status === 1 ? '🔴 Unverify' : '🟢 Verify'}
-                        </button>
+                        {vendor.status === 0 ? <div className="d-flex align-items-center">
+                          <button
+                            onClick={() => handleStatusToggle(vendor.id, vendor.status)}
+                            style={{
+                              backgroundColor: '#f8d7da',
+                              color: '#721c24',
+                              border: '1px solid #f5c6cb',
+                              borderRadius: '4px',
+                              margin: '0 5px',
+                              padding: '5px 10px',
+                              cursor: 'pointer',
+                              whiteSpace: 'nowrap'
+                            }}
+                          >
+                            Reject
+                          </button>
+
+                          <button
+                            onClick={() => handleStatusToggle(vendor.id, vendor.status)}
+                            style={{
+                              backgroundColor: '#d4edda',
+                              color: '#155724',
+                              border: '1px solid #c3e6cb',
+                              borderRadius: '4px',
+                              margin: '0 5px',
+                              padding: '5px 10px',
+                              cursor: 'pointer',
+                              whiteSpace: 'nowrap'
+                            }}
+                          >
+                            Verify
+                          </button>
+                        </div> :
+                          vendor.status === 1 ? (
+                            <button
+                              style={{
+                                backgroundColor: '#d4edda',
+                                color: '#155724',
+                                border: '1px solid #c3e6cb',
+                                borderRadius: '4px',
+                                margin: '0 5px',
+                                padding: '5px 10px',
+                                cursor: 'pointer',
+                                whiteSpace: 'nowrap'
+                              }}
+                            >
+                              Verified
+                            </button>
+                          ) : (
+                            <button
+                              style={{
+                                backgroundColor: '#f8d7da',
+                                color: '#721c24',
+                                border: '1px solid #f5c6cb',
+                                borderRadius: '4px',
+                                margin: '0 5px',
+                                padding: '5px 10px',
+                                cursor: 'pointer',
+                                whiteSpace: 'nowrap'
+                              }}
+                            >
+                              Rejected
+                            </button>
+                          )}
 
                         <button
                           className="text-nowrap btn btn-success me-2"

@@ -18,12 +18,12 @@ const ManageLeads = () => {
   const fetchLeads = async () => {
     setLoading(true);
     try {
-      const response = await axios.get("https://quickcabpune.com/app/leads", {
+      const response = await axios.get("https://quickcabpune.com/app/leads/all", {
         headers: { "Content-Type": "application/json" },
       });
 
-      if (response.data && Array.isArray(response.data.result)) {
-        setLeads(response.data.result);
+      if (response.data && Array.isArray(response.data.leads)) {
+        setLeads(response.data.leads);
       } else {
         console.warn("Unexpected API response format:", response.data);
         setLeads([]);
