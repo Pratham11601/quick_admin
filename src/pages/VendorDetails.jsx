@@ -23,7 +23,7 @@ const VendorDetails = ({ selectedCategory, onCategoryChange }) => {
     const fetchVendors = async () => {
       setLoading(true);
       try {
-        const response = await axios.get("https://quickcabpune.com/app/vendorDetails/get-all-vendors", {
+        const response = await axios.get("https://quickcabpune.com/dev/api/vendorDetails/get-all-vendors", {
           params: {
             page: currentPage + 1,
             size: vendorsPerPage,
@@ -364,9 +364,9 @@ const VendorDetails = ({ selectedCategory, onCategoryChange }) => {
                   vendors.map((vendor, index) => (
                     <tr key={vendor.id || index}>
                       <td className="d-flex align-items-center">
-                        {vendor.status === 0 ? <div className="d-flex align-items-center">
+                        {/* {vendor.status === 0 ? <div className="d-flex align-items-center">
                           <button
-                            onClick={() => handleStatusToggle(vendor.id, vendor.status)}
+                            onClick={() => handleStatusToggle(vendor.id, 'reject')}
                             style={{
                               backgroundColor: '#f8d7da',
                               color: '#721c24',
@@ -382,7 +382,7 @@ const VendorDetails = ({ selectedCategory, onCategoryChange }) => {
                           </button>
 
                           <button
-                            onClick={() => handleStatusToggle(vendor.id, vendor.status)}
+                            onClick={() => handleStatusToggle(vendor.id, 'verify')}
                             style={{
                               backgroundColor: '#d4edda',
                               color: '#155724',
@@ -427,7 +427,23 @@ const VendorDetails = ({ selectedCategory, onCategoryChange }) => {
                             >
                               Rejected
                             </button>
-                          )}
+                          )} */}
+
+                        <button
+                          onClick={() => handleStatusToggle(vendor.id, vendor.status)}
+                          style={{
+                            backgroundColor: vendor.status === 1 ? '#f8d7da' : '#d4edda',
+                            color: vendor.status === 1 ? '#721c24' : '#155724',
+                            border: vendor.status === 1 ? '1px solid #f5c6cb' : '1px solid #c3e6cb',
+                            borderRadius: '4px',
+                            margin: '0 5px',
+                            padding: '5px 10px',
+                            cursor: 'pointer',
+                            whiteSpace: 'nowrap'
+                          }}
+                        >
+                          {vendor.status === 1 ? '🔴 Unverify' : '🟢 Verify'}
+                        </button>
 
                         <button
                           className="text-nowrap btn btn-success me-2"

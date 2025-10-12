@@ -44,8 +44,8 @@ const SubAdmins = () => {
       setTotalVendors(response.data?.totalItems || data.length);
       setTotalPages(response.data?.totalPages || Math.ceil(data.length / vendorsPerPage));
     } catch (err) {
-      console.error("Error fetching vendors:", err);
-      setError("Failed to load vendors.");
+      console.error("Error fetching sub-admins:", err);
+      setError("Failed to load Sub Admins.");
       setVendors([]);
     } finally {
       setLoading(false);
@@ -360,7 +360,7 @@ const SubAdmins = () => {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="15" style={{ textAlign: "center", fontWeight: "bold" }}>No vendors found</td>
+                    <td colSpan="15" style={{ textAlign: "center", fontWeight: "bold" }}>No Sub Admins found</td>
                   </tr>
                 )}
               </tbody>
