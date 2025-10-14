@@ -112,15 +112,20 @@ const VendorDetails = ({ selectedCategory, onCategoryChange }) => {
 
   const [rejected_message, setRejected_message] = useState('')
 
-  const handleStatusToggle = async (vendorId, status) => {
+  const [openRejectModal, setOpenRejectModal] = useState(null);
+  const handleStatusToggle = async (vendorId, carnumber) => {
     try {
       console.log("Toggling vendor block status:", {
         vendorId,
+        carnumber,
+        rejected_message
       });
+
+
 
       const response = await axios.put(
         `https://quickcabpune.com/app/vendorDetails/toggle-block/${vendorId}`,
-        { status, rejected_message },
+        { status: carnumber },
         {
           headers: {
             'Content-Type': 'application/json',
@@ -132,12 +137,13 @@ const VendorDetails = ({ selectedCategory, onCategoryChange }) => {
 
       setVendors(prev =>
         prev.map(v =>
-          v.id === vendorId ? { ...v, status: v.status === 1 ? 0 : 1 } : v
+          v.id === vendorId ? { ...v, status: carnumber} : v
         )
       );
 
       // Optional: You can refresh or update local state here if needed
       setRejected_message('')
+      setOpenRejectModal(null)
       alert("Vendor block/unblock status updated successfully!");
     } catch (err) {
       console.error("Error toggling vendor status:", err.response?.data || err.message);
@@ -364,9 +370,9 @@ const VendorDetails = ({ selectedCategory, onCategoryChange }) => {
                   vendors.map((vendor, index) => (
                     <tr key={vendor.id || index}>
                       <td className="d-flex align-items-center">
-                        {/* {vendor.status === 0 ? <div className="d-flex align-items-center">
+                        {vendor.status === 0 ? <div className="d-flex align-items-center">
                           <button
-                            onClick={() => handleStatusToggle(vendor.id, 'reject')}
+                            onClick={() => setOpenRejectModal(vendor.id)}
                             style={{
                               backgroundColor: '#f8d7da',
                               color: '#721c24',
@@ -382,7 +388,7 @@ const VendorDetails = ({ selectedCategory, onCategoryChange }) => {
                           </button>
 
                           <button
-                            onClick={() => handleStatusToggle(vendor.id, 'verify')}
+                            onClick={() => handleStatusToggle(vendor.id, 1)}
                             style={{
                               backgroundColor: '#d4edda',
                               color: '#155724',
@@ -400,8 +406,8 @@ const VendorDetails = ({ selectedCategory, onCategoryChange }) => {
                           vendor.status === 1 ? (
                             <button
                               style={{
-                                backgroundColor: '#d4edda',
-                                color: '#155724',
+                                backgroundColor: '#155724',
+                                color: 'white',
                                 border: '1px solid #c3e6cb',
                                 borderRadius: '4px',
                                 margin: '0 5px',
@@ -415,8 +421,8 @@ const VendorDetails = ({ selectedCategory, onCategoryChange }) => {
                           ) : (
                             <button
                               style={{
-                                backgroundColor: '#f8d7da',
-                                color: '#721c24',
+                                backgroundColor: '#721c24',
+                                color: 'white',
                                 border: '1px solid #f5c6cb',
                                 borderRadius: '4px',
                                 margin: '0 5px',
@@ -427,9 +433,9 @@ const VendorDetails = ({ selectedCategory, onCategoryChange }) => {
                             >
                               Rejected
                             </button>
-                          )} */}
+                          )}
 
-                        <button
+                        {/* <button
                           onClick={() => handleStatusToggle(vendor.id, vendor.status)}
                           style={{
                             backgroundColor: vendor.status === 1 ? '#f8d7da' : '#d4edda',
@@ -443,7 +449,7 @@ const VendorDetails = ({ selectedCategory, onCategoryChange }) => {
                           }}
                         >
                           {vendor.status === 1 ? '🔴 Unverify' : '🟢 Verify'}
-                        </button>
+                        </button> */}
 
                         <button
                           className="text-nowrap btn btn-success me-2"
@@ -637,6 +643,48 @@ const VendorDetails = ({ selectedCategory, onCategoryChange }) => {
         </div>
       )}
 
+
+
+      {openRejectModal && (
+        <div className="modal show d-block" tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
+          <div className="modal-dialog modal-lg">
+            <div className="modal-content shadow-lg border-0 rounded-3">
+              <div className="modal-header bg-primary text-white">
+                <h5 className="modal-title fw-bold">Reject Vendor Verification</h5>
+                <button
+                  type="button"
+                  className="btn-close"
+                  onClick={() => setOpenRejectModal(null)}
+                ></button>
+              </div>
+
+              <div className="modal-body">
+
+                <div className="col-12">
+                  <label className="form-label">Message <span style={{color:'red'}}>*</span></label>
+                  <textarea
+                    className="form-control"
+                    name="currentAddress"
+                    value={rejected_message}
+                    onChange={(event) => setRejected_message(event.target.value)}
+                    rows="3"
+                  ></textarea>
+                </div>
+              </div>
+
+              <div className="modal-footer">
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={() => handleStatusToggle(openRejectModal, 2)}
+                >
+                  Send
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
 
 
