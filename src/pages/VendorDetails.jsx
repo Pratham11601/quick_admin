@@ -125,7 +125,7 @@ const VendorDetails = ({ selectedCategory, onCategoryChange }) => {
 
       const response = await axios.put(
         `https://quickcabpune.com/app/vendorDetails/toggle-block/${vendorId}`,
-        { status: carnumber },
+        { status: carnumber, reject_message: rejected_message },
         {
           headers: {
             'Content-Type': 'application/json',
