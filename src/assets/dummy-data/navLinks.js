@@ -50,6 +50,11 @@ const navLinks = [
     path: "/sub-admins",
     icon: "ri-admin-line",
     display: "Sub Admins",
+  },
+  {
+    path: "/announcement",
+    icon: "ri-megaphone-line",
+    display: "Announcement",
   }
 
 ];

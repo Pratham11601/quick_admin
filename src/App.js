@@ -42,6 +42,7 @@ import ProtectedRoute from "./components/ProtectedRouteSub";
 import VendorDetailsSub from "./pages/VendorDetailsSub";
 import SubAdmins from "./pages/SubAdmins";
 import BlockedVendors from "./pages/BlockedVendors";
+import Announcement from "./pages/Announcement";
 
 // import Sidebar from "./components/Sidebar/Sidebarr";
 
@@ -77,6 +78,7 @@ function App() {
             <Route path="/email-settings" element={<EmailSettings />} />
             <Route path="/advertisements" element={<Advertisements />} />
             <Route path="/sub-admins" element={<SubAdmins />} />
+            <Route path="/announcement" element={<Announcement />} />
             {/* <Route path="/dashboard" element={<Dashboard />} />  */}
           </Route>
 

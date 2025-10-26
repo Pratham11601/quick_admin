@@ -38,7 +38,7 @@ const VendorDetails = ({ selectedCategory, onCategoryChange }) => {
         setVendors(data);
 
         // Set total counts for pagination
-        setTotalVendors(response.data?.totalItems || data.length);
+        setTotalVendors(response.data?.total || data.length);
         setTodayVendors(response.data?.todayCount || 0)
         setTotalPages(response.data?.totalPages || Math.ceil(data.length / vendorsPerPage));
       } catch (err) {
@@ -350,18 +350,33 @@ const VendorDetails = ({ selectedCategory, onCategoryChange }) => {
     <div className="vendor-details-page-body">
 
       <div className="sub-vender-details-counts">
-        <div className="sub-vender-details-count-box">
+        {/* <div className="sub-vender-details-count-box">
           <p className="heading">Total</p>
           <p className="count">{totalVendors || 0}</p>
         </div>
         <div className="sub-vender-details-count-box">
           <p className="heading">Today Count</p>
           <p className="count">{todayVendors || 0}</p>
-        </div>
+        </div> */}
       </div>
 
-      <div className="d-flex justify-content-between align-items-center flex-wrap" style={{ marginTop: '20px' }}>
-        <h1 className="vendor-details-h1 page-main-head text-muted">Vendor Details</h1>
+      <div className="d-flex justify-content-between align-items-center flex-wrap">
+        <div className="d-flex gap-3 items-center">
+          <h1 className="vendor-details-h1 page-main-head text-muted">Vendor Details</h1>
+          <p style={{
+            fontSize:'18px'
+          }}>|</p>
+          <p style={{
+            fontSize:'18px'
+          }} className="vendor-details-h1 text-muted">Total: <b>{totalVendors || 0}</b></p>
+          <p style={{
+            fontSize:'18px'
+          }}>|</p>
+
+          <p style={{
+            fontSize:'18px'
+          }} className="vendor-details-h1 text-muted">Today Count: <b>{todayVendors || 0}</b></p>
+        </div>
 
         <div className="d-flex align-items-center gap-4 mb-4" >
 

@@ -351,14 +351,22 @@ const BlockedVendors = ({ selectedCategory, onCategoryChange }) => {
     <div className="vendor-details-page-body">
 
       <div className="sub-vender-details-counts">
-        <div className="sub-vender-details-count-box">
+        {/* <div className="sub-vender-details-count-box">
           <p className="heading">Total</p>
           <p className="count">{totalVendors || 0}</p>
-        </div>
+        </div> */}
       </div>
 
-      <div className="d-flex justify-content-between align-items-center flex-wrap" style={{ marginTop: '20px' }}>
-        <h1 className="vendor-details-h1 page-main-head text-muted">Blocked vendors</h1>
+      <div className="d-flex justify-content-between align-items-center flex-wrap">
+        <div className="d-flex gap-3 items-center">
+          <h1 className="vendor-details-h1 page-main-head text-muted">Blocked Vendors</h1>
+          <p style={{
+            fontSize: '18px'
+          }}>|</p>
+          <p style={{
+            fontSize: '18px'
+          }} className="vendor-details-h1 text-muted">Total: <b>{totalVendors || 0}</b></p>
+        </div>
 
         <div className="d-flex align-items-center gap-4 mb-4" >
 
@@ -593,28 +601,28 @@ const BlockedVendors = ({ selectedCategory, onCategoryChange }) => {
                               padding: '5px 10px',
                               cursor: 'pointer',
                               whiteSpace: 'nowrap',
-                              fontStyle:'italic'
+                              fontStyle: 'italic'
                             }}
                           >
                             Unblock
                           </button>
                         </div>) : (
-                            <button
+                          <button
                             onClick={() => setOpenBlockModal(vendor.id)}
-                              style={{
-                                backgroundColor: '#000',
-                                color: 'white',
-                                border: '1px solid #000',
-                                borderRadius: '4px',
-                                margin: '0 5px',
-                                padding: '5px 10px',
-                                cursor: 'pointer',
-                                whiteSpace: 'nowrap'
-                              }}
-                            >
-                              Block
-                            </button>
-                          )}
+                            style={{
+                              backgroundColor: '#000',
+                              color: 'white',
+                              border: '1px solid #000',
+                              borderRadius: '4px',
+                              margin: '0 5px',
+                              padding: '5px 10px',
+                              cursor: 'pointer',
+                              whiteSpace: 'nowrap'
+                            }}
+                          >
+                            Block
+                          </button>
+                        )}
                       </td>
                       <td>{'QCKSRV000' + vendor.id || index + 1}</td>
 
