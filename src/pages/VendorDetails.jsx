@@ -16,6 +16,7 @@ const VendorDetails = ({ selectedCategory, onCategoryChange }) => {
   const [showViewModal, setShowViewModal] = useState(false);
   const [viewingVendor, setViewingVendor] = useState(null);
   const [totalVendors, setTotalVendors] = useState(0);
+  const [todayVendors, setTodayVendors] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
 
 
@@ -38,6 +39,7 @@ const VendorDetails = ({ selectedCategory, onCategoryChange }) => {
 
         // Set total counts for pagination
         setTotalVendors(response.data?.totalItems || data.length);
+        setTodayVendors(response.data?.todayCount || 0)
         setTotalPages(response.data?.totalPages || Math.ceil(data.length / vendorsPerPage));
       } catch (err) {
         console.error("Error fetching vendors:", err);
@@ -137,13 +139,55 @@ const VendorDetails = ({ selectedCategory, onCategoryChange }) => {
 
       setVendors(prev =>
         prev.map(v =>
-          v.id === vendorId ? { ...v, status: carnumber} : v
+          v.id === vendorId ? { ...v, status: carnumber } : v
         )
       );
 
       // Optional: You can refresh or update local state here if needed
       setRejected_message('')
       setOpenRejectModal(null)
+      alert("Vendor block/unblock status updated successfully!");
+    } catch (err) {
+      console.error("Error toggling vendor status:", err.response?.data || err.message);
+      alert("Failed to toggle vendor status. Please try again.");
+    }
+  };
+
+
+
+  const [blockedReason, setBlockedReason] = useState('')
+  const [openBlockModal, setOpenBlockModal] = useState(null);
+  const handleBlockToggle = async (vendorId, account_status) => {
+    try {
+      console.log("Toggling vendor block status:", {
+        vendorId,
+        account_status,
+        blockedReason
+      });
+
+
+
+      const response = await axios.post(
+        `https://quickcabpune.com/dev/api/vendorDetails/block-vendor`,
+        { account_status, block_reason: blockedReason, vendorId },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          }
+        }
+      );
+
+      console.log("Toggle Block Response:", response.data);
+
+      setVendors(prev =>
+        prev.map(v =>
+          v.id === vendorId ? { ...v, account_status } : v
+        )
+      );
+
+      // Optional: You can refresh or update local state here if needed
+      setBlockedReason('')
+      setOpenBlockModal(null)
       alert("Vendor block/unblock status updated successfully!");
     } catch (err) {
       console.error("Error toggling vendor status:", err.response?.data || err.message);
@@ -304,7 +348,19 @@ const VendorDetails = ({ selectedCategory, onCategoryChange }) => {
 
   return (
     <div className="vendor-details-page-body">
-      <div className="d-flex justify-content-between align-items-center flex-wrap">
+
+      <div className="sub-vender-details-counts">
+        <div className="sub-vender-details-count-box">
+          <p className="heading">Total</p>
+          <p className="count">{totalVendors || 0}</p>
+        </div>
+        <div className="sub-vender-details-count-box">
+          <p className="heading">Today Count</p>
+          <p className="count">{todayVendors || 0}</p>
+        </div>
+      </div>
+
+      <div className="d-flex justify-content-between align-items-center flex-wrap" style={{ marginTop: '20px' }}>
         <h1 className="vendor-details-h1 page-main-head text-muted">Vendor Details</h1>
 
         <div className="d-flex align-items-center gap-4 mb-4" >
@@ -527,6 +583,41 @@ const VendorDetails = ({ selectedCategory, onCategoryChange }) => {
                         >
                           <i className="fa-solid fa-trash"></i> Delete
                         </button>
+
+                        {vendor.account_status === 0 ? (<div className="d-flex align-items-center">
+                          <button
+                            onClick={() => handleBlockToggle(vendor.id, 1)}
+                            style={{
+                              backgroundColor: '#d3d2d2ff',
+                              color: '#000',
+                              border: '1px solid #000',
+                              borderRadius: '4px',
+                              margin: '0 5px',
+                              padding: '5px 10px',
+                              cursor: 'pointer',
+                              whiteSpace: 'nowrap',
+                              fontStyle:'italic'
+                            }}
+                          >
+                            Unblock
+                          </button>
+                        </div>) : (
+                            <button
+                            onClick={() => setOpenBlockModal(vendor.id)}
+                              style={{
+                                backgroundColor: '#000',
+                                color: 'white',
+                                border: '1px solid #000',
+                                borderRadius: '4px',
+                                margin: '0 5px',
+                                padding: '5px 10px',
+                                cursor: 'pointer',
+                                whiteSpace: 'nowrap'
+                              }}
+                            >
+                              Block
+                            </button>
+                          )}
                       </td>
                       <td>{'QCKSRV000' + vendor.id || index + 1}</td>
 
@@ -661,7 +752,7 @@ const VendorDetails = ({ selectedCategory, onCategoryChange }) => {
               <div className="modal-body">
 
                 <div className="col-12">
-                  <label className="form-label">Message <span style={{color:'red'}}>*</span></label>
+                  <label className="form-label">Message <span style={{ color: 'red' }}>*</span></label>
                   <textarea
                     className="form-control"
                     name="currentAddress"
@@ -677,6 +768,47 @@ const VendorDetails = ({ selectedCategory, onCategoryChange }) => {
                   type="button"
                   className="btn btn-secondary"
                   onClick={() => handleStatusToggle(openRejectModal, 2)}
+                >
+                  Send
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {openBlockModal && (
+        <div className="modal show d-block" tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
+          <div className="modal-dialog modal-lg">
+            <div className="modal-content shadow-lg border-0 rounded-3">
+              <div className="modal-header bg-primary text-white">
+                <h5 className="modal-title fw-bold">Block Vendor</h5>
+                <button
+                  type="button"
+                  className="btn-close"
+                  onClick={() => setOpenBlockModal(null)}
+                ></button>
+              </div>
+
+              <div className="modal-body">
+
+                <div className="col-12">
+                  <label className="form-label">Message <span style={{ color: 'red' }}>*</span></label>
+                  <textarea
+                    className="form-control"
+                    name="currentAddress"
+                    value={blockedReason}
+                    onChange={(event) => setBlockedReason(event.target.value)}
+                    rows="3"
+                  ></textarea>
+                </div>
+              </div>
+
+              <div className="modal-footer">
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={() => handleBlockToggle(openBlockModal, 0)}
                 >
                   Send
                 </button>

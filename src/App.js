@@ -41,6 +41,7 @@ import SubLayout from './components/subadmin/Layout/Layout';
 import ProtectedRoute from "./components/ProtectedRouteSub";
 import VendorDetailsSub from "./pages/VendorDetailsSub";
 import SubAdmins from "./pages/SubAdmins";
+import BlockedVendors from "./pages/BlockedVendors";
 
 // import Sidebar from "./components/Sidebar/Sidebarr";
 
@@ -70,6 +71,7 @@ function App() {
             <Route path="/subscriptions" element={<Subscriptions />} />
             <Route path="/leads" element={<ManageLeads />} />
             <Route path="/vendor-details" element={<VendorDetails />} />
+            <Route path="/blocked-vendors" element={<BlockedVendors />} />
             <Route path="/help-support" element={<HelpSupport />} />
             <Route path="/password-settings" element={<PasswordSettings />} />
             <Route path="/email-settings" element={<EmailSettings />} />

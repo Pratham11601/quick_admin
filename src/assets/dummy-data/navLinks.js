@@ -12,6 +12,11 @@ const navLinks = [
     display: "Vendor Details",
   },
   {
+    path: "/blocked-vendors",
+    icon: "ri-prohibited-line",
+    display: "Blocked Vendors",
+  },
+  {
     path: "/leads",
     icon: "ri-group-line",
     display: "Leads",

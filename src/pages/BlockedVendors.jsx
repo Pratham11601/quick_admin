@@ -1,56 +1,54 @@
 import React, { useState, useEffect } from "react";
-import "../styles/VendorDetailsSub.css";
+import "../styles/VendorDetails.css";
 import axios from "axios";
 import ReactPaginate from "react-paginate";
 
-const VendorDetailsSub = ({ selectedCategory, onCategoryChange }) => {
+const BlockedVendors = ({ selectedCategory, onCategoryChange }) => {
   const [vendors, setVendors] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [vendorsPerPage, setVendorsPerPage] = useState(50);
-  const API_BASE_URL = "https://quickcabpune.com/dev/api";
+  const API_BASE_URL = "https://quickcabpune.com/dev/api/";
   const [currentPage, setCurrentPage] = useState(0);
   const [editingVendor, setEditingVendor] = useState(null);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showViewModal, setShowViewModal] = useState(false);
   const [viewingVendor, setViewingVendor] = useState(null);
   const [totalVendors, setTotalVendors] = useState(0);
+  const [todayVendors, setTodayVendors] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
-  const [vendorStats, setVendorStats] = useState(null)
 
+
+  const fetchVendors = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.get("https://quickcabpune.com/dev/api/vendorDetails/get-blocked-vendor", {
+        params: {
+          page: currentPage + 1,
+          size: vendorsPerPage,
+          search: searchTerm,
+        },
+      });
+
+      console.log("Raw API response:", response.data);
+
+      const data = Array.isArray(response.data?.vendors) ? response.data.vendors : [];
+      setVendors(data);
+
+      // Set total counts for pagination
+      setTotalVendors(response.data?.totalItems || data.length);
+      setTodayVendors(response.data?.todayCount || 0)
+      setTotalPages(response.data?.totalPages || Math.ceil(data.length / vendorsPerPage));
+    } catch (err) {
+      console.error("Error fetching vendors:", err);
+      setError("Failed to load vendors.");
+      setVendors([]);
+    } finally {
+      setLoading(false);
+    }
+  };
   useEffect(() => {
-    const fetchVendors = async () => {
-      setLoading(true);
-      try {
-        const response = await axios.get("https://quickcabpune.com/dev/api/vendordetails/referred-vendors", {
-          params: {
-            page: currentPage + 1,
-            size: vendorsPerPage,
-            search: searchTerm,
-          },
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`,
-          }
-        });
-
-        console.log("Raw API response:", response.data);
-
-        const data = Array.isArray(response.data?.data) ? response.data.data : [];
-        setVendors(data);
-
-        // Set total counts for pagination
-        setTotalVendors(response.data?.totalItems || data.length);
-        setTotalPages(response.data?.totalPages || Math.ceil(data.length / vendorsPerPage));
-        setVendorStats(response.data?.stats || null);
-      } catch (err) {
-        console.error("Error fetching vendors:", err);
-        setError("Failed to load vendors.");
-        setVendors([]);
-      } finally {
-        setLoading(false);
-      }
-    };
 
     fetchVendors();
   }, [currentPage, vendorsPerPage, searchTerm]);
@@ -114,7 +112,6 @@ const VendorDetailsSub = ({ selectedCategory, onCategoryChange }) => {
     }
   };
 
-
   const [rejected_message, setRejected_message] = useState('')
 
   const [openRejectModal, setOpenRejectModal] = useState(null);
@@ -156,6 +153,49 @@ const VendorDetailsSub = ({ selectedCategory, onCategoryChange }) => {
     }
   };
 
+
+
+  const [blockedReason, setBlockedReason] = useState('')
+  const [openBlockModal, setOpenBlockModal] = useState(null);
+  const handleBlockToggle = async (vendorId, account_status) => {
+    try {
+      console.log("Toggling vendor block status:", {
+        vendorId,
+        account_status,
+        blockedReason
+      });
+
+
+
+      const response = await axios.post(
+        `https://quickcabpune.com/dev/api/vendorDetails/block-vendor`,
+        { account_status, block_reason: blockedReason, vendorId },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          }
+        }
+      );
+
+      console.log("Toggle Block Response:", response.data);
+      fetchVendors();
+
+      setVendors(prev =>
+        prev.map(v =>
+          v.id === vendorId ? { ...v, account_status } : v
+        )
+      );
+
+      // Optional: You can refresh or update local state here if needed
+      setBlockedReason('')
+      setOpenBlockModal(null)
+      alert("Vendor block/unblock status updated successfully!");
+    } catch (err) {
+      console.error("Error toggling vendor status:", err.response?.data || err.message);
+      alert("Failed to toggle vendor status. Please try again.");
+    }
+  };
+
   // const handleApproveVendor = async (vendorId) => {
   //   try {
   //     const response = await axios.put(
@@ -180,9 +220,10 @@ const VendorDetailsSub = ({ selectedCategory, onCategoryChange }) => {
   const handleView = (vendor) => {
     const viewVendor = {
       ...vendor,
-      profileImgUrl: vendor.profileImgUrl ? `${API_BASE_URL}/${vendor.profileImgUrl.replace(/^\/+/, '')}` : null,
-      documentImgUrl: vendor.documentImgUrl ? `${API_BASE_URL}/${vendor.documentImgUrl.replace(/^\/+/, '')}` : null,
-      licenseImgUrl: vendor.licenseImgUrl ? `${API_BASE_URL}/${vendor.licenseImgUrl.replace(/^\/+/, '')}` : null,
+      profileImgUrl: vendor.profileImgUrl ? `${API_BASE_URL}${vendor.profileImgUrl.replace(/^\/+/, '')}` : null,
+      documentImgUrl: vendor.documentImgUrl ? `${API_BASE_URL}${vendor.documentImgUrl.replace(/^\/+/, '')}` : null,
+      documentImgUrlBack: vendor.documentImgUrlBack ? `${API_BASE_URL}${vendor.documentImgUrlBack.replace(/^\/+/, '')}` : null,
+      licenseImgUrl: vendor.licenseImgUrl ? `${API_BASE_URL}${vendor.licenseImgUrl.replace(/^\/+/, '')}` : null,
       createdAt: vendor.createdAt || vendor.created_date || null
     };
 
@@ -308,22 +349,16 @@ const VendorDetailsSub = ({ selectedCategory, onCategoryChange }) => {
 
   return (
     <div className="vendor-details-page-body">
+
       <div className="sub-vender-details-counts">
         <div className="sub-vender-details-count-box">
           <p className="heading">Total</p>
-          <p className="count">{vendorStats?.totalCount || 0}</p>
-        </div>
-        <div className="sub-vender-details-count-box">
-          <p className="heading">Verified</p>
-          <p className="count">{vendorStats?.verifiedCount || 0}</p>
-        </div>
-        <div className="sub-vender-details-count-box">
-          <p className="heading">Not Verified</p>
-          <p className="count">{vendorStats?.notVerifiedCount || 0}</p>
+          <p className="count">{totalVendors || 0}</p>
         </div>
       </div>
-      <div className="d-flex justify-content-between align-items-center flex-wrap mt-4">
-        <h1 className="vendor-details-h1 page-main-head text-muted">Vendor Details</h1>
+
+      <div className="d-flex justify-content-between align-items-center flex-wrap" style={{ marginTop: '20px' }}>
+        <h1 className="vendor-details-h1 page-main-head text-muted">Blocked vendors</h1>
 
         <div className="d-flex align-items-center gap-4 mb-4" >
 
@@ -453,6 +488,22 @@ const VendorDetailsSub = ({ selectedCategory, onCategoryChange }) => {
                             </button>
                           )}
 
+                        {/* <button
+                          onClick={() => handleStatusToggle(vendor.id, vendor.status)}
+                          style={{
+                            backgroundColor: vendor.status === 1 ? '#f8d7da' : '#d4edda',
+                            color: vendor.status === 1 ? '#721c24' : '#155724',
+                            border: vendor.status === 1 ? '1px solid #f5c6cb' : '1px solid #c3e6cb',
+                            borderRadius: '4px',
+                            margin: '0 5px',
+                            padding: '5px 10px',
+                            cursor: 'pointer',
+                            whiteSpace: 'nowrap'
+                          }}
+                        >
+                          {vendor.status === 1 ? '🔴 Unverify' : '🟢 Verify'}
+                        </button> */}
+
                         <button
                           className="text-nowrap btn btn-success me-2"
                           onClick={() => handleWhatsApp(vendor.phone)}
@@ -514,7 +565,7 @@ const VendorDetailsSub = ({ selectedCategory, onCategoryChange }) => {
                           <i className="fa-solid fa-edit"></i> Edit
                         </button>
 
-                        {/* <button
+                        <button
                           className="text-nowrap"
                           onClick={() => handleDeleteVendor(vendor.id)}
                           style={{
@@ -528,7 +579,42 @@ const VendorDetailsSub = ({ selectedCategory, onCategoryChange }) => {
                           }}
                         >
                           <i className="fa-solid fa-trash"></i> Delete
-                        </button> */}
+                        </button>
+
+                        {vendor.account_status === 0 ? (<div className="d-flex align-items-center">
+                          <button
+                            onClick={() => handleBlockToggle(vendor.id, 1)}
+                            style={{
+                              backgroundColor: '#d3d2d2ff',
+                              color: '#000',
+                              border: '1px solid #000',
+                              borderRadius: '4px',
+                              margin: '0 5px',
+                              padding: '5px 10px',
+                              cursor: 'pointer',
+                              whiteSpace: 'nowrap',
+                              fontStyle:'italic'
+                            }}
+                          >
+                            Unblock
+                          </button>
+                        </div>) : (
+                            <button
+                            onClick={() => setOpenBlockModal(vendor.id)}
+                              style={{
+                                backgroundColor: '#000',
+                                color: 'white',
+                                border: '1px solid #000',
+                                borderRadius: '4px',
+                                margin: '0 5px',
+                                padding: '5px 10px',
+                                cursor: 'pointer',
+                                whiteSpace: 'nowrap'
+                              }}
+                            >
+                              Block
+                            </button>
+                          )}
                       </td>
                       <td>{'QCKSRV000' + vendor.id || index + 1}</td>
 
@@ -597,6 +683,7 @@ const VendorDetailsSub = ({ selectedCategory, onCategoryChange }) => {
                   {[
                     { label: "Profile Image", key: "profileImgUrl", defaultName: "profile" },
                     { label: "Document Image", key: "documentImgUrl", defaultName: "document" },
+                    { label: "Document Image Back", key: "documentImgUrlBack", defaultName: "document-back" },
                     { label: "License Image", key: "licenseImgUrl", defaultName: "license" },
                   ].map((image, index) => (
                     viewingVendor[image.key] && (
@@ -644,6 +731,8 @@ const VendorDetailsSub = ({ selectedCategory, onCategoryChange }) => {
         </div>
       )}
 
+
+
       {openRejectModal && (
         <div className="modal show d-block" tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
           <div className="modal-dialog modal-lg">
@@ -676,6 +765,47 @@ const VendorDetailsSub = ({ selectedCategory, onCategoryChange }) => {
                   type="button"
                   className="btn btn-secondary"
                   onClick={() => handleStatusToggle(openRejectModal, 2)}
+                >
+                  Send
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {openBlockModal && (
+        <div className="modal show d-block" tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
+          <div className="modal-dialog modal-lg">
+            <div className="modal-content shadow-lg border-0 rounded-3">
+              <div className="modal-header bg-primary text-white">
+                <h5 className="modal-title fw-bold">Block Vendor</h5>
+                <button
+                  type="button"
+                  className="btn-close"
+                  onClick={() => setOpenBlockModal(null)}
+                ></button>
+              </div>
+
+              <div className="modal-body">
+
+                <div className="col-12">
+                  <label className="form-label">Message <span style={{ color: 'red' }}>*</span></label>
+                  <textarea
+                    className="form-control"
+                    name="currentAddress"
+                    value={blockedReason}
+                    onChange={(event) => setBlockedReason(event.target.value)}
+                    rows="3"
+                  ></textarea>
+                </div>
+              </div>
+
+              <div className="modal-footer">
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={() => handleBlockToggle(openBlockModal, 0)}
                 >
                   Send
                 </button>
@@ -882,4 +1012,4 @@ const VendorDetailsSub = ({ selectedCategory, onCategoryChange }) => {
   );
 };
 
-export default VendorDetailsSub;
+export default BlockedVendors;
