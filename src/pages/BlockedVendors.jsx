@@ -409,6 +409,7 @@ const BlockedVendors = ({ selectedCategory, onCategoryChange }) => {
               <thead>
                 <tr>
                   <th>Actions</th>
+                  <th style={{width:'500px'}}>Blocked Reason</th>
                   <th>Sr. No.</th>
                   <th>Full Name</th>
                   <th>Category</th>
@@ -624,6 +625,7 @@ const BlockedVendors = ({ selectedCategory, onCategoryChange }) => {
                           </button>
                         )}
                       </td>
+                      <td style={{width:'500px'}}><p style={{width:'200px'}}>{vendor.block_reason}</p></td>
                       <td>{'QCKSRV000' + vendor.id || index + 1}</td>
 
                       <td>{vendor.fullname || "N/A"}</td>
