@@ -24,7 +24,7 @@ const VendorDetails = ({ selectedCategory, onCategoryChange }) => {
     const fetchVendors = async () => {
       setLoading(true);
       try {
-        const response = await axios.get("https://quickcabpune.com/dev/api/vendorDetails/get-all-vendors", {
+        const response = await axios.get(`${API_BASE_URL}vendorDetails/get-all-vendors`, {
           params: {
             page: currentPage + 1,
             size: vendorsPerPage,
@@ -249,28 +249,32 @@ const VendorDetails = ({ selectedCategory, onCategoryChange }) => {
   };
 
   const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setEditingVendor(prev => ({
+    const { name, value, type, files } = e.target;
+
+    setEditingVendor((prev) => ({
       ...prev,
-      [name]: value
+      [name]: type === "file" ? files[0] : value, // if file input, store file object
     }));
   };
 
   const handleSaveEdit = async () => {
     try {
-      const cleanedData = Object.fromEntries(
-        Object.entries(editingVendor).filter(([_, value]) => value != null)
-      );
+      const formData = new FormData();
 
-      console.log('Sending update request:', cleanedData);
+      // Append all keys dynamically
+      Object.entries(editingVendor).forEach(([key, value]) => {
+        if (value !== null && value !== undefined) {
+          formData.append(key, value);
+        }
+      });
 
-      // Use your localhost API here:
+
       const response = await axios.put(
         `https://quickcabpune.com/app/vendorDetails/edit/${editingVendor?.id}`,
-        cleanedData,
+        formData,
         {
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "multipart/form-data",
           },
         }
       );
@@ -278,21 +282,20 @@ const VendorDetails = ({ selectedCategory, onCategoryChange }) => {
       if (response.data) {
         // Update local vendor list state
         const updatedVendors = vendors.map(vendor =>
-          vendor.id === editingVendor.id ? { ...vendor, ...cleanedData } : vendor
+          response.data?.vendor?.id === editingVendor.id ? { ...response.data.vendor } : vendor
         );
         setVendors(updatedVendors);
         setShowEditModal(false);
         setEditingVendor(null);
         alert("Vendor updated successfully!");
       } else {
-        throw new Error('No response data received');
+        throw new Error("No response data received");
       }
     } catch (err) {
       console.error("Error saving vendor updates:", err);
       alert(`Failed to save updates: ${err.response?.data?.message || err.message}`);
     }
   };
-
 
   // Format date safely
   const formatDate = (dateString) => {
@@ -364,17 +367,17 @@ const VendorDetails = ({ selectedCategory, onCategoryChange }) => {
         <div className="d-flex gap-3 items-center">
           <h1 className="vendor-details-h1 page-main-head text-muted">Vendor Details</h1>
           <p style={{
-            fontSize:'18px'
+            fontSize: '18px'
           }}>|</p>
           <p style={{
-            fontSize:'18px'
+            fontSize: '18px'
           }} className="vendor-details-h1 text-muted">Total: <b>{totalVendors || 0}</b></p>
           <p style={{
-            fontSize:'18px'
+            fontSize: '18px'
           }}>|</p>
 
           <p style={{
-            fontSize:'18px'
+            fontSize: '18px'
           }} className="vendor-details-h1 text-muted">Today Count: <b>{todayVendors || 0}</b></p>
         </div>
 
@@ -611,28 +614,28 @@ const VendorDetails = ({ selectedCategory, onCategoryChange }) => {
                               padding: '5px 10px',
                               cursor: 'pointer',
                               whiteSpace: 'nowrap',
-                              fontStyle:'italic'
+                              fontStyle: 'italic'
                             }}
                           >
                             Unblock
                           </button>
                         </div>) : (
-                            <button
+                          <button
                             onClick={() => setOpenBlockModal(vendor.id)}
-                              style={{
-                                backgroundColor: '#000',
-                                color: 'white',
-                                border: '1px solid #000',
-                                borderRadius: '4px',
-                                margin: '0 5px',
-                                padding: '5px 10px',
-                                cursor: 'pointer',
-                                whiteSpace: 'nowrap'
-                              }}
-                            >
-                              Block
-                            </button>
-                          )}
+                            style={{
+                              backgroundColor: '#000',
+                              color: 'white',
+                              border: '1px solid #000',
+                              borderRadius: '4px',
+                              margin: '0 5px',
+                              padding: '5px 10px',
+                              cursor: 'pointer',
+                              whiteSpace: 'nowrap'
+                            }}
+                          >
+                            Block
+                          </button>
+                        )}
                       </td>
                       <td>{'QCKSRV000' + vendor.id || index + 1}</td>
 
@@ -1003,6 +1006,53 @@ const VendorDetails = ({ selectedCategory, onCategoryChange }) => {
                       onChange={handleInputChange}
                       disabled={true}
                     />
+                  </div>
+
+                  <div className="col-md-6 justify-start">
+                    <label className="form-label">Profile Image</label>
+                    <input
+                      type="file"
+                      className="form-control"
+                      name="profileImgUrl"
+                      // value={editingVendor.profileImgUrl.name ?  : ''}
+                      onChange={handleInputChange}
+                    />
+                    <a style={{ fontSize: '12px', color: 'blue', textAlign: 'left' }} href={`${API_BASE_URL}${editingVendor.profileImgUrl}`} target="_blank" rel="noopener noreferrer">View Profile Image</a>
+                  </div>
+
+                  <div className="col-md-6">
+                    <label className="form-label">Document Image</label>
+                    <input
+                      type="file"
+                      className="form-control"
+                      name="documentImage"
+                      // value={editingVendor.subscriptionPlan || ''}
+                      onChange={handleInputChange}
+                    />
+                    <a style={{ fontSize: '12px', color: 'blue', textAlign: 'left' }} href={`${API_BASE_URL}${editingVendor.documentImgUrl}`} target="_blank" rel="noopener noreferrer">View Document Image</a>
+                  </div>
+
+                  <div className="col-md-6">
+                    <label className="form-label">Document Image Back</label>
+                    <input
+                      type="file"
+                      className="form-control"
+                      name="documentImageBack"
+                      // value={editingVendor.subscription_date ? editingVendor.subscription_date.split('T')[0] : ''}
+                      onChange={handleInputChange}
+                    />
+                    <a style={{ fontSize: '12px', color: 'blue', textAlign: 'left' }} href={`${API_BASE_URL}${editingVendor.documentImgUrlBack}`} target="_blank" rel="noopener noreferrer">View Document Image Back</a>
+                  </div>
+                  <div className="col-md-6">
+                    <label className="form-label">License Image</label>
+                    <input
+                      type="file"
+                      className="form-control"
+                      name="licenseImage"
+                      // value={editingVendor.subscriptionPlan || ''}
+                      onChange={handleInputChange}
+                    />
+                    <a style={{ fontSize: '12px', color: 'blue', textAlign: 'left' }} href={`${API_BASE_URL}${editingVendor.licenseImgUrl}`} target="_blank" rel="noopener noreferrer">View License Image</a>
                   </div>
                 </form>
               </div>
