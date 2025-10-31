@@ -20,35 +20,35 @@ const VendorDetails = ({ selectedCategory, onCategoryChange }) => {
   const [totalPages, setTotalPages] = useState(0);
 
 
+  const fetchVendors = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.get(`${API_BASE_URL}vendorDetails/get-all-vendors`, {
+        params: {
+          page: currentPage + 1,
+          size: vendorsPerPage,
+          search: searchTerm,
+        },
+      });
+
+      console.log("Raw API response:", response.data);
+
+      const data = Array.isArray(response.data?.vendors) ? response.data.vendors : [];
+      setVendors(data);
+
+      // Set total counts for pagination
+      setTotalVendors(response.data?.total || data.length);
+      setTodayVendors(response.data?.todayCount || 0)
+      setTotalPages(response.data?.totalPages || Math.ceil(data.length / vendorsPerPage));
+    } catch (err) {
+      console.error("Error fetching vendors:", err);
+      setError("Failed to load vendors.");
+      setVendors([]);
+    } finally {
+      setLoading(false);
+    }
+  };
   useEffect(() => {
-    const fetchVendors = async () => {
-      setLoading(true);
-      try {
-        const response = await axios.get(`${API_BASE_URL}vendorDetails/get-all-vendors`, {
-          params: {
-            page: currentPage + 1,
-            size: vendorsPerPage,
-            search: searchTerm,
-          },
-        });
-
-        console.log("Raw API response:", response.data);
-
-        const data = Array.isArray(response.data?.vendors) ? response.data.vendors : [];
-        setVendors(data);
-
-        // Set total counts for pagination
-        setTotalVendors(response.data?.total || data.length);
-        setTodayVendors(response.data?.todayCount || 0)
-        setTotalPages(response.data?.totalPages || Math.ceil(data.length / vendorsPerPage));
-      } catch (err) {
-        console.error("Error fetching vendors:", err);
-        setError("Failed to load vendors.");
-        setVendors([]);
-      } finally {
-        setLoading(false);
-      }
-    };
 
     fetchVendors();
   }, [currentPage, vendorsPerPage, searchTerm]);
@@ -270,7 +270,7 @@ const VendorDetails = ({ selectedCategory, onCategoryChange }) => {
 
 
       const response = await axios.put(
-        `https://quickcabpune.com/app/vendorDetails/edit/${editingVendor?.id}`,
+        `${API_BASE_URL}vendorDetails/edit/${editingVendor?.id}`,
         formData,
         {
           headers: {
@@ -281,10 +281,11 @@ const VendorDetails = ({ selectedCategory, onCategoryChange }) => {
 
       if (response.data) {
         // Update local vendor list state
-        const updatedVendors = vendors.map(vendor =>
-          response.data?.vendor?.id === editingVendor.id ? { ...response.data.vendor } : vendor
-        );
-        setVendors(updatedVendors);
+        // const updatedVendors = vendors.map(vendor =>
+        //   response.data?.vendor?.id === editingVendor.id ? { ...vendor, ...response.data.vendor } : vendor
+        // );
+        fetchVendors();
+        // setVendors(updatedVendors);
         setShowEditModal(false);
         setEditingVendor(null);
         alert("Vendor updated successfully!");
