@@ -6,7 +6,7 @@ import ReactPaginate from "react-paginate";
 const VendorDetails = ({ selectedCategory, onCategoryChange }) => {
   const [vendors, setVendors] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [vendorsPerPage, setVendorsPerPage] = useState(50);
   const API_BASE_URL = "https://quickcabpune.com/dev/api/";
@@ -259,6 +259,7 @@ const VendorDetails = ({ selectedCategory, onCategoryChange }) => {
 
   const handleSaveEdit = async () => {
     try {
+      setLoading(true)
       const formData = new FormData();
 
       // Append all keys dynamically
@@ -295,6 +296,8 @@ const VendorDetails = ({ selectedCategory, onCategoryChange }) => {
     } catch (err) {
       console.error("Error saving vendor updates:", err);
       alert(`Failed to save updates: ${err.response?.data?.message || err.message}`);
+    } finally {
+      setLoading(false)
     }
   };
 
@@ -1067,6 +1070,7 @@ const VendorDetails = ({ selectedCategory, onCategoryChange }) => {
                 </button>
                 <button
                   type="button"
+                  disabled={loading}
                   className="btn btn-primary"
                   onClick={handleSaveEdit}
                 >
