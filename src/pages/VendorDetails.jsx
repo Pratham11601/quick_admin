@@ -1049,7 +1049,7 @@ const VendorDetails = ({ selectedCategory, onCategoryChange }) => {
                     <input
                       type="file"
                       className="form-control"
-                      name="licenseImage"
+                      name="licenseImgUrl"
                       // value={editingVendor.subscriptionPlan || ''}
                       onChange={handleInputChange}
                     />
